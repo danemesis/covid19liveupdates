@@ -1,33 +1,51 @@
-const unirest = require("unirest");
+import {ApiCountrySituation, Situation} from "../models/covid";
+import axios, {AxiosResponse} from 'axios';
 
+const MILLISECONDS_IN_HOUR = 3600000;
 
-export function getData(): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-        const req = unirest("GET", "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats");
+let availableCountries = [];
+let cachedCountriesResponse: [number, Array<[string, Array<Situation>]>];
 
-        req.query({
-            "country": "Canada"
+function adaptCountry(country: string): string {
+    return country
+        .trim()
+        .toLocaleLowerCase()
+        .replace(' ', '_');
+}
+
+function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
+    return axios.get("https://pomber.github.io/covid19/timeseries.json")
+        .then((response: AxiosResponse): ApiCountrySituation => response.data)
+        .then((apiCountriesSituation: ApiCountrySituation) => {
+            const countriesSituation: Array<[string, Array<Situation>]> = Object.entries(apiCountriesSituation)
+                .map(([country, situations]) => [adaptCountry(country), situations]);
+
+            availableCountries = countriesSituation.map(([country]) => country);
+            cachedCountriesResponse = [Date.now(), countriesSituation];
+
+            return countriesSituation;
         });
+}
 
-        req.headers({
-            "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com",
-            "x-rapidapi-key": "f935b06f2bmsh9f32dd67a4382f7p1eafb9jsnaceb43c77417"
-        });
+export function getCountriesSituation(): Promise<Array<[string, Array<Situation>]>> {
+    const [lastFetchedTime, countriesSituation] = cachedCountriesResponse ?? [];
 
+    if (lastFetchedTime > Date.now() - MILLISECONDS_IN_HOUR) {
+        return Promise.resolve(countriesSituation);
+    }
 
-        req.end(function (res) {
-            res
-                .forEach((a) => {
-                    console.log('Result case', a, a.confirmed, a.deaths, a.recovered);
-                });
+    return getCovidData();
+}
 
-            console.log(res);
-            if (res.error) {
-                reject(new Error(res.error));
-            }
+export function getAvailableCountries(): Promise<Array<string>> {
+    if (!!availableCountries?.length) {
+        return Promise.resolve(availableCountries);
+    }
 
-            console.log(res.body);
-            return resolve(res.body);
-        });
-    })
+    return getCovidData()
+        .then((countriesSituation: Array<[string, Array<Situation>]>) =>
+            countriesSituation.map(
+                ([country]) => country
+            )
+        )
 }

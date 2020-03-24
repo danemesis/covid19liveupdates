@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', baseController.base);
 
 runTelegramBot(app);
-//
+
 // exec(`ngrok http ${port}`, function (error, stdout, stderr) {
 //     console.log(error, stdout, stderr);
 //     runTelegramBot(app);

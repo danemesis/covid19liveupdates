@@ -1,0 +1,1 @@
+export const REXEX_ALL_CODES = /\/([^\s]+)/;

@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv';
-import {getUserName} from "./utils/message";
-import {getData} from "../../api/covid19";
-import {getChatId} from "./utils/chat";
+import {countries} from "./text/countries";
+import {greetUser} from "./utils/message";
+import {showCountries, showCountry} from "./text/country";
+import {REXEX_ALL_CODES} from "../../models/constants";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -16,7 +17,7 @@ function runTelegramBot(app) {
 
     // This informs the Telegram servers of the new webhook.
     // TODO: MAKE IT AUTOMATICALLY
-    bot.setWebHook(`https://97d74d9f.ngrok.io/bot${token}`);
+    bot.setWebHook(`https://54daaf4a.ngrok.io/bot${token}`);
 
     // We are receiving updates at the route below!
     app.post(`/bot${token}`, (req, res) => {
@@ -25,52 +26,30 @@ function runTelegramBot(app) {
     });
 
     bot.onText(/\/start/, (msg) => {
-        bot.sendMessage(msg.chat.id, "Welcome", {
+        bot.sendMessage(msg.chat.id, `${greetUser(msg.from)}`, {
             "reply_markup": {
-                "keyboard": [["Get data for all countries"]]
+                "keyboard": [["Get data for all countries", "For specific country"]]
             }
         });
 
     });
 
-    bot.onText('Get data for all countries', (msg) => {
-        getData()
-            .then((data: Array<unknown>) => {
-                let totalDeath = 0;
-                let totalRecovered = 0;
+    bot.onText(/\/all/, (message) => countries(bot, message));
+    bot.onText(/Get data for all countries/g, (message) => countries(bot, message));
 
-                data
-                    .forEach(({confirmed, deaths, recovered}) => {
-                        totalDeath += deaths;
-                        totalRecovered += recovered;
-                    });
+    bot.onText(/\/countries/, (message) => showCountries(bot, message));
+    bot.onText(/For specific country/g, (message) => showCountries(bot, message));
 
-                bot.sendMessage(getChatId(msg), `We've calculated total recovered: ${totalRecovered} and death: ${totalDeath}`);
-            })
+    bot.onText(/\/country/, (message, match) => showCountry(bot, message, match));
 
+    // ALL CODES
+    bot.onText(REXEX_ALL_CODES, (message, match) => {
+        console.log('REXEX_ALL_CODES'. match, message);
     });
 
-// Matches "/echo [whatever]"
-    bot.onText(/\/echo (.+)/, (msg, match) => {
-        // 'msg' is the received Message from Telegram
-        // 'match' is the result of executing the regexp above on the text content
-        // of the message
-
-        const chatId = msg.chat.id;
-        const resp = match[1]; // the captured "whatever"
-
-        // send back the matched "whatever" to the chat
-        bot.sendMessage(chatId, resp);
-    });
-
-// Listen for any kind of message. There are different kinds of
-// messages.
-    bot.on('message', (message) => {
-        const chatId = message.chat.id;
-
-        // send a message to the chat acknowledging receipt of their message
-        bot.sendMessage(chatId, `Thank you for your message, ${getUserName(message.from)}. We're working on this bot to make it even better.`);
-    });
+    bot.on("polling_error", (err) => console.log('polling_error', err));
+    bot.on("webhook_error", (err) => console.log('webhook_error', err));
+    bot.on("error", (err) => console.log('error', err));
 }
 
 export {runTelegramBot};
