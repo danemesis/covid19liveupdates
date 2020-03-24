@@ -1,0 +1,10 @@
+# folders
+node_modules/
+dist/
+
+# ide & other stuff files
+.idea/
+.now/
+
+# environments files
+server/src/bots/telegram/.env
