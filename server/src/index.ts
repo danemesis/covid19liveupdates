@@ -17,10 +17,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', baseController.base);
 
-exec(`ngrok http ${port}`, function (error, stdout, stderr) {
-    console.log(error, stdout, stderr);
-    runTelegramBot(app);
-});
+runTelegramBot(app);
+//
+// exec(`ngrok http ${port}`, function (error, stdout, stderr) {
+//     console.log(error, stdout, stderr);
+//     runTelegramBot(app);
+// });
 
 app.listen(app.get('port'), () => {
     console.log(('App is running at http://localhost:%d in %s mode. This update inspect?'),

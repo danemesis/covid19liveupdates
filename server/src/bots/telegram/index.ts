@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv';
 import {getUserName} from "./utils/message";
+import {getData} from "../../api/covid19";
+import {getChatId} from "./utils/chat";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -13,7 +15,8 @@ function runTelegramBot(app) {
     const bot = new TelegramBot(token, {polling: true});
 
     // This informs the Telegram servers of the new webhook.
-    bot.setWebHook(`https://4310ca24.ngrok.io/bot${token}`);
+    // TODO: MAKE IT AUTOMATICALLY
+    bot.setWebHook(`https://97d74d9f.ngrok.io/bot${token}`);
 
     // We are receiving updates at the route below!
     app.post(`/bot${token}`, (req, res) => {
@@ -24,9 +27,26 @@ function runTelegramBot(app) {
     bot.onText(/\/start/, (msg) => {
         bot.sendMessage(msg.chat.id, "Welcome", {
             "reply_markup": {
-                "keyboard": [["Sample text", "Second sample"], ["Keyboard"], ["I'm robot"]]
+                "keyboard": [["Get data for all countries"]]
             }
         });
+
+    });
+
+    bot.onText('Get data for all countries', (msg) => {
+        getData()
+            .then((data: Array<unknown>) => {
+                let totalDeath = 0;
+                let totalRecovered = 0;
+
+                data
+                    .forEach(({confirmed, deaths, recovered}) => {
+                        totalDeath += deaths;
+                        totalRecovered += recovered;
+                    });
+
+                bot.sendMessage(getChatId(msg), `We've calculated total recovered: ${totalRecovered} and death: ${totalDeath}`);
+            })
 
     });
 
@@ -46,11 +66,10 @@ function runTelegramBot(app) {
 // Listen for any kind of message. There are different kinds of
 // messages.
     bot.on('message', (message) => {
-        console.log(message);
         const chatId = message.chat.id;
 
         // send a message to the chat acknowledging receipt of their message
-        bot.sendMessage(chatId, `Дякую за повідомлення, ${getUserName(message.from)}. Ми працюємо над нашим ботом, чекайте на оновлення.`);
+        bot.sendMessage(chatId, `Thank you for your message, ${getUserName(message.from)}. We're working on this bot to make it even better.`);
     });
 }
 

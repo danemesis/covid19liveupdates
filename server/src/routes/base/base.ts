@@ -4,7 +4,7 @@ let pkg = require(__dirname + '/../../../../package.json');
 
 export let base = (req: Request, res: Response) => {
     res.json({
-        message: 'Welcome to API sekeleton. Browser doesn\'t update',
+        message: 'Welcome to API.',
         version: pkg.version || 'Unkown',
     });
 };

@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch",
+    "build": "webpack --config webpack.config.js",
+    "start": "npm run build && node ./dist/server.js",
+    "start:watch": "ts-node-dev --respawn --transpileOnly server/src/index.ts",
+    "start:inspect": "ts-node-dev --inspect --respawn --transpileOnly server/src/index.ts"
   },
   "keywords": [
     "covid19",
@@ -37,6 +42,7 @@
     "ts-loader": "^6.2.1",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.8.3",
+    "unirest": "^0.6.0",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
   }

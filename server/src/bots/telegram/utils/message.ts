@@ -1,9 +1,9 @@
 const getUserName = ({first_name, last_name, username}): string => {
-    return first_name ?? last_name ?? username ?? 'Друже';
+    return first_name ?? last_name ?? username ?? 'friend';
 };
 
 const greetUser = (from): string => {
-    return `Привіт ${getUserName(from)}`;
+    return `Hi, ${getUserName(from)}`;
 };
 
 export {
