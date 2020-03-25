@@ -5,6 +5,14 @@ bot for covid19 live updates in Telegram messanger
 #### Telegram chat bot: https://github.com/yagop/node-telegram-bot-api
 #### Data maining: https://github.com/pomber/covid19 
 
+
+## Run
+
+##### Add Telegram bot API key
+1. Receive from BotFather Key
+2. Add to the project, <a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/bots/telegram'>More about it</a>
+
+##### Setup secure connection, e.g. 
 1. ngrok http 3000
 2. find https proxy 
 3. copy it 
