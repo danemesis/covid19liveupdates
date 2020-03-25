@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import {countries} from "./text/countries";
 import {greetUser} from "./utils/userMessage";
 import {showCountries, showCountry} from "./text/country";
-import {REXEX_ALL_CODES} from "../../models/constants";
+import {REXEX_ALL_CODES, UserMessages} from "../../models/constants";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -28,23 +28,25 @@ function runTelegramBot(app) {
     bot.onText(/\/start/, (msg) => {
         bot.sendMessage(msg.chat.id, `${greetUser(msg.from)}`, {
             "reply_markup": {
-                "keyboard": [["Get data for all countries", "For specific country"]]
+                "keyboard": [[UserMessages.AllCountries, UserMessages.CountryByName]]
             }
         });
 
     });
 
+    const allCountriesRegExp = new RegExp(UserMessages.AllCountries, 'g');
     bot.onText(/\/all/, (message) => countries(bot, message));
-    bot.onText(/Get data for all countries/g, (message) => countries(bot, message));
+    bot.onText(allCountriesRegExp, (message) => countries(bot, message));
 
+    const byCountryNameRegExp = new RegExp(UserMessages.CountryByName, 'g');
     bot.onText(/\/countries/, (message) => showCountries(bot, message));
-    bot.onText(/For specific country/g, (message) => showCountries(bot, message));
+    bot.onText(byCountryNameRegExp, (message) => showCountries(bot, message));
 
     bot.onText(/\/country/, (message, match) => showCountry(bot, message, match));
 
     // ALL CODES
     bot.onText(REXEX_ALL_CODES, (message, match) => {
-        console.log('REXEX_ALL_CODES'. match, message);
+        console.log('REXEX_ALL_CODES'.match, message);
     });
 
     bot.on("polling_error", (err) => console.log('polling_error', err));

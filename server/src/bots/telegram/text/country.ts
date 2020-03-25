@@ -3,7 +3,7 @@ import {getAvailableCountries, getCountriesSituation} from "../../../api/covid19
 import {Situation} from "../../../models/covid";
 import {getMessageForCountry} from "../utils/covid19";
 
-const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative;)';
+const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
 
 export const showCountries = (bot, message) => {
     getAvailableCountries()
