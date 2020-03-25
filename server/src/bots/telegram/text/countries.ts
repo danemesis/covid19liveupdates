@@ -1,6 +1,7 @@
 import {getCountriesSituation} from "../../../api/covid19";
-import {ApiCountrySituation, OverallCountrySituationResponse, Situation} from "../../../models/covid";
+import {OverallCountrySituationResponse, Situation} from "../../../models/covid";
 import {getChatId} from "../utils/chat";
+import {getMessageForCountry} from "../utils/covid19";
 
 export const countries = (bot, message) => {
     getCountriesSituation()
@@ -29,7 +30,7 @@ export const countries = (bot, message) => {
                     worldTotalDeaths += totalDeaths;
 
                     countriesResult.push({
-                        date: situations[0].date,
+                        date: situations[situations.length - 1].date,
                         countryName,
                         totalConfirmed,
                         totalDeaths,
@@ -54,7 +55,7 @@ export const countries = (bot, message) => {
 
                     portionMessage
                         .push(
-                            `${countryName} has ${totalConfirmed} confirmed cases, ${totalRecovered} recovered, ${totalDeaths} deaths. Last update time: ${date}`
+                            getMessageForCountry(countryName, totalConfirmed, totalRecovered, totalDeaths, date)
                         );
 
                     if (idx % portionSize === 0 || idx === countriesResult.length - 1) {

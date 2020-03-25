@@ -9,8 +9,8 @@ let cachedCountriesResponse: [number, Array<[string, Array<Situation>]>];
 function adaptCountry(country: string): string {
     return country
         .trim()
-        .toLocaleLowerCase()
-        .replace(' ', '_');
+        .toLocaleUpperCase()
+        // .replace(' ', '_');
 }
 
 function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
@@ -18,7 +18,17 @@ function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
         .then((response: AxiosResponse): ApiCountrySituation => response.data)
         .then((apiCountriesSituation: ApiCountrySituation) => {
             const countriesSituation: Array<[string, Array<Situation>]> = Object.entries(apiCountriesSituation)
-                .map(([country, situations]) => [adaptCountry(country), situations]);
+                .map(([country, situations]: [string, Array<Situation>]) =>
+                    [
+                        adaptCountry(country),
+                        situations.map((situation: Situation) => ({
+                            ...situation,
+                            recovered: situation.recovered ?? 0,
+                            deaths: situation.deaths ?? 0,
+                            confirmed: situation.confirmed ?? 0,
+                        }))
+                    ]
+                );
 
             availableCountries = countriesSituation.map(([country]) => country);
             cachedCountriesResponse = [Date.now(), countriesSituation];

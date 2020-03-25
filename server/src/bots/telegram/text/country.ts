@@ -1,8 +1,9 @@
 import {getChatId} from "../utils/chat";
 import {getAvailableCountries, getCountriesSituation} from "../../../api/covid19";
 import {Situation} from "../../../models/covid";
+import {getMessageForCountry} from "../utils/covid19";
 
-const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative; If there is <<space>>, then use <<_>> instead)';
+const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative;)';
 
 export const showCountries = (bot, message) => {
     getAvailableCountries()
@@ -17,10 +18,12 @@ export const showCountries = (bot, message) => {
         )
 };
 
-const getCountryFromMessage = (message): string => message.split(' ')[1];
+const getCountryFromMessage = (userTextCode): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
 
 export const showCountry = async (bot, message): Promise<void> => {
-    const requestedCountry: string = getCountryFromMessage(message.text);
+    const requestedCountry: string = getCountryFromMessage(message.text).toLocaleUpperCase();
+    console.log('requestedCountry', requestedCountry);
+
     const country = [...await getAvailableCountries()]
         .find(country => country === requestedCountry);
 
@@ -30,18 +33,21 @@ export const showCountry = async (bot, message): Promise<void> => {
     }
 
     const allCountries: Array<[string, Array<Situation>]> = await getCountriesSituation();
-    const countrySituation: Array<Situation> = allCountries
-        .find(([receivedCountry]) => receivedCountry === country)
-        .map(([country, situations]: [string, Array<Situation>]) => situations);
+    const foundCountrySituations: [string, Array<Situation>] = allCountries
+        .find(([receivedCountry, situations]) => receivedCountry === country);
 
-    console.log('countrySituation', countrySituation);
+    if (!foundCountrySituations?.length) {
+        bot.sendMessage(getChatId(message), `Cannot find data for ${requestedCountry}`);
+        return;
+    }
+
+    const [foundCountry, foundSituations] = foundCountrySituations;
 
     let totalRecovered = 0;
     let totalConfirmed = 0;
     let totalDeaths = 0;
 
-    countrySituation.forEach(({confirmed, deaths, recovered}: Situation) => {
-        console.log('recovered', recovered, confirmed, deaths);
+    foundSituations.forEach(({confirmed, deaths, recovered}: Situation) => {
         totalRecovered += recovered;
         totalConfirmed += confirmed;
         totalDeaths += deaths;
@@ -49,6 +55,6 @@ export const showCountry = async (bot, message): Promise<void> => {
 
     bot.sendMessage(
         getChatId(message),
-        `${country} has ${totalConfirmed} confirmed cases, ${totalRecovered} recovered, ${totalDeaths} deaths. Last update time: ${countrySituation[0].date}`
+        getMessageForCountry(foundCountry, totalConfirmed, totalRecovered, totalDeaths, foundSituations[foundSituations.length - 1].date)
     );
 };

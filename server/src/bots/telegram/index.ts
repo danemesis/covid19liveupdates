@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import {countries} from "./text/countries";
-import {greetUser} from "./utils/message";
+import {greetUser} from "./utils/userMessage";
 import {showCountries, showCountry} from "./text/country";
 import {REXEX_ALL_CODES} from "../../models/constants";
 
