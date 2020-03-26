@@ -1,7 +1,18 @@
 export const REXEX_ALL_CODES = /\/([^\s]+)/;
 
+export const countriesCode = '/countries';
+
+export enum UserRegExps {
+    All = '/countries',
+    Countries = '/available',
+    Country = '/country',
+    Advices = '/advices',
+    Help = '/help'
+}
+
 export enum UserMessages {
-    AllCountries = 'All countries',
-    CountryByName = 'By country name',
-    GetAdvicesHowToBehave = 'Get advices how to ...'
+    AllCountries = 'Countries data',
+    CountriesAvailable = 'Countries available',
+    GetAdvicesHowToBehave = 'Get advices how to ...',
+    Help = 'What can you do?'
 }

@@ -2,8 +2,9 @@ import * as dotenv from 'dotenv';
 import {countries} from "./text/countries";
 import {greetUser} from "./utils/userMessage";
 import {showCountries, showCountry} from "./text/country";
-import {REXEX_ALL_CODES, UserMessages} from "../../models/constants";
+import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./text/advices";
+import {showHelpInfo} from "./text/help";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -33,8 +34,9 @@ function runTelegramBot(app) {
             {
                 "reply_markup": {
                     "keyboard": [
-                        [UserMessages.AllCountries, UserMessages.CountryByName],
+                        [UserMessages.AllCountries, UserMessages.CountriesAvailable],
                         [UserMessages.GetAdvicesHowToBehave],
+                        [UserMessages.Help]
                     ]
                 }
             }
@@ -42,18 +44,34 @@ function runTelegramBot(app) {
 
     });
 
-    const allCountriesRegExp = new RegExp(UserMessages.AllCountries, 'g');
-    bot.onText(/\/all/, (message) => countries(bot, message));
+    // 1
+    const allCountriesMessageRegExp = new RegExp(UserMessages.AllCountries, 'g');
+    const allCountriesRegExp = new RegExp(UserRegExps.All);
     bot.onText(allCountriesRegExp, (message) => countries(bot, message));
+    bot.onText(allCountriesMessageRegExp, (message) => countries(bot, message));
 
-    const byCountryNameRegExp = new RegExp(UserMessages.CountryByName, 'g');
-    bot.onText(/\/countries/, (message) => showCountries(bot, message));
-    bot.onText(byCountryNameRegExp, (message) => showCountries(bot, message));
+    // 2
+    const byCountryNamesMessageRegExp = new RegExp(UserMessages.CountriesAvailable, 'g');
+    const byCountryNamesRegExp = new RegExp(UserRegExps.Countries);
+    bot.onText(byCountryNamesRegExp, (message) => showCountries(bot, message));
+    bot.onText(byCountryNamesMessageRegExp, (message) => showCountries(bot, message));
 
-    bot.onText(/\/country/, (message, match) => showCountry(bot, message, match));
+    // 3
+    const countryRegExp = new RegExp(UserRegExps.Country);
+    bot.onText(countryRegExp, (message, match) => showCountry(bot, message, match));
 
-    const getAdvicesHowToBehaveRegExp = new RegExp(UserMessages.GetAdvicesHowToBehave, 'g');
+
+    // 4
+    const getAdvicesHowToBehaveMessageRegExp = new RegExp(UserMessages.GetAdvicesHowToBehave, 'g');
+    const getAdvicesHowToBehaveRegExp = new RegExp(UserRegExps.Advices);
+    bot.onText(getAdvicesHowToBehaveMessageRegExp, (message) => showAdvicesHowToBehave(bot, message));
     bot.onText(getAdvicesHowToBehaveRegExp, (message) => showAdvicesHowToBehave(bot, message));
+
+    // 5
+    const helpMessageRegExp = new RegExp(UserMessages.Help, 'g');
+    const helpRegExp = new RegExp(UserRegExps.Help);
+    bot.onText(helpMessageRegExp, (message) => showHelpInfo(bot, message));
+    bot.onText(helpRegExp, (message) => showHelpInfo(bot, message));
 
     // ALL CODES
     bot.onText(REXEX_ALL_CODES, (message, match) => {

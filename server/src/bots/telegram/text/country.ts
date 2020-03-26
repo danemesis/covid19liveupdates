@@ -13,7 +13,7 @@ export const showCountries = (bot, message) => {
         .then((countries: Array<string>) => {
                 bot.sendMessage(
                     getChatId(message),
-                    `Available ${countries.length} countries. \n\n`
+                    `Available for ${countries.length} countries. \n\n`
                         .concat(countries.join('; '))
                         .concat(`\n\n${EXPLANATION_MESSAGE}, \n\ni.e. /country ${countries[0]}`)
                 );
