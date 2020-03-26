@@ -2,11 +2,14 @@ import {getChatId} from "../utils/chat";
 import {getAvailableCountries, getCountriesSituation} from "../../../api/covid19";
 import {Situation} from "../../../models/covid";
 import {getMessageForCountry} from "../utils/covid19";
+import {getCountryNameFormat} from "../utils/country";
+import {UpperCaseString} from "../../../models/tsTypes";
 
 const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
 
 export const showCountries = (bot, message) => {
     getAvailableCountries()
+        .then((countries: Array<UpperCaseString>) => countries.map(getCountryNameFormat))
         .then((countries: Array<string>) => {
                 bot.sendMessage(
                     getChatId(message),
@@ -22,13 +25,14 @@ const getCountryFromMessage = (userTextCode): string => userTextCode.slice(userT
 
 export const showCountry = async (bot, message): Promise<void> => {
     const requestedCountry: string = getCountryFromMessage(message.text).toLocaleUpperCase();
-    console.log('requestedCountry', requestedCountry);
-
     const country = [...await getAvailableCountries()]
         .find(country => country === requestedCountry);
 
     if (!country) {
-        bot.sendMessage(getChatId(message), `Cannot find data for ${requestedCountry}`);
+        bot.sendMessage(
+            getChatId(message),
+            `Cannot find data for ${getCountryNameFormat(requestedCountry)}`
+        );
         return;
     }
 
@@ -37,7 +41,10 @@ export const showCountry = async (bot, message): Promise<void> => {
         .find(([receivedCountry, situations]) => receivedCountry === country);
 
     if (!foundCountrySituations?.length) {
-        bot.sendMessage(getChatId(message), `Cannot find data for ${requestedCountry}`);
+        bot.sendMessage(
+            getChatId(message),
+            `Cannot find data for ${getCountryNameFormat(requestedCountry)}`
+        );
         return;
     }
 
@@ -47,7 +54,7 @@ export const showCountry = async (bot, message): Promise<void> => {
     let totalConfirmed = 0;
     let totalDeaths = 0;
 
-    foundSituations.forEach(({confirmed, deaths, recovered}: Situation) => {
+    [foundSituations[foundSituations.length - 1]].forEach(({confirmed, deaths, recovered}: Situation) => {
         totalRecovered += recovered;
         totalConfirmed += confirmed;
         totalDeaths += deaths;
@@ -55,6 +62,12 @@ export const showCountry = async (bot, message): Promise<void> => {
 
     bot.sendMessage(
         getChatId(message),
-        getMessageForCountry(foundCountry, totalConfirmed, totalRecovered, totalDeaths, foundSituations[foundSituations.length - 1].date)
+        getMessageForCountry(
+            getCountryNameFormat(foundCountry),
+            totalConfirmed,
+            totalRecovered,
+            totalDeaths,
+            foundSituations[foundSituations.length - 1].date
+        )
     );
 };

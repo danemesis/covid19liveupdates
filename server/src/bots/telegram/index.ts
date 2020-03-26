@@ -3,6 +3,7 @@ import {countries} from "./text/countries";
 import {greetUser} from "./utils/userMessage";
 import {showCountries, showCountry} from "./text/country";
 import {REXEX_ALL_CODES, UserMessages} from "../../models/constants";
+import {showAdvicesHowToBehave} from "./text/advices";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -26,11 +27,18 @@ function runTelegramBot(app) {
     });
 
     bot.onText(/\/start/, (msg) => {
-        bot.sendMessage(msg.chat.id, `${greetUser(msg.from)}`, {
-            "reply_markup": {
-                "keyboard": [[UserMessages.AllCountries, UserMessages.CountryByName]]
+        bot.sendMessage(
+            msg.chat.id,
+            `${greetUser(msg.from)}`,
+            {
+                "reply_markup": {
+                    "keyboard": [
+                        [UserMessages.AllCountries, UserMessages.CountryByName],
+                        [UserMessages.GetAdvicesHowToBehave],
+                    ]
+                }
             }
-        });
+        );
 
     });
 
@@ -43,6 +51,9 @@ function runTelegramBot(app) {
     bot.onText(byCountryNameRegExp, (message) => showCountries(bot, message));
 
     bot.onText(/\/country/, (message, match) => showCountry(bot, message, match));
+
+    const getAdvicesHowToBehaveRegExp = new RegExp(UserMessages.GetAdvicesHowToBehave, 'g');
+    bot.onText(getAdvicesHowToBehaveRegExp, (message) => showAdvicesHowToBehave(bot, message));
 
     // ALL CODES
     bot.onText(REXEX_ALL_CODES, (message, match) => {

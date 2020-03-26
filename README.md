@@ -2,8 +2,13 @@
 bot for covid19 live updates in Telegram messanger
 
 ## Main dependencies 
-#### Telegram chat bot: https://github.com/yagop/node-telegram-bot-api
-#### Data maining: https://github.com/pomber/covid19 
+##### Telegram chat bot: https://github.com/yagop/node-telegram-bot-api
+##### Data maining: https://github.com/pomber/covid19 
+
+#### Other
+<ul>
+ <li><a href="https://github.com/meeDamian/country-emoji">emoji</a></li>
+</ul>
 
 
 ## Run

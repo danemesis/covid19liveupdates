@@ -1,7 +1,8 @@
 import {getCountriesSituation} from "../../../api/covid19";
 import {OverallCountrySituationResponse, Situation} from "../../../models/covid";
 import {getChatId} from "../utils/chat";
-import {getMessageForCountry} from "../utils/covid19";
+import {getSimplifiedMessageForCountry} from "../utils/covid19";
+import {getCountryNameFormat} from "../utils/country";
 
 export const countries = (bot, message) => {
     getCountriesSituation()
@@ -19,7 +20,7 @@ export const countries = (bot, message) => {
                     let totalRecovered = 0;
                     let totalDeaths = 0;
 
-                    situations.forEach(({confirmed, deaths, recovered}: Situation) => {
+                    [situations[situations.length - 1]].forEach(({confirmed, deaths, recovered}: Situation) => {
                         totalRecovered += recovered;
                         totalConfirmed += confirmed;
                         totalDeaths += deaths;
@@ -40,11 +41,14 @@ export const countries = (bot, message) => {
 
             const portionSize: number = 40;
 
-            bot.sendMessage(getChatId(message), `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries based on last available information.`);
+            bot.sendMessage(
+                getChatId(message),
+                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
+            );
 
             let portionMessage = [];
             countriesResult
-                .forEach((countryResult, idx) => {
+                .forEach((countryResult: OverallCountrySituationResponse, idx: number) => {
                     const {
                         countryName,
                         date,
@@ -55,7 +59,13 @@ export const countries = (bot, message) => {
 
                     portionMessage
                         .push(
-                            getMessageForCountry(countryName, totalConfirmed, totalRecovered, totalDeaths, date)
+                            getSimplifiedMessageForCountry(
+                                getCountryNameFormat(countryName),
+                                totalConfirmed,
+                                totalRecovered,
+                                totalDeaths,
+                                date
+                            )
                         );
 
                     if (idx % portionSize === 0 || idx === countriesResult.length - 1) {

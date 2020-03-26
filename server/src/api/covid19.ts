@@ -1,16 +1,16 @@
 import {ApiCountrySituation, Situation} from "../models/covid";
 import axios, {AxiosResponse} from 'axios';
+import {UpperCaseString} from "../models/tsTypes";
 
 const MILLISECONDS_IN_HOUR = 3600000;
 
-let availableCountries = [];
+let availableCountries: Array<UpperCaseString> = [];
 let cachedCountriesResponse: [number, Array<[string, Array<Situation>]>];
 
-function adaptCountry(country: string): string {
+function adaptCountry(country: string): UpperCaseString {
     return country
         .trim()
-        .toLocaleUpperCase()
-        // .replace(' ', '_');
+        .toLocaleUpperCase();
 }
 
 function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
@@ -47,7 +47,7 @@ export function getCountriesSituation(): Promise<Array<[string, Array<Situation>
     return getCovidData();
 }
 
-export function getAvailableCountries(): Promise<Array<string>> {
+export function getAvailableCountries(): Promise<Array<UpperCaseString>> {
     if (!!availableCountries?.length) {
         return Promise.resolve(availableCountries);
     }

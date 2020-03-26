@@ -1,3 +1,5 @@
+import {UpperCaseString} from "./tsTypes";
+
 export interface ApiCountrySituation {
     [country: string]: Array<Situation>;
 }
@@ -11,7 +13,7 @@ export interface Situation {
 
 export interface OverallCountrySituationResponse {
     date: string;
-    countryName: string;
+    countryName: UpperCaseString;
     totalConfirmed: number;
     totalRecovered: number;
     totalDeaths: number;
