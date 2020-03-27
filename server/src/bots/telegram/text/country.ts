@@ -1,6 +1,6 @@
 import {getChatId} from "../utils/chat";
 import {getAvailableCountries, getCountriesSituation} from "../../../api/covid19";
-import {Situation} from "../../../models/covid";
+import {ApiSituation} from "../../../models/covid";
 import {getMessageForCountry} from "../utils/covid19";
 import {getCountryNameFormat} from "../utils/country";
 import {UpperCaseString} from "../../../models/tsTypes";
@@ -36,8 +36,8 @@ export const showCountry = async (bot, message): Promise<void> => {
         return;
     }
 
-    const allCountries: Array<[string, Array<Situation>]> = await getCountriesSituation();
-    const foundCountrySituations: [string, Array<Situation>] = allCountries
+    const allCountries: Array<[string, Array<ApiSituation>]> = await getCountriesSituation();
+    const foundCountrySituations: [string, Array<ApiSituation>] = allCountries
         .find(([receivedCountry, situations]) => receivedCountry === country);
 
     if (!foundCountrySituations?.length) {
@@ -54,7 +54,7 @@ export const showCountry = async (bot, message): Promise<void> => {
     let totalConfirmed = 0;
     let totalDeaths = 0;
 
-    [foundSituations[foundSituations.length - 1]].forEach(({confirmed, deaths, recovered}: Situation) => {
+    [foundSituations[foundSituations.length - 1]].forEach(({confirmed, deaths, recovered}: ApiSituation) => {
         totalRecovered += recovered;
         totalConfirmed += confirmed;
         totalDeaths += deaths;

@@ -1,33 +1,41 @@
-import {ApiCountrySituation, Situation} from "../models/covid";
+import {ApiCountrySituation, ApiSituation, CountrySituationInfo} from "../models/covid";
 import axios, {AxiosResponse} from 'axios';
 import {UpperCaseString} from "../models/tsTypes";
+import {Country} from "../models/country";
+import * as lookup from 'country-code-lookup';
 
 const MILLISECONDS_IN_HOUR = 3600000;
 
-let availableCountries: Array<UpperCaseString> = [];
-let cachedCountriesResponse: [number, Array<[string, Array<Situation>]>];
+let availableCountries: Array<Country> = [];
+let cachedCountriesResponse: [number, Array<CountrySituationInfo>];
 
-function adaptCountry(country: string): UpperCaseString {
+function adaptCountryToUpperCase(country: string): UpperCaseString {
     return country
         .trim()
         .toLocaleUpperCase();
 }
 
-function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
+function getCovidData(): Promise<Array<[string, Array<ApiSituation>]>> {
     return axios.get("https://pomber.github.io/covid19/timeseries.json")
         .then((response: AxiosResponse): ApiCountrySituation => response.data)
         .then((apiCountriesSituation: ApiCountrySituation) => {
-            const countriesSituation: Array<[string, Array<Situation>]> = Object.entries(apiCountriesSituation)
-                .map(([country, situations]: [string, Array<Situation>]) =>
-                    [
-                        adaptCountry(country),
-                        situations.map((situation: Situation) => ({
-                            ...situation,
-                            recovered: situation.recovered ?? 0,
-                            deaths: situation.deaths ?? 0,
-                            confirmed: situation.confirmed ?? 0,
-                        }))
-                    ]
+            const countriesSituation: Array<[string, Array<ApiSituation>]> = Object.entries(apiCountriesSituation)
+                .map(([apiCountry, situations]: [string, Array<ApiSituation>]) => {
+                    const upperCaseCountry: UpperCaseString = adaptCountryToUpperCase(apiCountry);
+                    const country: Country = {
+                        name: upperCaseCountry,
+                    }
+
+                    return [
+                            adaptCountryToUpperCase(country),
+                            situations.map((situation: ApiSituation) => ({
+                                ...situation,
+                                recovered: situation.recovered ?? 0,
+                                deaths: situation.deaths ?? 0,
+                                confirmed: situation.confirmed ?? 0,
+                            }))
+                        ]
+                    }
                 );
 
             availableCountries = countriesSituation.map(([country]) => country);
@@ -37,7 +45,7 @@ function getCovidData(): Promise<Array<[string, Array<Situation>]>> {
         });
 }
 
-export function getCountriesSituation(): Promise<Array<[string, Array<Situation>]>> {
+export function getCountriesSituation(): Promise<Array<[string, Array<ApiSituation>]>> {
     const [lastFetchedTime, countriesSituation] = cachedCountriesResponse ?? [];
 
     if (lastFetchedTime > Date.now() - MILLISECONDS_IN_HOUR) {
@@ -53,7 +61,7 @@ export function getAvailableCountries(): Promise<Array<UpperCaseString>> {
     }
 
     return getCovidData()
-        .then((countriesSituation: Array<[string, Array<Situation>]>) =>
+        .then((countriesSituation: Array<[string, Array<ApiSituation>]>) =>
             countriesSituation.map(
                 ([country]) => country
             )
