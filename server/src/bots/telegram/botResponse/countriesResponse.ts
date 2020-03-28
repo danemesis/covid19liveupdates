@@ -40,6 +40,11 @@ export const countriesResponse = (bot, message) => {
                     });
                 });
 
+            bot.sendMessage(
+                getChatId(message),
+                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
+            );
+
             const portionSize: number = 40;
             const tableConfig = {
                 columns: {
@@ -57,44 +62,41 @@ export const countriesResponse = (bot, message) => {
               };
 
             let portionMessage = [];
-            countriesResult
-                .forEach((countryResult: OverallCountrySituationResponse, idx: number) => {
-                    const {
-                        country,
-                        lastUpdateDate,
-                        totalConfirmed,
-                        totalRecovered,
-                        totalDeaths
-                    } = countryResult;
+            while(countriesResult.length > 0)
+            {
+                countriesResult
+                    .splice(0, portionSize)
+                    .forEach((countryResult: OverallCountrySituationResponse) => {
+                        const {
+                            country,
+                            lastUpdateDate,
+                            totalConfirmed,
+                            totalRecovered,
+                            totalDeaths
+                        } = countryResult;
 
-                    portionMessage
-                        .push(
-                            getSimplifiedMessageForCountry({
-                                countryName: country.name,
-                                totalConfirmed,
-                                totalRecovered,
-                                totalDeaths,
-                                lastUpdateDate
-                            })
-                        );
+                        portionMessage
+                            .push(
+                                getSimplifiedMessageForCountry({
+                                    countryName: country.name,
+                                    totalConfirmed,
+                                    totalRecovered,
+                                    totalDeaths,
+                                    lastUpdateDate
+                                })
+                            );
 
-                    if (idx % portionSize === 0 || idx === countriesResult.length - 1) {
-                        bot.sendMessage(
-                            getChatId(message),
-                            `<pre>
-                            ${table(portionMessage, tableConfig)}
-                            </pre>`
-                            ,
-                            { parse_mode: "HTML" }
-                        );
+                    });
 
-                        portionMessage = [];
-                    }
-                });
-
-            bot.sendMessage(
-                getChatId(message),
-                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
-            );
+                bot.sendMessage(
+                    getChatId(message),
+                    `<pre>
+                    ${table(portionMessage, tableConfig)}
+                    </pre>`
+                    ,
+                    { parse_mode: "HTML" }
+                );
+                portionMessage = [];
+            }
         });
 };
