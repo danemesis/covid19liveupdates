@@ -12,8 +12,10 @@ const codesExplanations = new Map([
 export const showHelpInfo = (bot, message) => {
     bot.sendMessage(
         getChatId(message),
-        Object.values(UserRegExps)
-            .map((code: string) => `${code} ${codesExplanations.get(code)}`)
-            .join('\n')
+        `Things I can do\n ${
+            Object.values(UserRegExps)
+                .map((code: string) => `${code} ${codesExplanations.get(code)}`)
+                .join('\n')
+        }`
     );
 };

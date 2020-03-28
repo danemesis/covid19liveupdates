@@ -27,10 +27,10 @@ function runTelegramBot(app) {
         res.sendStatus(200);
     });
 
-    bot.onText(/\/start/, (msg) => {
+    bot.onText(/\/start/, (message) => {
         bot.sendMessage(
-            msg.chat.id,
-            `${greetUser(msg.from)}`,
+            message.chat.id,
+            `${greetUser(message.from)} /n`,
             {
                 "reply_markup": {
                     "keyboard": [
@@ -42,6 +42,7 @@ function runTelegramBot(app) {
             }
         );
 
+        showHelpInfo(bot, message);
     });
 
     // 1
