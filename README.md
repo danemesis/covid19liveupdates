@@ -8,6 +8,7 @@ bot for covid19 live updates in Telegram messanger
 #### Other
 <ul>
  <li><a href="https://github.com/meeDamian/country-emoji">emoji</a></li>
+ <li><a href="https://github.com/richorama/country-code-lookup">Country lookup</a></li>
 </ul>
 
 

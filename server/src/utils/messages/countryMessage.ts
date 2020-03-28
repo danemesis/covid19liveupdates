@@ -1,0 +1,39 @@
+import {Country, CountryMessage} from "../../models/country";
+import {getCountriesByContinent} from "../../services/domain/countriesByContinent";
+import {getActiveCases} from "./covid19Messages";
+import {flag} from 'country-emoji';
+
+const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
+
+export const getShowCountriesMessage = (countries: Array<Country>): string => {
+    const availableFor: string = `Available for ${countries.length} countries.`;
+    const countriesList: string = Object.entries(getCountriesByContinent(countries))
+        .map(
+            ([continentName, countries]: [string, Array<string>]): string => `\n${continentName}, totally ${countries.length} countries\n`
+                .concat(countries.join('; '))
+        )
+        .join('\n');
+    const hint: string = `${EXPLANATION_MESSAGE}, \n\ni.e. /country ${countries[0].name}`;
+
+    return availableFor
+        .concat(`\n\n${countriesList}`)
+        .concat(`\n\n${hint}`)
+};
+
+export const getSimplifiedMessageForCountry = ({
+                                                   countryName,
+                                                   totalConfirmed,
+                                                   totalRecovered,
+                                                   totalDeaths,
+                                                   lastUpdateDate,
+                                               }: CountryMessage): string =>
+    `${flag(countryName)} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths, on ${lastUpdateDate}`;
+
+export const getMessageForCountry = ({
+                                         countryName,
+                                         totalConfirmed,
+                                         totalRecovered,
+                                         totalDeaths,
+                                         lastUpdateDate,
+                                     }: CountryMessage): string =>
+    `${flag(countryName)} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths. ⏱️${lastUpdateDate}`;

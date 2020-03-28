@@ -1,7 +1,15 @@
-import {UpperCaseString} from "./tsTypes";
+import {UserPresentationalCountryNameString} from "./tsTypes";
 
 export interface Country {
-    name: UpperCaseString;
+    name: UserPresentationalCountryNameString;
     region: string;
     continent: string;
+}
+
+export interface CountryMessage {
+    countryName: string;
+    totalConfirmed: number;
+    totalRecovered: number;
+    totalDeaths: number;
+    lastUpdateDate: string;
 }

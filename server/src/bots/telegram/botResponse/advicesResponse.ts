@@ -1,5 +1,5 @@
 import {getChatId} from "../utils/chat";
-import {alternativeGreetings, encouragingMessage, socialDistancing, suggestedBehaviors} from "../utils/userMessage";
+import {alternativeGreetings, encouragingMessage, socialDistancing, suggestedBehaviors} from "../../../utils/messages/userMessage";
 
 export const showAdvicesHowToBehave = (bot, message) => {
     bot.sendMessage(

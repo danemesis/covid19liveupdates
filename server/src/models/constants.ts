@@ -1,3 +1,7 @@
+export const TIMES = {
+    MILLISECONDS_IN_HOUR: 3600000,
+};
+
 export const REXEX_ALL_CODES = /\/([^\s]+)/;
 
 export const countriesCode = '/countries';

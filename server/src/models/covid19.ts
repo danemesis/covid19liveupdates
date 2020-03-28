@@ -1,21 +1,20 @@
-import {UpperCaseString} from "./tsTypes";
 import {Country} from "./country";
 
-export interface ApiCountrySituation {
-    [country: string]: Array<ApiSituation>;
+export interface ApiCountriesCovid19Situation {
+    [country: string]: Array<ApiCovid19Situation>;
 }
 
-export interface ApiSituation {
+export interface ApiCovid19Situation {
     date: string;
     confirmed: number;
     deaths: number;
     recovered: number;
 }
 
-export type CountrySituationInfo = Country & ApiSituation;
+export type CountrySituationInfo = Country & ApiCovid19Situation;
 
 export interface OverallCountrySituationResponse {
-    date: string;
+    lastUpdateDate: string;
     country: Country;
     totalConfirmed: number;
     totalRecovered: number;

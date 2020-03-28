@@ -1,21 +1,12 @@
-import {getCountriesSituation} from "../../../api/covid19";
-import {OverallCountrySituationResponse, ApiSituation} from "../../../models/covid";
+import {ApiCovid19Situation, CountrySituationInfo, OverallCountrySituationResponse} from "../../../models/covid19";
 import {getChatId} from "../utils/chat";
-import {getSimplifiedMessageForCountry} from "../utils/covid19";
-import {getCountryNameFormat} from "../utils/country";
-import * as lookup from 'country-code-lookup';
+import {getCountriesSituation} from "../../../services/domain/covid19";
+import {getSimplifiedMessageForCountry} from "../../../utils/messages/countryMessage";
+import {Country} from "../../../models/country";
 
-// const lookup = require('country-code-lookup');
-
-export const countries = (bot, message) => {
+export const countriesResponse = (bot, message) => {
     getCountriesSituation()
-        .then((countriesSituation: Array<[string, Array<ApiSituation>]>) => {
-            const Al = getCountryNameFormat(countriesSituation[0][0]);
-            console.log('lookup', lookup.countries.length, Al);
-            console.log('coun', lookup.byCountry(Al));
-            return countriesSituation;
-        })
-        .then((countriesSituation: Array<[string, Array<ApiSituation>]>) => {
+        .then((countriesSituation: Array<[Country, Array<CountrySituationInfo>]>) => {
             let worldTotalConfirmed = 0;
             let worldTotalRecovered = 0;
             let worldTotalDeaths = 0;
@@ -23,13 +14,13 @@ export const countries = (bot, message) => {
             const countriesResult: Array<OverallCountrySituationResponse> = [];
 
             countriesSituation
-                .forEach(([countryName, situations]: [string, Array<ApiSituation>]) => {
+                .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
 
                     let totalConfirmed = 0;
                     let totalRecovered = 0;
                     let totalDeaths = 0;
 
-                    [situations[situations.length - 1]].forEach(({confirmed, deaths, recovered}: ApiSituation) => {
+                    [situations[situations.length - 1]].forEach(({confirmed, deaths, recovered}: ApiCovid19Situation) => {
                         totalRecovered += recovered;
                         totalConfirmed += confirmed;
                         totalDeaths += deaths;
@@ -40,8 +31,8 @@ export const countries = (bot, message) => {
                     worldTotalDeaths += totalDeaths;
 
                     countriesResult.push({
-                        date: situations[situations.length - 1].date,
-                        countryName,
+                        lastUpdateDate: situations[situations.length - 1].date,
+                        country,
                         totalConfirmed,
                         totalDeaths,
                         totalRecovered
@@ -59,8 +50,8 @@ export const countries = (bot, message) => {
             countriesResult
                 .forEach((countryResult: OverallCountrySituationResponse, idx: number) => {
                     const {
-                        countryName,
-                        date,
+                        country,
+                        lastUpdateDate,
                         totalConfirmed,
                         totalRecovered,
                         totalDeaths
@@ -68,13 +59,13 @@ export const countries = (bot, message) => {
 
                     portionMessage
                         .push(
-                            getSimplifiedMessageForCountry(
-                                getCountryNameFormat(countryName),
+                            getSimplifiedMessageForCountry({
+                                countryName: country.name,
                                 totalConfirmed,
                                 totalRecovered,
                                 totalDeaths,
-                                date
-                            )
+                                lastUpdateDate
+                            })
                         );
 
                     if (idx % portionSize === 0 || idx === countriesResult.length - 1) {
