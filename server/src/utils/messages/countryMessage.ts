@@ -21,13 +21,13 @@ export const getShowCountriesMessage = (countries: Array<Country>): string => {
 };
 
 export const getSimplifiedMessageForCountry = ({
-                                                   countryName,
-                                                   totalConfirmed,
-                                                   totalRecovered,
-                                                   totalDeaths,
-                                                   lastUpdateDate,
-                                               }: CountryMessage): string =>
-    `${flag(countryName)} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths, on ${lastUpdateDate}`;
+        countryName,
+        totalConfirmed,
+        totalRecovered,
+        totalDeaths,
+        lastUpdateDate,
+    }: CountryMessage):Array<string> => 
+    [`${flag(countryName)} ${countryName}` , `${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)}`, `${totalRecovered}`, `${totalDeaths}`];
 
 export const getMessageForCountry = ({
                                          countryName,

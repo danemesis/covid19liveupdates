@@ -3,6 +3,7 @@ import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
 import {getSimplifiedMessageForCountry} from "../../../utils/messages/countryMessage";
 import {Country} from "../../../models/country";
+import {table, getBorderCharacters} from 'table';
 
 export const countriesResponse = (bot, message) => {
     getCountriesSituation()
@@ -40,11 +41,20 @@ export const countriesResponse = (bot, message) => {
                 });
 
             const portionSize: number = 40;
-
-            bot.sendMessage(
-                getChatId(message),
-                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
-            );
+            const tableConfig = {
+                columns: {
+                  0: {
+                    width: 25
+                  }
+                },
+                columnDefault: {
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                    width: 6
+                },
+                singleLine: true,
+                border: getBorderCharacters("honeywell")
+              };
 
             let portionMessage = [];
             countriesResult
@@ -71,11 +81,20 @@ export const countriesResponse = (bot, message) => {
                     if (idx % portionSize === 0 || idx === countriesResult.length - 1) {
                         bot.sendMessage(
                             getChatId(message),
-                            portionMessage.join('\n')
+                            `<pre>
+                            ${table(portionMessage, tableConfig)}
+                            </pre>`
+                            ,
+                            { parse_mode: "HTML" }
                         );
 
                         portionMessage = [];
                     }
                 });
+
+            bot.sendMessage(
+                getChatId(message),
+                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
+            );
         });
 };
