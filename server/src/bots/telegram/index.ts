@@ -6,11 +6,11 @@ import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
-import {MessageRegistry} from "./utils/messageRegistry"
+import {MessageRegistry} from "./utils/messageRegistry";
+import {getKeyboard} from "./utils/keyboard";
 
 
 const TelegramBot = require('node-telegram-bot-api');
-const KeyboardWrapper = require("node-telegram-keyboard-wrapper");
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
@@ -30,18 +30,11 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         res.sendStatus(200);
     });
 
-    const rk = new KeyboardWrapper.ReplyKeyboard();
-    
-    rk
-    .addRow(UserMessages.AllCountries, UserMessages.CountriesAvailable)
-    .addRow(UserMessages.GetAdvicesHowToBehave)
-    .addRow(UserMessages.Help);
-
     bot.onText(/\/start/, (message) => {
         bot.sendMessage(
             message.chat.id,
             `${greetUser(message.from)} /n`,
-            rk.open({ resize_keyboard: true })
+            getKeyboard(message)
         );
 
         showHelpInfo(bot, message);

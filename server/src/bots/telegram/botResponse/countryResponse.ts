@@ -8,6 +8,7 @@ import {
 import {Country} from "../../../models/country";
 import {getMessageForCountry, getShowCountriesMessage} from "../../../utils/messages/countryMessage";
 import {UserPresentationalCountryNameString} from "../../../models/tsTypes";
+import  {Cache} from "../../../utils/cache";
 
 export const showCountries = (bot, message) => {
     getAvailableCountries()
@@ -23,7 +24,9 @@ export const showCountries = (bot, message) => {
 const getCountryFromMessage = (userTextCode): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
 
 export const showCountry = async (bot, message): Promise<void> => {
+
     const requestedCountry: UserPresentationalCountryNameString = adaptCountryToSystemRepresentation(getCountryFromMessage(message.text));
+    Cache.set(`${getChatId(message)}_country`, requestedCountry);
 
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
