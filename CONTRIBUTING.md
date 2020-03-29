@@ -41,6 +41,14 @@ All inner folder's structure preferebly should follow structure above (fine-grai
 
 ## Running for development
 
+#### Prerequirements
+Checked, that the application works with
+- Node **version v10.16.0**
+- npm **version 6.9.0**
+
+on Windows 10, x64 machine
+
+
 ##### Telegram
 - Open <a href='https://t.me/botfather'>BotFather</a>,
 - Create your development version of the bot (for your local testing purpose) via `/newbot` command
