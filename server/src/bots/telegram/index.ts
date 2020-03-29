@@ -6,6 +6,7 @@ import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
+import {MessageRegistry} from "./utils/messageRegistry"
 
 
 const TelegramBot = require('node-telegram-bot-api');
@@ -46,36 +47,19 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         showHelpInfo(bot, message);
     });
 
-    // 1
-    const allCountriesMessageRegExp = new RegExp(UserMessages.AllCountries, 'g');
-    bot.onText(allCountriesMessageRegExp, (message) => countriesResponse(bot, message));
-    const allCountriesRegExp = new RegExp(UserRegExps.All);
-    bot.onText(allCountriesRegExp, (message) => countriesResponse(bot, message));
+    const registry = new MessageRegistry(bot);
 
-    // 2
-    const byCountryNamesMessageRegExp = new RegExp(UserMessages.CountriesAvailable, 'g');
-    bot.onText(byCountryNamesMessageRegExp, (message) => showCountries(bot, message));
-    const byCountryNamesRegExp = new RegExp(UserRegExps.Countries);
-    bot.onText(byCountryNamesRegExp, (message) => showCountries(bot, message));
+    registry
+        .Register(UserMessages.AllCountries, countriesResponse)
+        .Register(UserRegExps.All, countriesResponse)
+        .Register(UserMessages.CountriesAvailable, showCountries)
+        .Register(UserRegExps.Countries, showCountries)
+        .Register(UserRegExps.Country, showCountry)
+        .Register(UserMessages.GetAdvicesHowToBehave, showAdvicesHowToBehave)
+        .Register(UserRegExps.Advices, showAdvicesHowToBehave)
+        .Register(UserMessages.Help, showHelpInfo)
+        .Register(UserRegExps.Help, showHelpInfo);
 
-    // 3
-    const countryRegExp = new RegExp(UserRegExps.Country);
-    bot.onText(countryRegExp, (message, match) => showCountry(bot, message, match));
-
-
-    // 4
-    const getAdvicesHowToBehaveMessageRegExp = new RegExp(UserMessages.GetAdvicesHowToBehave, 'g');
-    bot.onText(getAdvicesHowToBehaveMessageRegExp, (message) => showAdvicesHowToBehave(bot, message));
-    const getAdvicesHowToBehaveRegExp = new RegExp(UserRegExps.Advices);
-    bot.onText(getAdvicesHowToBehaveRegExp, (message) => showAdvicesHowToBehave(bot, message));
-
-    // 5
-    const helpMessageRegExp = new RegExp(UserMessages.Help, 'g');
-    bot.onText(helpMessageRegExp, (message) => showHelpInfo(bot, message));
-    const helpRegExp = new RegExp(UserRegExps.Help);
-    bot.onText(helpRegExp, (message) => showHelpInfo(bot, message));
-
-    // ALL CODES
     bot.on('message', (message, match) => {
         console.log('all messages', match, message);
     });
@@ -89,8 +73,6 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     bot.on("error", (err) => console.log('error', err));
 }
 
-function displayKeyBoard(){
 
-}
 
 export {runTelegramBot};
