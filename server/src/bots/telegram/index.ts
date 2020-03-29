@@ -5,10 +5,11 @@ import {showCountries, showCountry} from "./botResponse/countryResponse";
 import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
+import {Express} from "express";
 
 const TelegramBot = require('node-telegram-bot-api');
 
-function runTelegramBot(app) {
+function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
 
     // replace the value below with the Telegram token you receive from @BotFather
@@ -17,9 +18,8 @@ function runTelegramBot(app) {
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(token, {polling: true});
 
-    // This informs the Telegram servers of the new webhook.
-    // TODO: MAKE IT AUTOMATICALLY
-    bot.setWebHook(`https://54daaf4a.ngrok.io/bot${token}`);
+    // This informs the Telegram servers of the new webhook
+    bot.setWebHook(`${ngRokUrl}/bot${token}`);
 
     // We are receiving updates at the route below!
     app.post(`/bot${token}`, (req, res) => {
