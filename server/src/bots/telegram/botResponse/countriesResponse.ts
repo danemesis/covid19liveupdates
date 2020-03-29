@@ -45,14 +45,15 @@ export const countriesResponse = (bot, message) => {
                 `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
             );
 
-            const portionSize: number = 40;
+            const portionSize: number = 30;
             let portionStart: number = 0;
             let portionEnd = portionSize;
             let portionMessage = [];
-            portionMessage.push(getTableHeader());
-
+            
             while(portionStart <= countriesResult.length) {
-
+                portionMessage = [];
+                portionMessage.push(["","","",""]);
+                portionMessage.push(getTableHeader());
                 countriesResult
                     .slice(portionStart, portionEnd)
                     .forEach((countryResult: OverallCountrySituationResponse) => {
@@ -85,7 +86,6 @@ export const countriesResponse = (bot, message) => {
                     { parse_mode: "HTML" }
                 );
                 
-                portionMessage = [];
                 portionStart = portionEnd;
                 portionEnd += portionSize;
             }
