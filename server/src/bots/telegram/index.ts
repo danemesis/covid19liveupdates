@@ -1,13 +1,18 @@
 import * as dotenv from 'dotenv';
 import {countriesResponse} from "./botResponse/countriesResponse";
 import {greetUser} from "../../utils/messages/userMessage";
-import {showCountries, showCountry} from "./botResponse/countryResponse";
+import {showCountries, showCountryByName, showCountryByFlag} from "./botResponse/countryResponse";
 import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
 import {MessageRegistry} from "./utils/messageRegistry";
 import {getKeyboard} from "./utils/keyboard";
+import {
+    getAvailableCountries,
+} from "../../services/domain/covid19";
+import {Country} from "../../models/country";
+import {flag} from 'country-emoji';
 
 
 const TelegramBot = require('node-telegram-bot-api');
@@ -42,16 +47,35 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
 
     const registry = new MessageRegistry(bot);
 
+    
+
+
     registry
         .Register(UserMessages.AllCountries, countriesResponse)
         .Register(UserRegExps.All, countriesResponse)
         .Register(UserMessages.CountriesAvailable, showCountries)
         .Register(UserRegExps.Countries, showCountries)
-        .Register(UserRegExps.Country, showCountry)
+        .Register(UserRegExps.Country, showCountryByName)
         .Register(UserMessages.GetAdvicesHowToBehave, showAdvicesHowToBehave)
         .Register(UserRegExps.Advices, showAdvicesHowToBehave)
         .Register(UserMessages.Help, showHelpInfo)
         .Register(UserRegExps.Help, showHelpInfo);
+
+        getAvailableCountries()
+        .then((countries: Array<Country>) => {
+            const single = countries
+            .map(c => flag(c.name))
+            .join('|');
+            registry.Register(`[${single}]`, showCountryByFlag);
+            });
+
+
+    bot.on("callback_query", (query) => {
+        bot.answerCallbackQuery(query.id, { text: "Action received!" })
+            .then(function () {
+            bot.sendMessage(query.from.id, "Hey there! You clicked on an inline button! ;) So, as you saw, the support library works!");
+        });
+    });
 
     bot.on('message', (message, match) => {
         console.log('all messages', match, message);

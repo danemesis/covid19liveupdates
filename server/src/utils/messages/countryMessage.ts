@@ -3,6 +3,7 @@ import {getCountriesByContinent} from "../../services/domain/countriesByContinen
 import {getActiveCases} from "./covid19Messages";
 import {flag} from 'country-emoji';
 
+
 const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
 
 export const getShowCountriesMessage = (countries: Array<Country>): string => {
