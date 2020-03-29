@@ -7,7 +7,9 @@ import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
 
+
 const TelegramBot = require('node-telegram-bot-api');
+const KeyboardWrapper = require("node-telegram-keyboard-wrapper");
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
@@ -27,19 +29,18 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         res.sendStatus(200);
     });
 
+    const rk = new KeyboardWrapper.ReplyKeyboard();
+    
+    rk
+    .addRow(UserMessages.AllCountries, UserMessages.CountriesAvailable)
+    .addRow(UserMessages.GetAdvicesHowToBehave)
+    .addRow(UserMessages.Help);
+
     bot.onText(/\/start/, (message) => {
         bot.sendMessage(
             message.chat.id,
             `${greetUser(message.from)} /n`,
-            {
-                "reply_markup": {
-                    "keyboard": [
-                        [UserMessages.AllCountries, UserMessages.CountriesAvailable],
-                        [UserMessages.GetAdvicesHowToBehave],
-                        [UserMessages.Help]
-                    ]
-                }
-            }
+            rk.open({ resize_keyboard: true })
         );
 
         showHelpInfo(bot, message);
@@ -86,6 +87,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     bot.on("polling_error", (err) => console.log('polling_error', err));
     bot.on("webhook_error", (err) => console.log('webhook_error', err));
     bot.on("error", (err) => console.log('error', err));
+}
+
+function displayKeyBoard(){
+
 }
 
 export {runTelegramBot};
