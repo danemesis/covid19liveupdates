@@ -21,15 +21,15 @@ export const getShowCountriesMessage = (countries: Array<Country>): string => {
 };
 
 export const getTableRowMessageForCountry = ({
-        countryName,
-        totalConfirmed,
-        totalRecovered,
-        totalDeaths,
-        lastUpdateDate,
-    }: CountryMessage):Array<string> => 
-    [`${flag(countryName)} ${countryName}` , `${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)}`, `${totalRecovered}`, `${totalDeaths}`];
+                                                 countryName,
+                                                 totalConfirmed,
+                                                 totalRecovered,
+                                                 totalDeaths,
+                                                 lastUpdateDate,
+                                             }: CountryMessage): Array<string> =>
+    [`${flag(countryName) ?? ''} ${countryName}`, `${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)}`, `${totalRecovered}`, `${totalDeaths}`];
 
-export const getTableHeader = ():Array<string> => ["Country", "Active", "Recovered", "Deaths"];
+export const getTableHeader = (): Array<string> => ["Country", "Active", "Recovered", "Deaths"];
 
 export const getMessageForCountry = ({
                                          countryName,
@@ -38,4 +38,4 @@ export const getMessageForCountry = ({
                                          totalDeaths,
                                          lastUpdateDate,
                                      }: CountryMessage): string =>
-    `${flag(countryName)} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths. ⏱️${lastUpdateDate}`;
+    `${flag(countryName) ?? ''} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths. ⏱️${lastUpdateDate}`;

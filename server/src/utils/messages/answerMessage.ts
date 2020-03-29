@@ -1,7 +1,9 @@
 import {Answer} from "../../models/answer";
 
 export const getAnswerMessage = ({answer, links, additionalAnswers, additionalLinks}: Answer): string => {
-    const ourAnswer = `\n${answer}`;
+    const ourAnswer = answer
+        ? `\n${answer}`
+        : '';
     const ourLinks: string = links?.length
         ? `\n\nConsider these links: \n${links.join(',\n')}`
         : '';
