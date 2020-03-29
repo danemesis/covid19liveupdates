@@ -1,8 +1,9 @@
 import {ApiCovid19Situation, CountrySituationInfo, OverallCountrySituationResponse} from "../../../models/covid19";
 import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
-import {getSimplifiedMessageForCountry} from "../../../utils/messages/countryMessage";
+import {getTableRowMessageForCountry, getTableHeader} from "../../../utils/messages/countryMessage";
 import {Country} from "../../../models/country";
+import {table, tableConfig} from '../../../models/table';
 
 export const countriesResponse = (bot, message) => {
     getCountriesSituation()
@@ -39,43 +40,55 @@ export const countriesResponse = (bot, message) => {
                     });
                 });
 
-            const portionSize: number = 40;
-
             bot.sendMessage(
                 getChatId(message),
                 `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
             );
 
+            const portionSize: number = 40;
+            let portionStart: number = 0;
+            let portionEnd = portionSize;
             let portionMessage = [];
-            countriesResult
-                .forEach((countryResult: OverallCountrySituationResponse, idx: number) => {
-                    const {
-                        country,
-                        lastUpdateDate,
-                        totalConfirmed,
-                        totalRecovered,
-                        totalDeaths
-                    } = countryResult;
+            portionMessage.push(getTableHeader());
 
-                    portionMessage
-                        .push(
-                            getSimplifiedMessageForCountry({
-                                countryName: country.name,
-                                totalConfirmed,
-                                totalRecovered,
-                                totalDeaths,
-                                lastUpdateDate
-                            })
-                        );
+            while(portionStart <= countriesResult.length) {
 
-                    if (idx % portionSize === 0 || idx === countriesResult.length - 1) {
-                        bot.sendMessage(
-                            getChatId(message),
-                            portionMessage.join('\n')
-                        );
+                countriesResult
+                    .slice(portionStart, portionEnd)
+                    .forEach((countryResult: OverallCountrySituationResponse) => {
+                        const {
+                            country,
+                            lastUpdateDate,
+                            totalConfirmed,
+                            totalRecovered,
+                            totalDeaths
+                        } = countryResult;
+                        portionMessage
+                            .push(
+                                getTableRowMessageForCountry({
+                                    countryName: country.name,
+                                    totalConfirmed,
+                                    totalRecovered,
+                                    totalDeaths,
+                                    lastUpdateDate
+                                })
+                            );
 
-                        portionMessage = [];
-                    }
-                });
+                    });
+
+                bot.sendMessage(
+                    getChatId(message),
+                    `<pre>
+                    ${table(portionMessage, tableConfig)}
+                    </pre>`
+                    ,
+                    { parse_mode: "HTML" }
+                );
+                
+                portionMessage = [];
+                portionStart = portionEnd;
+                portionEnd += portionSize;
+            }
+
         });
 };
