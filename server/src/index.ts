@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', baseController.base);
 
+const EASE_DELIMITER: string = '==============> ';
 const DELIMITER: string = '\n\n==============> ';
 let ngRokUrl = '';
 
@@ -33,6 +34,7 @@ const server = app.listen(app.get('port'), async () => {
 
     app.set('ngRokUrl', ngRokUrl);
     process.env.NG_ROK_URL = ngRokUrl;
+    console.log(`${EASE_DELIMITER} ngRokUrl ${ngRokUrl}`);
 
     console.log(`${DELIMITER}Starting Telegram bot`);
     runTelegramBot(app, ngRokUrl);

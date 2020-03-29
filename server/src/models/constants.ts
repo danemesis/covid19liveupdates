@@ -11,6 +11,7 @@ export enum UserRegExps {
     Countries = '/available',
     Country = '/country',
     Advices = '/advices',
+    Question = '/question',
     Help = '/help'
 }
 

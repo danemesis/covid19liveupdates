@@ -20,7 +20,7 @@ export const showCountries = (bot, message) => {
         )
 };
 
-const getCountryFromMessage = (userTextCode): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
+const getCountryFromMessage = (userTextCode: string): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
 
 export const showCountry = async (bot, message): Promise<void> => {
     const requestedCountry: UserPresentationalCountryNameString = adaptCountryToSystemRepresentation(getCountryFromMessage(message.text));

@@ -2,10 +2,11 @@ import * as dotenv from 'dotenv';
 import {countriesResponse} from "./botResponse/countriesResponse";
 import {greetUser} from "../../utils/messages/userMessage";
 import {showCountries, showCountry} from "./botResponse/countryResponse";
-import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants";
+import {UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
+import {answerOnQuestion} from "./botResponse/quetionResponse";
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -74,14 +75,18 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     const helpRegExp = new RegExp(UserRegExps.Help);
     bot.onText(helpRegExp, (message) => showHelpInfo(bot, message));
 
-    // ALL CODES
+    // 6
+    const questionRegExp = new RegExp(UserRegExps.Question);
+    bot.onText(questionRegExp, (message) => answerOnQuestion(bot, message));
+
+    // ALL MESSAGES LOGGING
     bot.on('message', (message, match) => {
         console.log('all messages', match, message);
     });
-    // ALL CODES
-    bot.onText(REXEX_ALL_CODES, (message, match) => {
-        console.log('REXEX_ALL_CODES', match, message);
-    });
+    // // ALL CODES
+    // bot.onText(REXEX_ALL_CODES, (message, match) => {
+    //     console.log('REXEX_ALL_CODES', match, message);
+    // });
 
     bot.on("polling_error", (err) => console.log('polling_error', err));
     bot.on("webhook_error", (err) => console.log('webhook_error', err));
