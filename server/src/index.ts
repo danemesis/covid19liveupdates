@@ -3,8 +3,7 @@ import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import * as baseController from './routes/base/base';
 import {runTelegramBot} from "./bots/telegram";
-
-const exec = require('child_process').exec;
+import {runNgrok, stopNgrok} from './runNgrok';
 
 dotenv.config();
 
@@ -17,16 +16,33 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', baseController.base);
 
-runTelegramBot(app);
+const DELIMITER: string = '\n\n==============> ';
+let ngRokUrl = '';
 
-// exec(`ngrok http ${port}`, function (error, stdout, stderr) {
-//     console.log(error, stdout, stderr);
-//     runTelegramBot(app);
-// });
+const server = app.listen(app.get('port'), async () => {
+    console.log(
+        ('App is running at http://localhost:%d in %s mode'),
+        app.get('port'),
+        app.get('env'),
+    );
 
-app.listen(app.get('port'), () => {
-    console.log(('App is running at http://localhost:%d in %s mode. This update inspect?'),
-        app.get('port'), app.get('env'));
+    console.log('\nPress CTRL-C to stop');
 
-    console.log('Press CTRL-C to stop\n');
+    console.log(`${DELIMITER}Starting ngrok`);
+    ngRokUrl = await runNgrok(app.get('port'));
+
+    app.set('ngRokUrl', ngRokUrl);
+    process.env.NG_ROK_URL = ngRokUrl;
+
+    console.log(`${DELIMITER}Starting Telegram bot`);
+    runTelegramBot(app, ngRokUrl);
 });
+
+process.on('SIGTERM', () => {
+    server.close(async () => {
+        console.log(`${DELIMITER}Stopping ngrok`);
+        await stopNgrok(ngRokUrl);
+        process.exit(0);
+    });
+});
+

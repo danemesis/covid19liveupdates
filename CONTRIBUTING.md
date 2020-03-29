@@ -39,7 +39,7 @@ Leave for now.
 
 All inner folder's structure preferebly should follow structure above (fine-grained approach).
 
-## Dev Run
+## Running for development
 
 ##### Telegram
 - Open <a href='https://t.me/botfather'>BotFather</a>,
@@ -47,13 +47,17 @@ All inner folder's structure preferebly should follow structure above (fine-grai
 - Receive from <a href='https://t.me/botfather'>BotFather</a> Key & Copy it,
 - Create `.env` in `/server/src/bots/telegram` file and add received **key** there (<a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/bots/telegram'>more about it, example of the file</a>),
 - Add to the project,
-- **Setup secure connection (below)**,
-- **find & copy** created https proxy path (if used method above, then it should be in your console),
-- replace it in `*/telegram/index.ts` `bot.setWebHook(URL)`.
+- run `npm i`
+- run `npm run start:watch`
 
-##### Setup secure connection, e.g. I used ngrok
-- `ngrok http 3000` (3000 - default local port PORT),
 
 ##### If any questions and/or issues, 
 - contact any collaborator,
 - or text via mail (danbilokha@gmail.com) or via Telegram (@danbilokha)
+
+
+### Restrictions and Limitations
+For running the application we need to have secure connection (as some all known messengers
+do not support running via http) thus we are using **ngrok** library for that currently. It
+creates public domain with secured connection with we are using for redirecting all messages
+to our local machines.
