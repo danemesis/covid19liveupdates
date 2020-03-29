@@ -1,7 +1,7 @@
 {
   "name": "covid19liveupdates",
   "version": "1.0.0",
-  "description": "",
+  "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
     "test": "jest --forceExit",
@@ -11,9 +11,25 @@
     "start:watch": "ts-node-dev --respawn --transpileOnly server/src/index.ts",
     "start:inspect": "ts-node-dev --inspect --respawn --transpileOnly server/src/index.ts"
   },
+  "homepage": "https://github.com/danbilokha/covid19liveupdates",
+  "bugs": {
+    "url": "https://github.com/danbilokha/covid19liveupdates/issues",
+    "email": "danbilokha@gmail.com"
+  },
   "keywords": [
     "covid19",
     "coronavirus"
+  ],
+  "contributors": [
+    {
+      "name": "Vladimir Kovalenko",
+      "email": "proladge@gmail.com",
+      "url": "https://github.com/Proladge"
+    },
+    {
+      "name": "Danylo Bilokha",
+      "email": "danbilokha@gmail.com"
+    }
   ],
   "author": "Danylo Bilokha & Julia Melnychenko",
   "license": "ISC",

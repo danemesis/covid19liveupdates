@@ -75,8 +75,12 @@ function runTelegramBot(app) {
     bot.onText(helpRegExp, (message) => showHelpInfo(bot, message));
 
     // ALL CODES
+    bot.on('message', (message, match) => {
+        console.log('all messages', match, message);
+    });
+    // ALL CODES
     bot.onText(REXEX_ALL_CODES, (message, match) => {
-        console.log('REXEX_ALL_CODES'.match, message);
+        console.log('REXEX_ALL_CODES', match, message);
     });
 
     bot.on("polling_error", (err) => console.log('polling_error', err));
