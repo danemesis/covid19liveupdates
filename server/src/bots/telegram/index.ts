@@ -14,7 +14,6 @@ import {
 import {Country} from "../../models/country";
 import {flag} from 'country-emoji';
 
-
 const TelegramBot = require('node-telegram-bot-api');
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
@@ -46,10 +45,6 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     });
 
     const registry = new MessageRegistry(bot);
-
-    
-
-
     registry
         .Register(UserMessages.AllCountries, countriesResponse)
         .Register(UserRegExps.All, countriesResponse)
@@ -62,20 +57,12 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .Register(UserRegExps.Help, showHelpInfo);
 
         getAvailableCountries()
-        .then((countries: Array<Country>) => {
-            const single = countries
-            .map(c => flag(c.name))
-            .join('|');
-            registry.Register(`[${single}]`, showCountryByFlag);
-            });
-
-
-    bot.on("callback_query", (query) => {
-        bot.answerCallbackQuery(query.id, { text: "Action received!" })
-            .then(function () {
-            bot.sendMessage(query.from.id, "Hey there! You clicked on an inline button! ;) So, as you saw, the support library works!");
-        });
-    });
+            .then((countries: Array<Country>) => {
+                    const single = countries
+                        .map(c => flag(c.name))
+                        .join('|');
+                    registry.Register(`[${single}]`, showCountryByFlag);
+                });
 
     bot.on('message', (message, match) => {
         console.log('all messages', match, message);
@@ -89,7 +76,5 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     bot.on("webhook_error", (err) => console.log('webhook_error', err));
     bot.on("error", (err) => console.log('error', err));
 }
-
-
 
 export {runTelegramBot};
