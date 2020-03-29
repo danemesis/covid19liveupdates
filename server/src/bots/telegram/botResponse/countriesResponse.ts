@@ -1,9 +1,9 @@
 import {ApiCovid19Situation, CountrySituationInfo, OverallCountrySituationResponse} from "../../../models/covid19";
 import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
-import {getSimplifiedMessageForCountry} from "../../../utils/messages/countryMessage";
+import {getTableRowMessageForCountry, getTableHeader} from "../../../utils/messages/countryMessage";
 import {Country} from "../../../models/country";
-import {table, getBorderCharacters} from 'table';
+import {table, tableConfig} from '../../../models/table';
 
 export const countriesResponse = (bot, message) => {
     getCountriesSituation()
@@ -46,26 +46,15 @@ export const countriesResponse = (bot, message) => {
             );
 
             const portionSize: number = 40;
-            const tableConfig = {
-                columns: {
-                  0: {
-                    width: 25
-                  }
-                },
-                columnDefault: {
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    width: 6
-                },
-                singleLine: true,
-                border: getBorderCharacters("honeywell")
-              };
-
+            let portionStart: number = 0;
+            let portionEnd = portionSize;
             let portionMessage = [];
-            while(countriesResult.length > 0)
-            {
+            portionMessage.push(getTableHeader());
+
+            while(portionStart <= countriesResult.length) {
+
                 countriesResult
-                    .splice(0, portionSize)
+                    .slice(portionStart, portionEnd)
                     .forEach((countryResult: OverallCountrySituationResponse) => {
                         const {
                             country,
@@ -74,10 +63,9 @@ export const countriesResponse = (bot, message) => {
                             totalRecovered,
                             totalDeaths
                         } = countryResult;
-
                         portionMessage
                             .push(
-                                getSimplifiedMessageForCountry({
+                                getTableRowMessageForCountry({
                                     countryName: country.name,
                                     totalConfirmed,
                                     totalRecovered,
@@ -96,7 +84,11 @@ export const countriesResponse = (bot, message) => {
                     ,
                     { parse_mode: "HTML" }
                 );
+                
                 portionMessage = [];
+                portionStart = portionEnd;
+                portionEnd += portionSize;
             }
+
         });
 };

@@ -20,7 +20,7 @@ export const getShowCountriesMessage = (countries: Array<Country>): string => {
         .concat(`\n\n${hint}`)
 };
 
-export const getSimplifiedMessageForCountry = ({
+export const getTableRowMessageForCountry = ({
         countryName,
         totalConfirmed,
         totalRecovered,
@@ -28,6 +28,8 @@ export const getSimplifiedMessageForCountry = ({
         lastUpdateDate,
     }: CountryMessage):Array<string> => 
     [`${flag(countryName)} ${countryName}` , `${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)}`, `${totalRecovered}`, `${totalDeaths}`];
+
+export const getTableHeader = ():Array<string> => ["Country", "Active", "Recovered", "Deaths"];
 
 export const getMessageForCountry = ({
                                          countryName,

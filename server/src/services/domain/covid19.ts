@@ -22,7 +22,6 @@ function adaptApiCountriesResponse(apiCountriesSituation: ApiCountriesCovid19Sit
         .map(([apiCountry, apiSituations]: [string, Array<ApiCovid19Situation>]) => {
                 const adaptedCountry: UserPresentationalCountryNameString = adaptCountryToSystemRepresentation(apiCountry);
                 const countryLookup: CountryLookup = lookup.byCountry(adaptedCountry) ?? '';
-                console.log('countryLookup', countryLookup);
 
                 const country: Country = {
                     name: adaptedCountry,
