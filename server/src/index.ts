@@ -12,6 +12,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.set('port', port);
+app.set('ngrok_url', process.argv[2]);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));

@@ -8,7 +8,7 @@
     "test:watch": "jest --watch",
     "build": "webpack --config webpack.config.js",
     "start": "npm run build && node ./dist/server.js",
-    "start:watch": "ts-node-dev --respawn --transpileOnly server/src/index.ts",
+    "start:watch": "bash startNgrok.sh ",
     "start:inspect": "ts-node-dev --inspect --respawn --transpileOnly server/src/index.ts"
   },
   "keywords": [
