@@ -1,5 +1,6 @@
 export class MessageRegistry
 {
+    //TODO: change type to unknown and Handle casting to BotType 
     _bot: any;
 
     constructor(bot) {

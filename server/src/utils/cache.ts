@@ -1,10 +1,11 @@
-const NodeCache = require( "node-cache" );
+import * as NodeCache from "node-cache" ;
 
 const nodeCache = new NodeCache( { stdTTL: 100000, checkperiod: 0 } );
 
 export const Cache = {
     get(key){
-        if(key && key.endsWith("_commands_country")){
+    if(key && key.endsWith("_commands_country")){
+        //TODO: Add type for get returned value
             return (nodeCache.get(key) || [])
             .slice(0, 3);
         }
