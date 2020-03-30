@@ -38,7 +38,9 @@
     "country-emoji": "^1.5.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "node-cache": "^5.1.0",
     "node-telegram-bot-api": "^0.40.0",
+    "node-telegram-keyboard-wrapper": "^2.0.1",
     "nodemon": "^2.0.2",
     "table": "^5.4.6",
     "webpack-node-externals": "^1.7.2"
