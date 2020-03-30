@@ -47,7 +47,8 @@ const showCountry = async (bot, message, requestedCountry): Promise<void> => {
         );
         return;
     }
-    Cache.set(`${getChatId(message)}_commands_country`, {command: message.text, display: flag(foundCountry.name)});
+
+    Cache.set(`${getChatId(message)}_commands_country`, flag(foundCountry.name));
 
     // TODO: Optimize!
     let totalRecovered = 0;
