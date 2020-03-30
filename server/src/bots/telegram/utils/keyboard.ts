@@ -3,7 +3,7 @@ import {Cache} from "../../../utils/cache";
 import {UserMessages} from "../../../models/constants";
 import {ReplyKeyboard} from "node-telegram-keyboard-wrapper";
 
-export const getKeyboard = (message) => {
+export const getKeyboard = (message): unknown => {
     const rk = new ReplyKeyboard();
     const latestSelectedContries = Cache
         .get(`${getChatId(message)}_commands_country`)
