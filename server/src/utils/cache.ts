@@ -6,14 +6,14 @@ export const Cache = {
     get(key){
         if(key && key.endsWith("_commands_country")){
             return (nodeCache.get(key) || [])
-            .splice(0, 3);
+            .slice(0, 3);
         }
         return nodeCache.get(key);
     },
     set(key :string, value : any){
         if(key && key.endsWith("_commands_country")){
-            const existingValue : string[] = (nodeCache.get(key) || [])
-            if(!existingValue.splice(0, 3).includes(value)){
+            let existingValue : string[] = (nodeCache.get(key) || []).splice(0, 3);
+            if(!existingValue.includes(value)){
                 existingValue.unshift(value);
             }
             nodeCache.set(
