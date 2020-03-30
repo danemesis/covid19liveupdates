@@ -5,16 +5,17 @@ import {ReplyKeyboard} from "node-telegram-keyboard-wrapper";
 
 export const getKeyboard = (message): unknown => {
     const rk = new ReplyKeyboard();
-    const latestSelectedContries = Cache
-        .get(`${getChatId(message)}_commands_country`)
-    if(latestSelectedContries.length > 0){
-        rk.addRow.apply(rk, latestSelectedContries);
+    const latestSelectedCountries = Cache
+        .get(`${getChatId(message)}_commands_country`);
+
+    if (latestSelectedCountries.length > 0) {
+        rk.addRow.apply(rk, latestSelectedCountries);
     }
 
     rk
-    .addRow(UserMessages.AllCountries, UserMessages.CountriesAvailable)
-    .addRow(UserMessages.GetAdvicesHowToBehave)
-    .addRow(UserMessages.Help);
+        .addRow(UserMessages.AllCountries, UserMessages.CountriesAvailable)
+        .addRow(UserMessages.Assistant, UserMessages.GetAdvicesHowToBehave)
+        .addRow(UserMessages.Help);
 
-    return rk.open({ resize_keyboard: true })
+    return rk.open({resize_keyboard: true})
 }

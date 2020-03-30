@@ -1,21 +1,18 @@
 import * as dotenv from 'dotenv';
 import {countriesResponse} from "./botResponse/countriesResponse";
 import {greetUser} from "../../utils/messages/userMessage";
-import {showCountries, showCountryByName, showCountryByFlag} from "./botResponse/countryResponse";
-import {REXEX_ALL_CODES, UserMessages, UserRegExps} from "../../models/constants";
+import {showCountries, showCountryByFlag, showCountryByName} from "./botResponse/countryResponse";
+import {UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
 import {MessageRegistry} from "./utils/messageRegistry";
 import {getKeyboard} from "./utils/keyboard";
-import {
-    getAvailableCountries,
-} from "../../services/domain/covid19";
+import {getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country";
 import {flag} from 'country-emoji';
-import {answerOnQuestion} from "./botResponse/quetionResponse";
-
-const TelegramBot = require('node-telegram-bot-api');
+import {answerOnQuestion, assistantStrategy, showAssistantFeatures} from "./botResponse/quetionResponse";
+import * as TelegramBot from 'node-telegram-bot-api';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
@@ -56,23 +53,20 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .Register(UserRegExps.Advices, showAdvicesHowToBehave)
         .Register(UserMessages.Help, showHelpInfo)
         .Register(UserRegExps.Help, showHelpInfo)
-        .Register(UserRegExps.Question, answerOnQuestion)
+        .Register(UserMessages.Assistant, assistantStrategy)
+        .Register(UserRegExps.Assistant, assistantStrategy);
 
-        getAvailableCountries()
-            .then((countries: Array<Country>) => {
-                    const single = countries
-                        .map(c => flag(c.name))
-                        .join('|');
-                    registry.Register(`[${single}]`, showCountryByFlag);
-                });
+    getAvailableCountries()
+        .then((countries: Array<Country>) => {
+            const single = countries
+                .map(c => flag(c.name))
+                .join('|');
+            registry.Register(`[${single}]`, showCountryByFlag);
+        });
 
     bot.on('message', (message, match) => {
         console.log('all messages', match, message);
     });
-    // // ALL CODES
-    // bot.onText(REXEX_ALL_CODES, (message, match) => {
-    //     console.log('REXEX_ALL_CODES', match, message);
-    // });
 
     bot.on("polling_error", (err) => console.log('polling_error', err));
     bot.on("webhook_error", (err) => console.log('webhook_error', err));

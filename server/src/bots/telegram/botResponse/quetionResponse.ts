@@ -1,18 +1,41 @@
 import {getChatId} from "../utils/chat";
-import {fetchAnswer} from "../../../services/api/knowledgebase";
-import {Answer} from "../../../models/answer";
-import {getAnswerMessage} from "../../../utils/messages/answerMessage";
+import {fetchAnswer, fetchCategories, fetchKnowledgeBaseInfo} from "../../../services/api/knowledgebase";
+import {Answer} from "../../../models/knowledgebase/answer";
+import {getAnswerMessage, getAssistantFeaturesMessage} from "../../../utils/messages/answerMessage";
+import {textAfterUserCommand} from "../../../utils/textAfterCommand";
+import {isCommandOnly, isMessageStartsWithCommand} from "../../../utils/incomingMessage";
+import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta";
+import {UserMessages} from "../../../models/constants";
 
-// TODO: Move to utils (text after code)
-const getQuestionFromMessage = (userTextCode: string): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
+export const assistantStrategy = (bot, message) => {
+    if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
+        || message.text === UserMessages.Assistant) {
+        return showAssistantFeatures(bot, message)
+    }
 
-export const answerOnQuestion = (bot, message) => {
-    const question = getQuestionFromMessage(message.text);
-    fetchAnswer(question)
-        .then((answers: Array<Answer>) => {
+    return answerOnQuestion(bot, message);
+};
+
+export const showAssistantFeatures = (bot, message) => {
+    Promise.all([fetchKnowledgeBaseInfo(), fetchCategories(),])
+        .then(([meta, categories]: [KnowledgebaseMeta, Array<string>]) =>
             bot.sendMessage(
                 getChatId(message),
-                answers.map(getAnswerMessage).join('\n\n')
+                getAssistantFeaturesMessage(meta, categories)
+            )
+        )
+};
+
+export const answerOnQuestion = (bot, message) => {
+    const question = textAfterUserCommand(message.text);
+    fetchAnswer(question)
+        .then((answers: Array<Answer>) => {
+            const messageIfMoreThanOneAnswer: string = answers.length > 1
+                ? `I have ${answers.length} answers on your❓\n`
+                : '';
+            bot.sendMessage(
+                getChatId(message),
+                `${messageIfMoreThanOneAnswer}${answers.map(getAnswerMessage).join('\n\n')}`
             );
         });
 };
