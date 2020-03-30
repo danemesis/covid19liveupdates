@@ -7,7 +7,7 @@ import {table, tableConfig} from '../../../models/table';
 
 export const countriesResponse = (bot, message) => {
     getCountriesSituation()
-        .then((countriesSituation: Array<[Country, Array<CountrySituationInfo>]>) => {
+        .then(async (countriesSituation: Array<[Country, Array<CountrySituationInfo>]>) => {
             let worldTotalConfirmed = 0;
             let worldTotalRecovered = 0;
             let worldTotalDeaths = 0;
@@ -40,7 +40,7 @@ export const countriesResponse = (bot, message) => {
                     });
                 });
 
-            bot.sendMessage(
+            await bot.sendMessage(
                 getChatId(message),
                 `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
             );
@@ -77,7 +77,7 @@ export const countriesResponse = (bot, message) => {
 
                     });
 
-                bot.sendMessage(
+                await bot.sendMessage(
                     getChatId(message),
                     `<pre>
                     ${table(portionMessage, tableConfig)}
