@@ -1,5 +1,10 @@
 Please, feel free to create PRs with suggestion & improvements of that document.
 
+## Information
+This file describes everything you need to know for writing code in a way we do it. Morever, here you'll find all basic answers how to start & develop.
+
+We have <a href='https://github.com/danbilokha/covid19liveupdates/issues/14'>special issue</a> for those who want to join. We (and world) need you :) 
+
 ## To write the code
 Follow style guidelines & folder structure; stay passionate and **code**,
 - You can contribute straight away, no need to wait - **create your PR**,
