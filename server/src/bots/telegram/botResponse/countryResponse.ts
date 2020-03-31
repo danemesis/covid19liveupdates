@@ -59,10 +59,10 @@ const showCountry = async (bot, message, requestedCountry): Promise<void> => {
     bot.sendMessage(
         getChatId(message),
         getMessageForCountry({
-            countryName: foundCountry.name,
-            totalConfirmed,
-            totalRecovered,
-            totalDeaths,
+            name: foundCountry.name,
+            confirmed: totalConfirmed,
+            recovered: totalRecovered,
+            deaths: totalDeaths,
             lastUpdateDate: foundSituation[foundSituation.length - 1].date
         }),
         getKeyboard(message)

@@ -13,10 +13,14 @@ export interface ApiCovid19Situation {
 
 export type CountrySituationInfo = Country & ApiCovid19Situation;
 
-export interface OverallCountrySituationResponse {
+export interface CountrySituation {
     lastUpdateDate: string;
     country: Country;
-    totalConfirmed: number;
-    totalRecovered: number;
-    totalDeaths: number;
+    confirmed: number;
+    recovered: number;
+    deaths: number;
+}
+
+export interface ContinentCountriesSituation {
+    [continentName: string]: Array<CountrySituation>
 }

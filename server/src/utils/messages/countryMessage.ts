@@ -22,21 +22,21 @@ export const getShowCountriesMessage = (countries: Array<Country>): string => {
 };
 
 export const getTableRowMessageForCountry = ({
-                                                 countryName,
-                                                 totalConfirmed,
-                                                 totalRecovered,
-                                                 totalDeaths,
+                                                 name,
+                                                 confirmed,
+                                                 recovered,
+                                                 deaths,
                                                  lastUpdateDate,
                                              }: CountryMessage): Array<string> =>
-    [`${flag(countryName) ?? ''} ${countryName}`, `${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)}`, `${totalRecovered}`, `${totalDeaths}`];
+    [`${flag(name) ?? ''} ${name}`, `${getActiveCases(confirmed, recovered, deaths)}`, `${recovered}`, `${deaths}`];
 
 export const getTableHeader = (): Array<string> => ["Country", "Active", "Recovered", "Deaths"];
 
 export const getMessageForCountry = ({
-                                         countryName,
-                                         totalConfirmed,
-                                         totalRecovered,
-                                         totalDeaths,
+                                         name,
+                                         confirmed,
+                                         recovered,
+                                         deaths,
                                          lastUpdateDate,
                                      }: CountryMessage): string =>
-    `${flag(countryName) ?? ''} ${countryName}, ${getActiveCases(totalConfirmed, totalRecovered, totalDeaths)} active, ${totalRecovered} recovered, ${totalDeaths} deaths. ⏱️${lastUpdateDate}`;
+    `${flag(name) ?? ''} ${name}, ${getActiveCases(confirmed, recovered, deaths)} active, ${recovered} recovered, ${deaths} deaths. ⏱️${lastUpdateDate}`;

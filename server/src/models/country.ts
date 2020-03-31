@@ -7,9 +7,9 @@ export interface Country {
 }
 
 export interface CountryMessage {
-    countryName: string;
-    totalConfirmed: number;
-    totalRecovered: number;
-    totalDeaths: number;
+    name: string;
+    confirmed: number;
+    recovered: number;
+    deaths: number;
     lastUpdateDate: string;
 }
