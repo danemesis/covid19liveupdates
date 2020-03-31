@@ -1,94 +1,95 @@
-import {ApiCovid19Situation, CountrySituationInfo, OverallCountrySituationResponse} from "../../../models/covid19";
+import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from "../../../models/covid19";
 import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
-import {getTableRowMessageForCountry, getTableHeader} from "../../../utils/messages/countryMessage";
+import {getTableHeader, getTableRowMessageForCountry} from "../../../utils/messages/countryMessage";
 import {Country} from "../../../models/country";
-import {table, tableConfig} from '../../../models/table';
+import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../utils/messages/countriesMessage";
 
-export const countriesResponse = (bot, message) => {
-    getCountriesSituation()
-        .then(async (countriesSituation: Array<[Country, Array<CountrySituationInfo>]>) => {
-            let worldTotalConfirmed = 0;
-            let worldTotalRecovered = 0;
-            let worldTotalDeaths = 0;
+export const countriesResponse = async (bot, message) => {
+    const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
+    const continentCountries: ContinentCountriesSituation = {};
+    let worldTotalConfirmed = 0;
+    let worldTotalRecovered = 0;
+    let worldTotalDeaths = 0;
 
-            const countriesResult: Array<OverallCountrySituationResponse> = [];
+    countriesSituation
+        .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
+            const {confirmed, recovered, deaths} = situations[situations.length - 1];
 
-            countriesSituation
-                .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
+            worldTotalConfirmed += confirmed;
+            worldTotalRecovered += recovered;
+            worldTotalDeaths += deaths;
 
-                    let totalConfirmed = 0;
-                    let totalRecovered = 0;
-                    let totalDeaths = 0;
+            const countrySituationResult: CountrySituation = {
+                lastUpdateDate: situations[situations.length - 1].date,
+                country,
+                confirmed,
+                recovered,
+                deaths
+            };
+            const prevCountriesResult = continentCountries[country.continent]
+                ? continentCountries[country.continent]
+                : [];
+            continentCountries[country.continent] = [
+                ...prevCountriesResult,
+                countrySituationResult
+            ];
+        });
 
-                    [situations[situations.length - 1]].forEach(({confirmed, deaths, recovered}: ApiCovid19Situation) => {
-                        totalRecovered += recovered;
-                        totalConfirmed += confirmed;
-                        totalDeaths += deaths;
-                    });
+    // Send overall world info,
+    await bot.sendMessage(
+        getChatId(message),
+        getCountriesSumupMessage(
+            worldTotalConfirmed,
+            worldTotalRecovered,
+            worldTotalDeaths,
+            countriesSituation.length,
+            Object.keys(continentCountries).length
+        )
+    );
 
-                    worldTotalConfirmed += totalConfirmed;
-                    worldTotalRecovered += totalRecovered;
-                    worldTotalDeaths += totalDeaths;
+    // Send all info split by continents,
+    for (const [continent, countries] of Object.entries(continentCountries)
+        .map(
+            ([continent, countries]) => [continent, countries.sort((country1, country2) => country2.confirmed - country1.confirmed)]
+        )) {
+        const portionSize: number = 30;
+        let portionStart: number = 0;
+        let portionEnd = portionSize;
+        let portionMessage = [];
 
-                    countriesResult.push({
-                        lastUpdateDate: situations[situations.length - 1].date,
-                        country,
-                        totalConfirmed,
-                        totalDeaths,
-                        totalRecovered
-                    });
+        while (portionStart <= countries.length) {
+            portionMessage = [getTableHeader()];
+
+            (countries as Array<CountrySituation>)
+                .slice(portionStart, portionEnd)
+                .forEach(({
+                              country: {name},
+                              lastUpdateDate,
+                              confirmed,
+                              recovered,
+                              deaths
+                          }: CountrySituation) => {
+                    portionMessage.push(
+                        getTableRowMessageForCountry({
+                            name,
+                            confirmed,
+                            recovered,
+                            deaths,
+                            lastUpdateDate
+                        })
+                    );
                 });
 
             await bot.sendMessage(
                 getChatId(message),
-                `Total confirmed: ${worldTotalConfirmed}, recovered: ${worldTotalRecovered}, death: ${worldTotalDeaths} in ${countriesResult.length} countries.`
+                getCountriesTableHTML({continent, portionMessage})
+                ,
+                {parse_mode: "HTML"}
             );
 
-            const portionSize: number = 30;
-            let portionStart: number = 0;
-            let portionEnd = portionSize;
-            let portionMessage = [];
-            
-            while(portionStart <= countriesResult.length) {
-                portionMessage = [];
-                portionMessage.push(["","","",""]);
-                portionMessage.push(getTableHeader());
-                countriesResult
-                    .slice(portionStart, portionEnd)
-                    .forEach((countryResult: OverallCountrySituationResponse) => {
-                        const {
-                            country,
-                            lastUpdateDate,
-                            totalConfirmed,
-                            totalRecovered,
-                            totalDeaths
-                        } = countryResult;
-                        portionMessage
-                            .push(
-                                getTableRowMessageForCountry({
-                                    countryName: country.name,
-                                    totalConfirmed,
-                                    totalRecovered,
-                                    totalDeaths,
-                                    lastUpdateDate
-                                })
-                            );
-
-                    });
-
-                await bot.sendMessage(
-                    getChatId(message),
-                    `<pre>
-                    ${table(portionMessage, tableConfig)}
-                    </pre>`
-                    ,
-                    { parse_mode: "HTML" }
-                );
-                
-                portionStart = portionEnd;
-                portionEnd += portionSize;
-            }
-
-        });
+            portionStart = portionEnd;
+            portionEnd += portionSize;
+        }
+    }
 };
