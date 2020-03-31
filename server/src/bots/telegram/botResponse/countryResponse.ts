@@ -7,10 +7,10 @@ import {
 } from "../../../services/domain/covid19";
 import {Country} from "../../../models/country";
 import {getMessageForCountry, getShowCountriesMessage} from "../../../utils/messages/countryMessage";
-import {UserPresentationalCountryNameString} from "../../../models/tsTypes";
-import  {Cache} from "../../../utils/cache";
+import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';
 import {getKeyboard} from '../utils/keyboard';
+import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 
 export const showCountries = (bot, message) => {
     getAvailableCountries()
@@ -23,21 +23,16 @@ export const showCountries = (bot, message) => {
         )
 };
 
-const getCountryFromMessage = (userTextCode): string => userTextCode.slice(userTextCode.indexOf(' ')).trim();
+export const showCountryByName = async (bot, message): Promise<void> =>
+    showCountry(bot, message, adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)));
 
-export const showCountryByName = async (bot, message): Promise<void> => {
-
-    return showCountry(bot, message, adaptCountryToSystemRepresentation(getCountryFromMessage(message.text)));
-};
-
-export const showCountryByFlag = async (bot, message): Promise<void> => {
-    return showCountry(bot, message, name(message.text));
-}
+export const showCountryByFlag = async (bot, message): Promise<void> =>
+    showCountry(bot, message, name(message.text));
 
 const showCountry = async (bot, message, requestedCountry): Promise<void> => {
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
-    .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
+        .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
     const [foundCountry, foundSituation] = foundCountrySituations;
 
     if (!foundCountry || !foundSituation?.length) {
@@ -69,7 +64,7 @@ const showCountry = async (bot, message, requestedCountry): Promise<void> => {
             totalRecovered,
             totalDeaths,
             lastUpdateDate: foundSituation[foundSituation.length - 1].date
-        }), 
+        }),
         getKeyboard(message)
     );
 }
