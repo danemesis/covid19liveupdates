@@ -1,7 +1,7 @@
 import {UpperCaseString, UserPresentationalCountryNameString} from "../../../models/tsTypes";
 
 const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseString, string>([
-    ['US', 'US'],
+    ['US', 'United States'],
     ['UNITED KINGDOM', 'United Kingdom'],
     ['UNITED ARAB EMIRATES', 'United Arab Emirates'],
     ['BOSNIA AND HERZEGOVINA', 'Bosnia and Herzegovina'],
@@ -9,6 +9,17 @@ const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseStr
     ['NEW ZEALAND', 'New Zealand'],
     ['PAPUA NEW GUINEA', 'Papua New Guinea'],
     ['SAINT KITTS AND NEVIS', 'Saint Kitts and Nevis'],
+    ['BAHAMAS', 'The Bahamas'],
+    ['CONGO (BRAZZAVILLE)', 'Republic of the Congo'],
+    ['CONGO (KINSHASA)', 'Republic of the Congo'],
+    ['KOREA, SOUTH', 'North Korea'],
+    ['TAIWAN*', 'Taiwan'],
+    ['BURMA', 'Myanmar (Burma)'],
+    ['KOSOVO', 'Republic of Kosovo'],
+    ['GAMBIA', 'The Gambia'],
+    ['CZECHIA', 'Czech Republic'],
+    ['CABO VERDE', 'Cape Verde'],
+    ['HOLY SEE', 'Holy See (Vatican City)'],
 ]);
 
 export const getCountryNameFormat = (country: UpperCaseString): UserPresentationalCountryNameString =>

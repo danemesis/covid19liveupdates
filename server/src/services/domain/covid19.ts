@@ -6,7 +6,9 @@ import {fetchCovid19Data} from "../api/covid19";
 import {CountryLookup} from "../../models/country-code-lookup";
 import * as lookup from 'country-code-lookup';
 import {getCountryNameFormat} from "../../utils/utils";
+import {getCountryByName, getDefaultCountry} from "./countryLookup";
 
+let availableContinents: Array<string> = [];
 let availableCountries: Array<Country> = [];
 let cachedCountriesResponse: [number, Array<[Country, Array<CountrySituationInfo>]>];
 
@@ -21,7 +23,7 @@ function adaptApiCountriesResponse(apiCountriesSituation: ApiCountriesCovid19Sit
     return Object.entries(apiCountriesSituation)
         .map(([apiCountry, apiSituations]: [string, Array<ApiCovid19Situation>]) => {
                 const adaptedCountry: UserPresentationalCountryNameString = adaptCountryToSystemRepresentation(apiCountry);
-                const countryLookup: CountryLookup = lookup.byCountry(adaptedCountry) ?? '';
+                const countryLookup: CountryLookup = getCountryByName(adaptedCountry) ?? getDefaultCountry(adaptedCountry);
 
                 const country: Country = {
                     name: adaptedCountry,
