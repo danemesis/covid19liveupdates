@@ -30,7 +30,7 @@ export const getTableRowMessageForCountry = ({
                                              }: CountryMessage): Array<string> =>
     [`${flag(name) ?? ''} ${name}`, `${getActiveCases(confirmed, recovered, deaths)}`, `${recovered}`, `${deaths}`];
 
-export const getTableHeader = (): Array<string> => ["Country", "Active", "Recovered", "Deaths"];
+export const getTableHeader = (): Array<string> => ["Country", "Act.🤧", "Rec.👍", "Deaths"];
 
 export const getMessageForCountry = ({
                                          name,

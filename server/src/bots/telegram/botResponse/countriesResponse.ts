@@ -50,8 +50,9 @@ export const countriesResponse = async (bot, message) => {
 
     // Send all info split by continents,
     for (const [continent, countries] of Object.entries(continentCountries)
-        .sort(([_, countriesList1], [_, countriesList2]) => countriesList2.length - countriesList1.length)
-        ) {
+        .map(
+            ([continent, countries]) => [continent, countries.sort((country1, country2) => country2.confirmed - country1.confirmed)]
+        )) {
         const portionSize: number = 30;
         let portionStart: number = 0;
         let portionEnd = portionSize;
