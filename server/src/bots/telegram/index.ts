@@ -13,12 +13,13 @@ import {Country} from "../../models/country";
 import {flag} from 'country-emoji';
 import {answerOnQuestion, assistantStrategy, showAssistantFeatures} from "./botResponse/quetionResponse";
 import * as TelegramBot from 'node-telegram-bot-api';
+import {environments} from "../../environments/environment";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
 
     // replace the value below with the Telegram token you receive from @BotFather
-    const token = process.env.TELEGRAM_TOKEN ?? '';
+    const token = environments.TELEGRAM_TOKEN ?? '';
 
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(token, {polling: true});
