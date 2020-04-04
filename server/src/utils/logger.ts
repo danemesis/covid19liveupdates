@@ -1,5 +1,4 @@
-
-var winston  = require('winston');
+import * as winston from 'winston';
 import {Loggly} from 'winston-loggly-bulk';
 import {environments} from "../environments/environment";
 
@@ -10,10 +9,10 @@ winston.add(new Loggly({
     json: true
 }));
 
-export const  logger  = {
-    log(severity, message){
+export const logger = {
+    log(severity, message) {
         winston.log(severity, message);
-        if(!environments.IsProduction()){
+        if (!environments.IsProduction()) {
             console.log(severity, message);
         }
     }
