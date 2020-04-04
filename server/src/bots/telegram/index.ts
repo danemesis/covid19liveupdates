@@ -14,6 +14,7 @@ import {flag} from 'country-emoji';
 import {answerOnQuestion, assistantStrategy, showAssistantFeatures} from "./botResponse/quetionResponse";
 import * as TelegramBot from 'node-telegram-bot-api';
 import {environments} from "../../environments/environment";
+import {logger} from "../../utils/logger";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
@@ -65,13 +66,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
             registry.Register(`[${single}]`, showCountryByFlag);
         });
 
-    bot.on('message', (message, match) => {
-        console.log('all messages', match, message);
-    });
-
-    bot.on("polling_error", (err) => console.log('polling_error', err));
-    bot.on("webhook_error", (err) => console.log('webhook_error', err));
-    bot.on("error", (err) => console.log('error', err));
+    bot.on('message', (message) => logger.log('info', message));
+    bot.on("polling_error", (err) => logger.log('error', err));
+    bot.on("webhook_error", (err) => logger.log('error', err));
+    bot.on("error", (err) => logger.log('error', err));
 }
 
 export {runTelegramBot};
