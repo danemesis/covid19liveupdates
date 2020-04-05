@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 import * as baseController from './routes/base/base';
 import {runTelegramBot} from "./bots/telegram";
 import {runNgrok, stopNgrok} from './runNgrok';
-import { environments } from './environments/environment';
+import Config from './environments/environment';
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ app.get('/', baseController.base);
 
 const EASE_DELIMITER: string = '==============> ';
 const DELIMITER: string = '\n\n==============> ';
-let ngRokUrl = environments.NGROK_URL;
+let appUrl = Config.APP_URL;
 
 const server = app.listen(PORT, async () => {
     console.log(
@@ -28,20 +28,22 @@ const server = app.listen(PORT, async () => {
 
     console.log('\nPress CTRL-C to stop');
 
-    console.log(`${DELIMITER}Starting ngrok`);
-    if(!ngRokUrl){
-        ngRokUrl = await runNgrok(PORT);
+    if(Config.IsNgRokMode()){
+        console.log(`${DELIMITER}Starting ngrok`);
+        appUrl = Config.NGROK_URL || await runNgrok(PORT);
+        console.log(`${EASE_DELIMITER} ngRokUrl ${appUrl}`);
     }
-    console.log(`${EASE_DELIMITER} ngRokUrl ${ngRokUrl}`);
 
     console.log(`${DELIMITER}Starting Telegram bot`);
-    runTelegramBot(app, ngRokUrl);
+    runTelegramBot(app, appUrl);
 });
 
 process.on('SIGTERM', () => {
     server.close(async () => {
         console.log(`${DELIMITER}Stopping ngrok`);
-        await stopNgrok(ngRokUrl);
+        if(Config.IsNgRokMode()){
+            await stopNgrok(appUrl);
+        }
         process.exit(0);
     });
 });

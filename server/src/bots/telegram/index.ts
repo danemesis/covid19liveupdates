@@ -13,23 +13,20 @@ import {Country} from "../../models/country";
 import {flag} from 'country-emoji';
 import {answerOnQuestion, assistantStrategy, showAssistantFeatures} from "./botResponse/quetionResponse";
 import * as TelegramBot from 'node-telegram-bot-api';
-import {environments} from "../../environments/environment";
+import Config from "../../environments/environment";
 import {logger} from "../../utils/logger";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     dotenv.config({path: `${__dirname}/.env`});
 
-    // replace the value below with the Telegram token you receive from @BotFather
-    const token = environments.TELEGRAM_TOKEN ?? '';
-
     // Create a bot that uses 'polling' to fetch new updates
-    const bot = new TelegramBot(token, {polling: true});
+    const bot = new TelegramBot(Config.TELEGRAM_TOKEN, {polling: true});
 
     // This informs the Telegram servers of the new webhook
-    bot.setWebHook(`${ngRokUrl}/bot${token}`);
+    bot.setWebHook(`${ngRokUrl}/bot${Config.TELEGRAM_TOKEN}`);
 
     // We are receiving updates at the route below!
-    app.post(`/bot${token}`, (req, res) => {
+    app.post(`/bot${Config.TELEGRAM_TOKEN}`, (req, res) => {
         bot.processUpdate(req.body);
         res.sendStatus(200);
     });
