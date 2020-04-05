@@ -7,13 +7,13 @@ import {isCommandOnly, isMessageStartsWithCommand} from "../../../utils/incoming
 import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta";
 import {UserMessages} from "../../../models/constants";
 
-export const assistantStrategy = (bot, message) => {
+export const assistantStrategy = (bot, message, chatId) => {
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
         || message.text === UserMessages.Assistant) {
         return showAssistantFeatures(bot, message)
     }
 
-    return answerOnQuestion(bot, message);
+    return answerOnQuestion(bot, message, chatId);
 };
 
 export const showAssistantFeatures = (bot, message) => {
@@ -26,7 +26,7 @@ export const showAssistantFeatures = (bot, message) => {
         )
 };
 
-export const answerOnQuestion = (bot, message) => {
+export const answerOnQuestion = (bot, message, chatId) => {
     const question = textAfterUserCommand(message.text);
     fetchAnswer(question)
         .then((answers: Array<Answer>) => {
@@ -34,7 +34,7 @@ export const answerOnQuestion = (bot, message) => {
                 ? `I have ${answers.length} answers on your❓\n`
                 : '';
             bot.sendMessage(
-                getChatId(message),
+                chatId,
                 `${messageIfMoreThanOneAnswer}${answers.map(getAnswerMessage).join('\n\n')}`
             );
         });

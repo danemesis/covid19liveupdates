@@ -11,9 +11,9 @@ const codesExplanations = new Map([
     [UserRegExps.Help, 'Open help (this)'],
 ]);
 
-export const showHelpInfo = (bot, message) => {
+export const showHelpInfo = (bot, message, chatId) => {
     bot.sendMessage(
-        getChatId(message),
+        chatId,
         `Things I can do\n${
             Object.values(UserRegExps)
                 .map((code: string, idx: number) => `${getNumberEmoji(idx)} ${code} ${codesExplanations.get(code)}`)
