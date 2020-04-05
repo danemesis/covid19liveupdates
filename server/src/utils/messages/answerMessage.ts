@@ -5,8 +5,8 @@ import {UserRegExps} from "../../models/constants";
 
 export const getAssistantFeaturesMessage = ({questions, categories}: KnowledgebaseMeta): string => {
     const typicalQuestions: string = `\n\nTypically, people ask me🧐\n${questions.map((v, idx) => `${getNumberEmoji(idx)} ${v}`).join('\n')}`;
-    const toAsk = `\n\nIf you have a question, type ${UserRegExps.Assistant} [question]`;
-    return `My knowledge base 📚 has ${categories.length} categories: ${categories.join(', ')}${typicalQuestions}${toAsk}`
+    const toAsk = `\n\nℹ If you have a question, type ${UserRegExps.Assistant} [question]`;
+    return `ℹ My knowledge base 📚 has ${categories.length} categories: ${categories.join(', ')}${typicalQuestions}${toAsk}`
 };
 
 export const getAnswerMessage = ({answer, links, additionalAnswers, additionalLinks}: Answer): string => {
