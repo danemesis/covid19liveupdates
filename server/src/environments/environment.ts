@@ -14,7 +14,7 @@ const tags = process.env.LOGGLY_TAGS && Array.isArray(process.env.LOGGLY_TAGS)
 
 tags.push('containerV' + process.env.CONTAINER_VERSION, 'pkgV' + process.env.npm_package_version, environmentName);
 
-const envConfig = {
+let envConfig = {
     ENV: environmentName,
     COVID19API_URL: process.env.COUNTRIESDATA_URL,
     KNOWLEDGEBASE_URL: process.env.KNOWLEDGEBASE_URL,
@@ -35,5 +35,12 @@ const envConfig = {
         return this.IsDevelopment();
     }
 };
+
+if(!envConfig.IsProduction()){
+    envConfig = {
+        ...envConfig,
+        LOGGLY_TAGS: tags
+    };
+}
 
 export default envConfig;
