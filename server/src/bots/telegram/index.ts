@@ -51,7 +51,6 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     registry.RegisterCallBackQuery();
 
     for(let item in Continents){
-        console.log(item);
         registry.RegisterCallBackQueryHandler(item, countriesByContinent(item));
     }
 
