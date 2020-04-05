@@ -4,20 +4,20 @@ export const TIMES = {
 
 export enum UserRegExps {
     Start = "/start",
+    Assistant = '/assistant',
     All = '/countries',
     Countries = '/available',
     Country = '/country',
     Advices = '/advices',
-    Assistant = '/assistant',
     Help = '/help'
 }
 
 export enum UserMessages {
-    AllCountries = 'Countries data',
+    AllCountries = 'Countries data 🌍',
     CountriesAvailable = 'Countries we track',
-    Assistant = 'Assistant',
-    GetAdvicesHowToBehave = 'Get advices how to ...',
-    Help = 'What can you do?'
+    Assistant = 'Assistant 👦',
+    GetAdvicesHowToBehave = 'Advices how not to  😷',
+    Help = 'ℹ What can you do?'
 }
 
 export enum Continents {

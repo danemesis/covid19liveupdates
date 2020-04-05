@@ -1,20 +1,20 @@
-import {getChatId} from "../utils/chat";
 import {UserRegExps} from "../../../models/constants";
 import {getNumberEmoji} from "../../../utils/emoji";
 
 const codesExplanations = new Map([
-    [UserRegExps.All, 'Show all countries data'],
-    [UserRegExps.Countries, 'Show all available countries I have'],
+    [UserRegExps.Start, 'My greetings 👋'],
+    [UserRegExps.Assistant, `Overall and all, I am your personal assistant 👦. You can ask me some COVID-19 related question and I will try to help you. Just follow pattern /assistant [your question]. To see my features available type just ${UserRegExps.Assistant}`],
+    [UserRegExps.All, 'Show all countries 🌍 COVID-19 data'],
+    [UserRegExps.Countries, 'Show all available countries 🌍 I have (on all continents 🗺️)'],
     [UserRegExps.Country, `Show data for any country. Just follow pattern ${UserRegExps.Country} [COUNTRY NAME]. Not case sensative`],
     [UserRegExps.Advices, 'I have some good advices for you how to stay safe & sound'],
-    [UserRegExps.Assistant, `You can ask me some COVID-19 related question and I will try to help you. Just follow pattern /assistant [your question]. To see what assistant features available type just ${UserRegExps.Assistant}`],
-    [UserRegExps.Help, 'Open help (this)'],
+    [UserRegExps.Help, 'Open help (this) ℹ'],
 ]);
 
 export const showHelpInfo = async (bot, message, chatId) => {
     return bot.sendMessage(
         chatId,
-        `Things I can do\n${
+        `ℹ Things I can do are\n${
             Object.values(UserRegExps)
                 .map((code: string, idx: number) => `${getNumberEmoji(idx)} ${code} ${codesExplanations.get(code)}`)
                 .join('\n')
