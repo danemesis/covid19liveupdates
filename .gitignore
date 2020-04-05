@@ -8,3 +8,5 @@ dist/
 
 # environments files
 server/**/*.env
+
+/server/src/environments/dev.config.json
