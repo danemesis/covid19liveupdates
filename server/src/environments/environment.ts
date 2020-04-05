@@ -12,6 +12,7 @@ export const environments = {
     LOGGLY_TOKEN: process.env.LOGGLY_TOKEN || '',
     LOGGLY_SUBDOMAIN: process.env.LOGGLY_SUBDOMAIN || 'covid19liveupd',
     LOGGLY_TAGS: tags,
+    NGROK_URL: '',
     IsProduction(){
         return environmentName === "production";
     }
