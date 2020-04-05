@@ -1,5 +1,5 @@
-import {Country} from "../../models/country";
-import {ContinentsCountries} from "../../models/continent";
+import {Country} from "../../models/country.models";
+import {ContinentsCountries} from "../../models/continent.models";
 
 export const getCountriesByContinent = (countries: Array<Country>): ContinentsCountries => {
     const continentsCountries: ContinentsCountries = {};

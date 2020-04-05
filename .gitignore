@@ -8,4 +8,4 @@ server/src/environments/dev.config.json
 .now/
 
 # environments files
-server/**/*.env
+server/**/*.env*

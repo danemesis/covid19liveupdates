@@ -1,11 +1,11 @@
 import {getChatId} from "../utils/chat";
-import {ApiCovid19Situation, CountrySituationInfo} from "../../../models/covid19";
+import {ApiCovid19Situation, CountrySituationInfo} from "../../../models/covid19.models";
 import {
     adaptCountryToSystemRepresentation,
     getAvailableCountries,
     getCountriesSituation
 } from "../../../services/domain/covid19";
-import {Country} from "../../../models/country";
+import {Country} from "../../../models/country.models";
 import {getMessageForCountry, getShowCountriesMessage} from "../../../utils/messages/countryMessage";
 import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';

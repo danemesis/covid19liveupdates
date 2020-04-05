@@ -1,4 +1,4 @@
-import {Country, CountryMessage} from "../../models/country";
+import {Country, CountryMessage} from "../../models/country.models";
 import {getCountriesByContinent} from "../../services/domain/countriesByContinent";
 import {getActiveCases} from "./covid19Messages";
 import {flag} from 'country-emoji';

@@ -1,8 +1,8 @@
-import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from "../../../models/covid19";
+import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from "../../../models/covid19.models";
 import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
 import {getTableHeader, getTableRowMessageForCountry} from "../../../utils/messages/countryMessage";
-import {Country} from "../../../models/country";
+import {Country} from "../../../models/country.models";
 import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../utils/messages/countriesMessage";
 import {getContinentsKeyboard} from '../utils/keyboard';
 

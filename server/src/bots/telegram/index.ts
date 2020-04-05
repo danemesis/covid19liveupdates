@@ -1,23 +1,20 @@
-import * as dotenv from 'dotenv';
-import {countriesResponse, countries, countriesByContinent} from "./botResponse/countriesResponse";
+import {countries, countriesByContinent} from "./botResponse/countriesResponse";
 import {showCountries, showCountryByFlag, showCountryByName} from "./botResponse/countryResponse";
-import {UserMessages, UserRegExps, Continents} from "../../models/constants";
+import {Continents, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
 import {MessageRegistry} from "./utils/messageRegistry";
 import {getAvailableCountries,} from "../../services/domain/covid19";
-import {Country} from "../../models/country";
+import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
-import {answerOnQuestion, assistantStrategy, showAssistantFeatures} from "./botResponse/quetionResponse";
+import {assistantStrategy} from "./botResponse/quetionResponse";
 import * as TelegramBot from 'node-telegram-bot-api';
 import Config from "../../environments/environment";
 import {logger} from "../../utils/logger";
-import { startResponse } from './botResponse/startResponse';
+import {startResponse} from './botResponse/startResponse';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
-    dotenv.config({path: `${__dirname}/.env`});
-
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(Config.TELEGRAM_TOKEN, {polling: true});
 
@@ -47,7 +44,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
 
     registry.RegisterCallBackQuery();
 
-    for(let item in Continents){
+    for (let item in Continents) {
         registry.RegisterCallBackQueryHandler(item, countriesByContinent(item));
     }
 

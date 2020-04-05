@@ -1,10 +1,10 @@
 import {getChatId} from "../utils/chat";
-import {fetchAnswer, fetchCategories, fetchKnowledgeBaseInfo} from "../../../services/api/knowledgebase";
-import {Answer} from "../../../models/knowledgebase/answer";
+import {fetchAnswer, fetchKnowledgeMetainformation} from "../../../services/api/api-knowledgebase";
+import {Answer} from "../../../models/knowledgebase/answer.models";
 import {getAnswerMessage, getAssistantFeaturesMessage} from "../../../utils/messages/answerMessage";
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isCommandOnly, isMessageStartsWithCommand} from "../../../utils/incomingMessage";
-import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta";
+import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta.models";
 import {UserMessages} from "../../../models/constants";
 
 export const assistantStrategy = (bot, message, chatId) => {
@@ -17,11 +17,11 @@ export const assistantStrategy = (bot, message, chatId) => {
 };
 
 export const showAssistantFeatures = (bot, message) => {
-    Promise.all([fetchKnowledgeBaseInfo(), fetchCategories(),])
-        .then(([meta, categories]: [KnowledgebaseMeta, Array<string>]) =>
+    fetchKnowledgeMetainformation()
+        .then((meta: KnowledgebaseMeta) =>
             bot.sendMessage(
                 getChatId(message),
-                getAssistantFeaturesMessage(meta, categories)
+                getAssistantFeaturesMessage(meta)
             )
         )
 };

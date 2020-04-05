@@ -1,12 +1,12 @@
-import {Answer} from "../../models/knowledgebase/answer";
-import {KnowledgebaseMeta} from "../../models/knowledgebase/meta";
+import {Answer} from "../../models/knowledgebase/answer.models";
+import {KnowledgebaseMeta} from "../../models/knowledgebase/meta.models";
 import {getNumberEmoji} from "../emoji";
 import {UserRegExps} from "../../models/constants";
 
-export const getAssistantFeaturesMessage = (meta: KnowledgebaseMeta, categories: Array<string>): string => {
-    const typicalQuestions: string = `\n\nTypically, people ask me🧐\n${meta.questions.map((v, idx) => `${getNumberEmoji(idx)} ${v}`).join('\n')}`;
+export const getAssistantFeaturesMessage = ({questions, categories}: KnowledgebaseMeta): string => {
+    const typicalQuestions: string = `\n\nTypically, people ask me🧐\n${questions.map((v, idx) => `${getNumberEmoji(idx)} ${v}`).join('\n')}`;
     const toAsk = `\n\nIf you have a question, type ${UserRegExps.Assistant} [question]`;
-    return `So. My knowledge base 📚 has ${categories.length} categories: ${categories.join(', ')}${typicalQuestions}${toAsk}`
+    return `My knowledge base 📚 has ${categories.length} categories: ${categories.join(', ')}${typicalQuestions}${toAsk}`
 };
 
 export const getAnswerMessage = ({answer, links, additionalAnswers, additionalLinks}: Answer): string => {

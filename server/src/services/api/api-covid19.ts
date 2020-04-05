@@ -1,4 +1,4 @@
-import {ApiCountriesCovid19Situation} from "../../models/covid19";
+import {ApiCountriesCovid19Situation} from "../../models/covid19.models";
 import axios, {AxiosResponse} from 'axios';
 import Config from "../../environments/environment";
 
