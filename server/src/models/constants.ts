@@ -3,6 +3,7 @@ export const TIMES = {
 };
 
 export enum UserRegExps {
+    Start = "/start",
     All = '/countries',
     Countries = '/available',
     Country = '/country',
@@ -17,4 +18,13 @@ export enum UserMessages {
     Assistant = 'Assistant',
     GetAdvicesHowToBehave = 'Get advices how to ...',
     Help = 'What can you do?'
+}
+
+export enum Continents {
+    Asia = 'Asia',
+    Europe = 'Europe',
+    Africa = 'Africa',
+    Americas = 'Americas',
+    Oceania = 'Oceania',
+    Other = 'Other'
 }

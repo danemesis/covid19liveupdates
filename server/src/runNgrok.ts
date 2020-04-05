@@ -5,7 +5,7 @@ export const runNgrok = async (appPort) => {
     return url;
 };
 
-export const stopNgrok = async (url) => {
+export const stopNgrok = async () => {
     await ngrok.disconnect();
     await ngrok.kill();
 };

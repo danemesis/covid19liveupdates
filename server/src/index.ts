@@ -31,7 +31,7 @@ const server = app.listen(PORT, async () => {
     if(Config.IsNgRokMode()){
         console.log(`${DELIMITER}Starting ngrok`);
         appUrl = Config.NGROK_URL || await runNgrok(PORT);
-        console.log(`${EASE_DELIMITER} ngRokUrl ${appUrl}`);
+        console.log(`${EASE_DELIMITER} NGROK started on ngRokUrl: ${appUrl}`);
     }
 
     console.log(`${DELIMITER}Starting Telegram bot`);
@@ -42,7 +42,7 @@ process.on('SIGTERM', () => {
     server.close(async () => {
         console.log(`${DELIMITER}Stopping ngrok`);
         if(Config.IsNgRokMode()){
-            await stopNgrok(appUrl);
+            await stopNgrok();
         }
         process.exit(0);
     });

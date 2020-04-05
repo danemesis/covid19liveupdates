@@ -1,0 +1,13 @@
+import {getKeyboard} from '../utils/keyboard';
+import {greetUser} from "../../../utils/messages/userMessage";
+import {showHelpInfo} from './helpResponse';
+
+export const startResponse = (bot, message, chatId) => {
+    bot.sendMessage(
+        message.chat.id,
+        `${greetUser(message.from)} /n`,
+        getKeyboard(message)
+    );
+
+    showHelpInfo(bot, message, chatId);
+}
