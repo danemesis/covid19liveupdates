@@ -1,12 +1,9 @@
 import * as express from 'express';
-import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import * as baseController from './routes/base/base';
 import {runTelegramBot} from "./bots/telegram";
 import {runNgrok, stopNgrok} from './runNgrok';
 import Config from './environments/environment';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,7 +25,7 @@ const server = app.listen(PORT, async () => {
 
     console.log('\nPress CTRL-C to stop');
 
-    if(Config.IsNgRokMode()){
+    if (Config.IsNgRokMode()) {
         console.log(`${DELIMITER}Starting ngrok`);
         appUrl = Config.NGROK_URL || await runNgrok(PORT);
         console.log(`${EASE_DELIMITER} NGROK started on ngRokUrl: ${appUrl}`);
@@ -41,7 +38,7 @@ const server = app.listen(PORT, async () => {
 process.on('SIGTERM', () => {
     server.close(async () => {
         console.log(`${DELIMITER}Stopping ngrok`);
-        if(Config.IsNgRokMode()){
+        if (Config.IsNgRokMode()) {
             await stopNgrok();
         }
         process.exit(0);

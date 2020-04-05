@@ -1,9 +1,9 @@
-import {UserPresentationalCountryNameString} from "../../models/tsTypes";
-import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from "../../models/covid19";
+import {UserPresentationalCountryNameString} from "../../models/tsTypes.models";
+import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from "../../models/covid19.models";
 import {TIMES} from "../../models/constants";
-import {Country} from "../../models/country";
-import {fetchCovid19Data} from "../api/covid19";
-import {CountryLookup} from "../../models/country-code-lookup";
+import {Country} from "../../models/country.models";
+import {fetchCovid19Data} from "../api/api-covid19";
+import {CountryLookup} from "../../models/country-code-lookup.models";
 import * as lookup from 'country-code-lookup';
 import {getCountryNameFormat} from "../../utils/utils";
 import {getCountryByName, getDefaultCountry} from "./countryLookup";

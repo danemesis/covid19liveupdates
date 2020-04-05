@@ -1,4 +1,4 @@
-import {CountryLookup} from "../../models/country-code-lookup";
+import {CountryLookup} from "../../models/country-code-lookup.models";
 import * as lookup from 'country-code-lookup';
 
 const COUNTRIES_LOOKUP_LIST: Array<CountryLookup> = lookup.countries;
