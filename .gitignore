@@ -1,6 +1,7 @@
 # folders
 node_modules/
 dist/
+server/src/environments/dev.config.json
 
 # ide & other stuff files
 .idea/
@@ -8,5 +9,3 @@ dist/
 
 # environments files
 server/**/*.env
-
-/server/src/environments/dev.config.json
