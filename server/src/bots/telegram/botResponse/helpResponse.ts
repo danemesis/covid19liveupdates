@@ -11,8 +11,8 @@ const codesExplanations = new Map([
     [UserRegExps.Help, 'Open help (this)'],
 ]);
 
-export const showHelpInfo = (bot, message, chatId) => {
-    bot.sendMessage(
+export const showHelpInfo = async (bot, message, chatId) => {
+    return bot.sendMessage(
         chatId,
         `Things I can do\n${
             Object.values(UserRegExps)

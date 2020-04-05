@@ -30,7 +30,6 @@ export const answerOnQuestion = (bot, message, chatId) => {
     const question = textAfterUserCommand(message.text);
     fetchAnswer(question)
         .then((answers: Array<Answer>) => {
-            console.log('anaswers', answers)
             const messageIfMoreThanOneAnswer: string = answers.length > 1
                 ? `I have ${answers.length} answers on your❓\n`
                 : '';

@@ -9,4 +9,3 @@ server/src/environments/dev.config.json
 
 # environments files
 server/**/*.env*
-#server/**/*.env.prod
