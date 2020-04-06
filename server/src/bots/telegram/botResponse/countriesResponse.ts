@@ -1,9 +1,9 @@
 import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from "../../../models/covid19.models";
 import {getChatId} from "../utils/chat";
 import {getCountriesSituation} from "../../../services/domain/covid19";
-import {getTableHeader, getTableRowMessageForCountry} from "../../../utils/messages/countryMessage";
+import {getTableHeader, getTableRowMessageForCountry} from "../../../messages/feature/countryMessages";
 import {Country} from "../../../models/country.models";
-import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../utils/messages/countriesMessage";
+import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../messages/feature/countriesMessages";
 import {getContinentsKeyboard} from '../utils/keyboard';
 
 //TODO: prolly remove this responseHandler
@@ -96,7 +96,7 @@ export const countriesResponse = async (bot, message) => {
     }
 };
 
-export const countriesByContinent = (continent) =>  async (bot, message, chatId) => {
+export const countriesByContinent = (continent) => async (bot, message, chatId) => {
     const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const continentCountries: ContinentCountriesSituation = {};
     let worldTotalConfirmed = 0;
@@ -132,12 +132,12 @@ export const countriesByContinent = (continent) =>  async (bot, message, chatId)
     continentCountries[continent]
         .sort((country1, country2) => country2.confirmed - country1.confirmed)
         .forEach(({
-            country: {name},
-            lastUpdateDate,
-            confirmed,
-            recovered,
-            deaths
-                }: CountrySituation) => {
+                      country: {name},
+                      lastUpdateDate,
+                      confirmed,
+                      recovered,
+                      deaths
+                  }: CountrySituation) => {
             portionMessage.push(
                 getTableRowMessageForCountry({
                     name,
@@ -155,7 +155,7 @@ export const countriesByContinent = (continent) =>  async (bot, message, chatId)
         ,
         {parse_mode: "HTML"}
     );
-}
+};
 
 export const countries = async (bot, message) => {
     const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();

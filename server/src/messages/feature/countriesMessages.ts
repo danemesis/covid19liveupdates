@@ -1,4 +1,4 @@
-import {getActiveCases} from "./covid19Messages";
+import {getActiveCases} from "../covid19Messages";
 import {table, tableConfig} from "../../models/table.models";
 
 export const getCountriesSumupMessage = (

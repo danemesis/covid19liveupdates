@@ -4,8 +4,7 @@ import {TIMES} from "../../models/constants";
 import {Country} from "../../models/country.models";
 import {fetchCovid19Data} from "../api/api-covid19";
 import {CountryLookup} from "../../models/country-code-lookup.models";
-import * as lookup from 'country-code-lookup';
-import {getCountryNameFormat} from "../../utils/utils";
+import {getCountryNameFormat} from "../../utils/featureHelpers/country";
 import {getCountryByName, getDefaultCountry} from "./countryLookup";
 
 let availableContinents: Array<string> = [];

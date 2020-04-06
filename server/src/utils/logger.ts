@@ -1,13 +1,13 @@
 import * as winston from 'winston';
 import {Loggly} from 'winston-loggly-bulk';
-import Config from "../environments/environment";
+import environment from "../environments/environment";
 
 
-if(Config.LOGGLY_TOKEN){
+if (environment.LOGGLY_TOKEN) {
     winston.add(new Loggly({
-        token: Config.LOGGLY_TOKEN,
-        subdomain: Config.LOGGLY_SUBDOMAIN,
-        tags: Config.LOGGLY_TAGS,
+        token: environment.LOGGLY_TOKEN,
+        subdomain: environment.LOGGLY_SUBDOMAIN,
+        tags: environment.LOGGLY_TAGS,
         json: true
     }));
 }
@@ -15,8 +15,8 @@ if(Config.LOGGLY_TOKEN){
 export const logger = {
     log(severity, message) {
         winston.log(severity, message);
-        if (!Config.IsProduction()) {
+        if (!environment.IsProduction()) {
             console.log(severity, message);
         }
     }
-}
+};

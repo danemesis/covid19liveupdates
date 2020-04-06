@@ -5,15 +5,16 @@ import {
     getAnswersOnQuestionMessage,
     getAssistantFeaturesMessage,
     noAnswersOnQuestionMessage
-} from "../../../utils/messages/answerMessage";
+} from "../../../messages/feature/assistantMessages";
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
-import {isCommandOnly, isMessageStartsWithCommand} from "../../../utils/incomingMessage";
+import {isCommandOnly, isMatchingDashboardItem, isMessageStartsWithCommand} from "../../../utils/incomingMessages";
 import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta.models";
 import {UserMessages} from "../../../models/constants";
 
 export const assistantStrategy = (bot, message, chatId) => {
+    console.log('message', message, isMessageStartsWithCommand(message.text), isMatchingDashboardItem(message.text, UserMessages.Assistant))
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
-        || message.text === UserMessages.Assistant) {
+        || isMatchingDashboardItem(message.text, UserMessages.Assistant)) {
         return showAssistantFeatures(bot, message)
     }
 
