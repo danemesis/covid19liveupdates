@@ -1,7 +1,11 @@
 import {getChatId} from "../utils/chat";
 import {fetchAnswer, fetchKnowledgeMetainformation} from "../../../services/api/api-knowledgebase";
 import {Answer} from "../../../models/knowledgebase/answer.models";
-import {getAnswerMessage, getAssistantFeaturesMessage} from "../../../utils/messages/answerMessage";
+import {
+    getAnswersOnQuestionMessage,
+    getAssistantFeaturesMessage,
+    noAnswersOnQuestionMessage
+} from "../../../utils/messages/answerMessage";
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isCommandOnly, isMessageStartsWithCommand} from "../../../utils/incomingMessage";
 import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta.models";
@@ -30,12 +34,16 @@ export const answerOnQuestion = (bot, message, chatId) => {
     const question = textAfterUserCommand(message.text);
     fetchAnswer(question)
         .then((answers: Array<Answer>) => {
-            const messageIfMoreThanOneAnswer: string = answers.length > 1
-                ? `I have ${answers.length} answers on your❓\n`
-                : '';
-            bot.sendMessage(
+            if (!answers.length) {
+                return bot.sendMessage(
+                    chatId,
+                    noAnswersOnQuestionMessage()
+                )
+            }
+
+            return bot.sendMessage(
                 chatId,
-                `${messageIfMoreThanOneAnswer}${answers.map(getAnswerMessage).join('\n\n')}`
+                getAnswersOnQuestionMessage(answers)
             );
         });
 };
