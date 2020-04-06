@@ -1,6 +1,6 @@
 import {Answer} from "../../models/knowledgebase/answer.models";
 import {KnowledgebaseMeta} from "../../models/knowledgebase/meta.models";
-import {getNumberEmoji} from "../emoji";
+import {getNumberEmoji} from "../../utils/emoji";
 import {UserRegExps} from "../../models/constants";
 
 export const getAssistantFeaturesMessage = ({questions, categories}: KnowledgebaseMeta): string => {

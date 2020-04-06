@@ -3,14 +3,14 @@ import {
     encouragingMessage,
     socialDistancing,
     suggestedBehaviors
-} from "../../../utils/messages/userMessage";
+} from "../../../messages/userMessage";
 
 export const showAdvicesHowToBehave = (bot, message, chatId) => {
     bot.sendMessage(
         chatId,
         `ℹ Suggested Behaviors
-        ${suggestedBehaviors()} \nSocial Distancing
-        ${socialDistancing()} \nAlternative Greetings
+        ${suggestedBehaviors()} \nℹ Social Distancing
+        ${socialDistancing()} \nℹ Alternative Greetings
         ${alternativeGreetings()} \n${encouragingMessage()}
         `
     );

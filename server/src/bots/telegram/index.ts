@@ -1,18 +1,19 @@
 import {countries, countriesByContinent} from "./botResponse/countriesResponse";
-import {showCountries, showCountryByFlag, showCountryByName} from "./botResponse/countryResponse";
+import {showCountryByFlag, showCountryByName} from "./botResponse/countryResponse";
 import {Continents, UserMessages, UserRegExps} from "../../models/constants";
-import {showAdvicesHowToBehave} from "./botResponse/advicesResponse";
+import {showAdvicesHowToBehave} from "./botResponse/adviceResponse";
 import {showHelpInfo} from "./botResponse/helpResponse";
 import {Express} from "express";
 import {MessageRegistry} from "./utils/messageRegistry";
 import {getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
-import {assistantStrategy} from "./botResponse/quetionResponse";
+import {assistantStrategy} from "./botResponse/assistantResponse";
 import * as TelegramBot from 'node-telegram-bot-api';
 import Config from "../../environments/environment";
 import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
+import {showAvailableCountries} from "./botResponse/availableResponse";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -30,13 +31,13 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     const registry = new MessageRegistry(bot);
     registry
         .Register(UserRegExps.Start, startResponse)
-        .Register(UserMessages.AllCountries, countries)
-        .Register(UserRegExps.All, countries)
-        .Register(UserMessages.CountriesAvailable, showCountries)
-        .Register(UserRegExps.Countries, showCountries)
-        .Register(UserRegExps.Country, showCountryByName)
+        .Register(UserMessages.CountriesData, countries)
+        .Register(UserRegExps.CountriesData, countries)
+        .Register(UserMessages.AvailableCountries, showAvailableCountries)
+        .Register(UserRegExps.AvailableCountries, showAvailableCountries)
+        .Register(UserRegExps.CountryData, showCountryByName)
         .Register(UserMessages.GetAdvicesHowToBehave, showAdvicesHowToBehave)
-        .Register(UserRegExps.Advices, showAdvicesHowToBehave)
+        .Register(UserRegExps.Advice, showAdvicesHowToBehave)
         .Register(UserMessages.Help, showHelpInfo)
         .Register(UserRegExps.Help, showHelpInfo)
         .Register(UserMessages.Assistant, assistantStrategy)
@@ -44,8 +45,8 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
 
     registry.RegisterCallBackQuery();
 
-    for (let item in Continents) {
-        registry.RegisterCallBackQueryHandler(item, countriesByContinent(item));
+    for (let country in Continents) {
+        registry.RegisterCallBackQueryHandler(country, countriesByContinent(country));
     }
 
     getAvailableCountries()

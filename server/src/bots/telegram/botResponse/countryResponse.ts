@@ -1,34 +1,34 @@
-import {getChatId} from "../utils/chat";
 import {ApiCovid19Situation, CountrySituationInfo} from "../../../models/covid19.models";
-import {
-    adaptCountryToSystemRepresentation,
-    getAvailableCountries,
-    getCountriesSituation
-} from "../../../services/domain/covid19";
+import {adaptCountryToSystemRepresentation, getCountriesSituation} from "../../../services/domain/covid19";
 import {Country} from "../../../models/country.models";
-import {getMessageForCountry, getShowCountriesMessage} from "../../../utils/messages/countryMessage";
+import {
+    getMessageForCountry,
+    getMessageForUserInputWithoutCountryName
+} from "../../../messages/feature/countryMessages";
 import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';
 import {getKeyboard} from '../utils/keyboard';
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
-
-export const showCountries = (bot, message, chatId) => {
-    getAvailableCountries()
-        .then((countries: Array<Country>) => {
-                bot.sendMessage(
-                    chatId,
-                    getShowCountriesMessage(countries),
-                );
-            }
-        )
-};
+import {isMessageIsCommand} from "../../../utils/incomingMessages";
+import {UserRegExps} from "../../../models/constants";
 
 export const showCountryByName = async (bot, message, chatId): Promise<void> =>
-    showCountry(bot, chatId, adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)));
+    isMessageIsCommand(message.text, UserRegExps.CountryData)
+        ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
+        : showCountry(
+            bot,
+        chatId,
+        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text))
+        );
 
 export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
-    showCountry(bot, chatId, name(message.text));
+    showCountry(
+        bot,
+        chatId,
+        name(message.text)
+    );
 
+// TODO: Move messages to /messages/feature directory
 const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries

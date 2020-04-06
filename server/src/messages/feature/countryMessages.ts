@@ -1,25 +1,9 @@
 import {Country, CountryMessage} from "../../models/country.models";
-import {getCountriesByContinent} from "../../services/domain/countriesByContinent";
-import {getActiveCases} from "./covid19Messages";
+import {getActiveCases} from "../covid19Messages";
 import {flag} from 'country-emoji';
+import {UserRegExps} from "../../models/constants";
 
-
-const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
-
-export const getShowCountriesMessage = (countries: Array<Country>): string => {
-    const availableFor: string = `Available for ${countries.length} countries around the 🌍.`;
-    const countriesList: string = Object.entries(getCountriesByContinent(countries))
-        .map(
-            ([continentName, countries]: [string, Array<string>]): string => `\n🗺️ ${continentName}, totally ${countries.length} countries\n`
-                .concat(countries.join('; '))
-        )
-        .join('\n');
-    const hint: string = `ℹ ${EXPLANATION_MESSAGE}, \n\nℹ i.e. /country ${countries[0].name}`;
-
-    return availableFor
-        .concat(`\n\n${countriesList}`)
-        .concat(`\n\n${hint}`)
-};
+export const getMessageForUserInputWithoutCountryName = (): string => `Sorry, but I can show country only by country name. Enter country name by following the pattern ${UserRegExps.CountryData} [country name]`;
 
 export const getTableRowMessageForCountry = ({
                                                  name,
@@ -30,7 +14,7 @@ export const getTableRowMessageForCountry = ({
                                              }: CountryMessage): Array<string> =>
     [`${flag(name) ?? ''} ${name}`, `${getActiveCases(confirmed, recovered, deaths)}`, `${recovered}`, `${deaths}`];
 
-export const getTableHeader = (): Array<string> => ["Country", "Act.🤧", "Rec.👍", "Deaths"];
+export const getTableHeader = (): Array<string> => ["Country", "Act.🤧", "Recovered", "Deaths"];
 
 export const getMessageForCountry = ({
                                          name,

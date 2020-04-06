@@ -18,6 +18,7 @@ let envConfig = {
     ENV: environmentName,
     COVID19API_URL: process.env.COUNTRIESDATA_URL,
     KNOWLEDGEBASE_URL: process.env.KNOWLEDGEBASE_URL,
+    KNOWLEDGEBASE_SECRET_KEY: process.env.KNOWLEDGEBASE_SECRET_KEY,
     TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
     CONTAINER_VERSION: process.env.CONTAINER_VERSION,
     LOGGLY_TOKEN: process.env.LOGGLY_TOKEN,
@@ -36,7 +37,7 @@ let envConfig = {
     }
 };
 
-if(!envConfig.IsProduction()){
+if (!envConfig.IsProduction()) {
     envConfig = {
         ...envConfig,
         LOGGLY_TAGS: tags
