@@ -5,14 +5,14 @@ import {KnowledgebaseMeta} from "../../models/knowledgebase/meta.models";
 
 export function fetchKnowledgeMetainformation(): Promise<KnowledgebaseMeta> {
     return axios.get<KnowledgebaseMeta>(`${environments.KNOWLEDGEBASE_URL}/meta/all`, {
-        headers: {'x-access-tokens': environments.KNOWLEDGEBASE_SECRET_KEY}
+        headers: {'x-access-token': environments.KNOWLEDGEBASE_SECRET_KEY}
     })
         .then((response: AxiosResponse): KnowledgebaseMeta => response.data)
 }
 
 export function fetchAnswer(question: string): Promise<Array<Answer>> {
     return axios.get<ApiAnswer>(`${environments.KNOWLEDGEBASE_URL}/question`, {
-            headers: {'x-access-tokens': environments.KNOWLEDGEBASE_SECRET_KEY},
+            headers: {'x-access-token': environments.KNOWLEDGEBASE_SECRET_KEY},
             params: {question},
         }
     )
