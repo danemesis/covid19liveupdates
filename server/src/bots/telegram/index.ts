@@ -14,6 +14,7 @@ import Config from "../../environments/environment";
 import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
 import {showAvailableCountries} from "./botResponse/availableResponse";
+import {readFullStorage} from "../../services/domain/storage";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -60,6 +61,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     bot.on('message', (message, ...args) => {
         logger.log('info', message);
         logger.log('info', args);
+        readFullStorage()
     });
     bot.on("polling_error", (err) => logger.log('error', err));
     bot.on("webhook_error", (err) => logger.log('error', err));
