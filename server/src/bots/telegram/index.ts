@@ -57,7 +57,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
             registry.Register(`[${single}]`, showCountryByFlag);
         });
 
-    bot.on('message', (message) => logger.log('info', message));
+    bot.on('message', (message, ...args) => {
+        logger.log('info', message);
+        logger.log('info', args);
+    });
     bot.on("polling_error", (err) => logger.log('error', err));
     bot.on("webhook_error", (err) => logger.log('error', err));
     bot.on("error", (err) => logger.log('error', err));

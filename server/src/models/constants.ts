@@ -2,6 +2,9 @@ export const TIMES = {
     MILLISECONDS_IN_HOUR: 3600000,
 };
 
+export const CONSOLE_LOG_EASE_DELIMITER: string = '==============> ';
+export const CONSOLE_LOG_DELIMITER: string = '\n\n==============> ';
+
 export enum UserRegExps {
     Start = "/start",
     Assistant = '/assistant',
