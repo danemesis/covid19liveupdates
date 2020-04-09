@@ -1,6 +1,6 @@
-import {TelagramChat} from "../bots/telegram/models";
+import {TelegramChat} from "../bots/telegram/models";
 
 export interface UserSubscription {
-    chat: TelagramChat;
+    chat: TelegramChat;
     subscriptionsOn: Array<string>;
 }

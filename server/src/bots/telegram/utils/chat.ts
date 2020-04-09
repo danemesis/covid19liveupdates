@@ -1,3 +1,3 @@
-export const getChatId = (message): unknown => {
-    return message.chat.id
+export const getChatId = (message): number => {
+    return message.chat.id;
 };  

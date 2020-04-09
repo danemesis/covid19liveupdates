@@ -1,6 +1,6 @@
-import {countriesResponse, countriesByContinent} from "./botResponse/countriesResponse";
+import {countriesByContinent, countriesResponse} from "./botResponse/countriesResponse";
 import {showCountryByFlag, showCountryByNameResponse} from "./botResponse/countryResponse";
-import {Continents, UserMessages, UserRegExps} from "../../models/constants";
+import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
 import {Express} from "express";
@@ -43,10 +43,13 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserRegExps.Help, showHelpInfoResponse)
         .registerMessageHandler(UserMessages.Assistant, assistantStrategyResponse)
         .registerMessageHandler(UserRegExps.Assistant, assistantStrategyResponse)
+        .registerMessageHandler(UserMessages.MySubscriptions, subscribingStrategyResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse);
-
     for (let continent in Continents) {
-        registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
+        registry.registerMessageHandler(continent, countriesByContinent(continent));
+    }
+    for (let subscribeOn in CustomSubscriptions) {
+        registry.registerMessageHandler(subscribeOn, subscribingStrategyResponse)
     }
 
     getAvailableCountries()

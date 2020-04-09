@@ -7,7 +7,6 @@ import {CountryLookup} from "../../models/country-code-lookup.models";
 import {getCountryNameFormat} from "../../utils/featureHelpers/country";
 import {getCountryByName, getDefaultCountry} from "./countryLookup";
 
-let availableContinents: Array<string> = [];
 let availableCountries: Array<Country> = [];
 let cachedCountriesResponse: [number, Array<[Country, Array<CountrySituationInfo>]>];
 

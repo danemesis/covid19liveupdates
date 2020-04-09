@@ -7,11 +7,11 @@ export const getFullStorage = async (): Promise<unknown> => {
     return snapshot.val();
 };
 
-export const getSubscriptions = async (): Promise<DataSnapshot> => {
+export const getUsersSubscriptions = async (): Promise<DataSnapshot> => {
     return firebase.database().ref('subscriptions').once('value');
 };
 
-export const listenSubscriptions = (
+export const listenUsersSubscriptionsChanges = (
     cb: (a: firebase.database.DataSnapshot, b?: string | null) => unknown
 ): (a: firebase.database.DataSnapshot | null, b?: string | null) => unknown => {
     return firebase.database()
@@ -19,9 +19,13 @@ export const listenSubscriptions = (
         .on('value', cb);
 };
 
-export const subscribeUser = async ({chat, subscriptionsOn}: UserSubscription) => {
-    return firebase.database().ref('subscriptions/' + chat.id).set(({
-        chat,
-        subscriptionsOn
-    }))
+export const setUserSubscriptionToStorage = async (
+    {chat, subscriptionsOn}: UserSubscription
+): Promise<unknown> => {
+    return firebase.database()
+        .ref('subscriptions/' + chat.id)
+        .set(({
+            chat,
+            subscriptionsOn
+        }))
 };

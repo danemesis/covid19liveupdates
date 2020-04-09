@@ -2,7 +2,7 @@ import {Cache} from "../../../utils/cache";
 import {Continents, UserMessages} from "../../../models/constants";
 import {InlineKeyboard, ReplyKeyboard} from "node-telegram-keyboard-wrapper";
 
-export const getKeyboard = (chatId): unknown => {
+export const getFullMenuKeyboard = (chatId): unknown => {
     const rk = new ReplyKeyboard();
     const latestSelectedCountries = Cache
         .get(`${chatId}_commands_country`);
@@ -14,9 +14,19 @@ export const getKeyboard = (chatId): unknown => {
     rk
         .addRow(UserMessages.CountriesData, UserMessages.AvailableCountries)
         .addRow(UserMessages.Assistant, UserMessages.GetAdvicesHowToBehave)
-        .addRow(UserMessages.Help);
+        .addRow(UserMessages.MySubscriptions, UserMessages.Help);
 
     return rk.open({resize_keyboard: true})
+};
+
+export const getAfterCountryResponseInlineKeyboard = (country: string): unknown => {
+    const ik = new InlineKeyboard();
+    ik
+        .addRow(
+            {text: `Subscribe on ${country}`, callback_data: country},
+        );
+
+    return ik.build();
 };
 
 export const getContinentsInlineKeyboard = (): unknown => {

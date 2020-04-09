@@ -7,7 +7,7 @@ import {
 } from "../../../messages/feature/countryMessages";
 import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';
-import {getKeyboard} from '../utils/keyboard';
+import {getAfterCountryResponseInlineKeyboard} from '../utils/keyboard';
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isMessageIsCommand} from "../../../utils/incomingMessages";
 import {UserRegExps} from "../../../models/constants";
@@ -16,7 +16,7 @@ export const showCountryByNameResponse = async (bot, message, chatId): Promise<v
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
         : showCountry(
-            bot,
+        bot,
         chatId,
         adaptCountryToSystemRepresentation(textAfterUserCommand(message.text))
         );
@@ -33,6 +33,7 @@ const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
         .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
+    console.log('SOME PROBLEM?', foundCountrySituations);
     const [foundCountry, foundSituation] = foundCountrySituations;
 
     if (!foundCountry || !foundSituation?.length) {
@@ -65,6 +66,6 @@ const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
             deaths: totalDeaths,
             lastUpdateDate: foundSituation[foundSituation.length - 1].date
         }),
-        getKeyboard(chatId)
+        getAfterCountryResponseInlineKeyboard(foundCountry.name)
     );
-}
+};
