@@ -19,12 +19,13 @@ export const getKeyboard = (chatId): unknown => {
     return rk.open({resize_keyboard: true})
 };
 
-export const getContinentsKeyboard = (): unknown => {
+export const getContinentsInlineKeyboard = (): unknown => {
     const ik = new InlineKeyboard();
     ik
         .addRow(
             {text: Continents.Europe, callback_data: Continents.Europe},
-            {text: Continents.Asia, callback_data: Continents.Asia})
+            {text: Continents.Asia, callback_data: Continents.Asia}
+        )
         .addRow(
             {text: Continents.Africa, callback_data: Continents.Africa},
             {text: Continents.Americas, callback_data: Continents.Americas},
@@ -35,4 +36,4 @@ export const getContinentsKeyboard = (): unknown => {
         );
 
     return ik.build();
-}
+};

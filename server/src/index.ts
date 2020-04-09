@@ -6,6 +6,7 @@ import {runNgrok, stopNgrok} from './runNgrok';
 import environments from './environments/environment';
 import {initFirebase} from "./services/infrastructure/firebase";
 import {CONSOLE_LOG_DELIMITER, CONSOLE_LOG_EASE_DELIMITER} from "./models/constants";
+import * as firebase from "firebase";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +47,12 @@ process.on('SIGTERM', () => {
         if (environments.IsNgRokMode()) {
             await stopNgrok();
         }
+
+        // If there are any subscription to Firebase - unsubscribe
+        if (firebase.database()) {
+            firebase.database().ref().off();
+        }
+
         process.exit(0);
     });
 });

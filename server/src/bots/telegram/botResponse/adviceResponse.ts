@@ -5,8 +5,8 @@ import {
     suggestedBehaviors
 } from "../../../messages/userMessage";
 
-export const showAdvicesHowToBehave = (bot, message, chatId) => {
-    bot.sendMessage(
+export const showAdvicesHowToBehaveResponse = (bot, message, chatId): Promise<void> => {
+    return bot.sendMessage(
         chatId,
         `ℹ Suggested Behaviors
         ${suggestedBehaviors()} \nℹ Social Distancing

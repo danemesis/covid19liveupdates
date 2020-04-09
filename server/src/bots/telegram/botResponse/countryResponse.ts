@@ -12,7 +12,7 @@ import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isMessageIsCommand} from "../../../utils/incomingMessages";
 import {UserRegExps} from "../../../models/constants";
 
-export const showCountryByName = async (bot, message, chatId): Promise<void> =>
+export const showCountryByNameResponse = async (bot, message, chatId): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
         : showCountry(

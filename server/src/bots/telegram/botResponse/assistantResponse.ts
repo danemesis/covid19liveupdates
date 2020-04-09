@@ -11,8 +11,7 @@ import {isCommandOnly, isMatchingDashboardItem, isMessageStartsWithCommand} from
 import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta.models";
 import {UserMessages} from "../../../models/constants";
 
-export const assistantStrategy = (bot, message, chatId) => {
-    console.log('message', message, isMessageStartsWithCommand(message.text), isMatchingDashboardItem(message.text, UserMessages.Assistant))
+export const assistantStrategyResponse = (bot, message, chatId) => {
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
         || isMatchingDashboardItem(message.text, UserMessages.Assistant)) {
         return showAssistantFeatures(bot, message)

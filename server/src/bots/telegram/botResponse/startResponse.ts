@@ -1,6 +1,6 @@
 import {getKeyboard} from '../utils/keyboard';
 import {greetUser} from "../../../messages/userMessage";
-import {showHelpInfo} from './helpResponse';
+import {showHelpInfoResponse} from './helpResponse';
 
 export const startResponse = async (bot, message, chatId) => {
     await bot.sendMessage(
@@ -9,5 +9,5 @@ export const startResponse = async (bot, message, chatId) => {
         getKeyboard(message)
     );
 
-    await showHelpInfo(bot, message, chatId);
+    await showHelpInfoResponse(bot, message, chatId);
 };
