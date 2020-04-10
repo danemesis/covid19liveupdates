@@ -7,7 +7,7 @@ import {
 } from "../../../messages/feature/countryMessages";
 import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';
-import {getAfterCountryResponseInlineKeyboard} from '../utils/keyboard';
+import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isMessageIsCommand} from "../../../utils/incomingMessages";
 import {UserRegExps} from "../../../models/constants";

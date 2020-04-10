@@ -1,4 +1,4 @@
-import {getFullMenuKeyboard} from '../utils/keyboard';
+import {getFullMenuKeyboard} from '../services/keyboard';
 import {greetUser} from "../../../messages/userMessage";
 import {showHelpInfoResponse} from './helpResponse';
 

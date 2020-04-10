@@ -1,8 +1,8 @@
 import {TelegramChat} from "../../bots/telegram/models";
 import {getAvailableCountries} from "./covid19";
 import {Country} from "../../models/country.models";
-import {getUserSubscription, setUserSubscriptionToStorage} from "./storage";
-import {UserSubscription} from "../../models/storage.models";
+import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
+import {SubscriptionType} from "../../models/storage.models";
 
 /*
     @params
@@ -18,12 +18,18 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
         throw Error('Is not supported, yet')
     }
 
-    const existingSubscriptions: UserSubscription = await getUserSubscription<UserSubscription>(chat.id);
-    console.log('existingSubscriptions', existingSubscriptions);
+    const existingSubscriptions: Array<string> = (await getTelegramUserSubscriptions(chat.id) ?? {}).subscriptionsOn ?? [];
 
-    await setUserSubscriptionToStorage({
+    await setTelegramSubscription({
         chat,
-        subscriptionsOn: [...existingSubscriptions.subscriptionsOn, subscribeMeOnCountry.name]
+        subscriptionsOn: [
+            ...existingSubscriptions,
+            {
+                type: SubscriptionType.Country,
+                value: subscribeMeOnCountry.name,
+                lastUpdate: Date.now(),
+            }
+        ]
     });
 
     return subscribeMeOnCountry.name;

@@ -12,7 +12,7 @@ import {
 import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
 import {subscribeOn} from "../../../services/domain/subscribe";
 import {catchAsyncError} from "../../../utils/catchError";
-import {getFullMenuKeyboard} from "../utils/keyboard";
+import {getFullMenuKeyboard} from "../services/keyboard";
 
 export const subscribingStrategyResponse = async (bot, message, chatId): Promise<void> => {
     console.log('INSIDE STRATEGY', message);

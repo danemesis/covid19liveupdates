@@ -4,7 +4,7 @@ import {getCountriesSituation} from "../../../services/domain/covid19";
 import {getTableHeader, getTableRowMessageForCountry} from "../../../messages/feature/countryMessages";
 import {Country} from "../../../models/country.models";
 import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../messages/feature/countriesMessages";
-import {getContinentsInlineKeyboard} from '../utils/keyboard';
+import {getContinentsInlineKeyboard} from '../services/keyboard';
 
 // TODO: Move this logic to domain and leave here only Telegram bot specific message response
 // Sending response itself

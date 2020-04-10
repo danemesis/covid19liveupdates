@@ -1,4 +1,4 @@
-import {getChatId} from "./chat";
+import {getChatId} from "../utils/chat";
 import {logger} from "../../../utils/logger";
 
 export class MessageRegistry {
@@ -24,11 +24,9 @@ export class MessageRegistry {
     };
 
     private registerCallBackQuery() {
-        this._bot.on("callback_query", ({id, data, message, from, ...evElse}) => {
+        this._bot.on("callback_query", ({id, data, message, from}) => {
             this._bot.answerCallbackQuery(id, {text: 'In process...'})
                 .then(() => {
-                    console.log('evElse', evElse);
-
                     if (this._messageHandlers[data]) {
                         return this._messageHandlers[data].call(this, this._bot, message, from.id)
                     }

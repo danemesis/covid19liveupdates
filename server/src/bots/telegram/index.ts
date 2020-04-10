@@ -4,7 +4,7 @@ import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../
 import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
 import {Express} from "express";
-import {MessageRegistry} from "./utils/messageRegistry";
+import {MessageRegistry} from "./services/messageRegistry";
 import {getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
@@ -15,6 +15,7 @@ import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
 import {showAvailableCountriesResponse} from "./botResponse/availableResponse";
 import {subscribingStrategyResponse} from "./botResponse/subscribeResponse";
+import {listenTelegramUsersSubscriptionsChanges, telegramUsersSubscriptionsChangesHandler} from "./services/storage";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -59,6 +60,8 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
                 .join('|');
             registry.registerMessageHandler(`[${single}]`, showCountryByFlag);
         });
+
+    listenTelegramUsersSubscriptionsChanges(telegramUsersSubscriptionsChangesHandler);
 
     bot.on('message', (message, ...args) => {
         logger.log('info', message);

@@ -5,3 +5,5 @@ export interface TelegramChat {
     username: string;
     type: string | 'private';
 }
+
+export const TELEGRAM_PREFIX: string = 'telegram';
