@@ -2,7 +2,7 @@ import {TelegramChat} from "../../bots/telegram/models";
 import {getAvailableCountries} from "./covid19";
 import {Country} from "../../models/country.models";
 import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
-import {SubscriptionType} from "../../models/storage.models";
+import {SubscriptionType} from "../../models/subscription.models";
 
 /*
     @params

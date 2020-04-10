@@ -4,7 +4,7 @@ import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../
 import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
 import {Express} from "express";
-import {MessageRegistry} from "./services/messageRegistry";
+import {MessageRegistry, registry} from "./services/messageRegistry";
 import {getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
@@ -15,7 +15,8 @@ import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
 import {showAvailableCountriesResponse} from "./botResponse/availableResponse";
 import {subscribingStrategyResponse} from "./botResponse/subscribeResponse";
-import {listenTelegramUsersSubscriptionsChanges, telegramUsersSubscriptionsChangesHandler} from "./services/storage";
+import {getTelegramSubscriptionsHandler} from "./services/storage";
+import {SubscriptionType} from "../../models/subscription.models";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -30,7 +31,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         res.sendStatus(200);
     });
 
-    const registry = new MessageRegistry(bot);
+    registry.setBot(bot); // TODO: DO IT COOLER
     registry
         .registerMessageHandler(UserRegExps.Start, startResponse)
         .registerMessageHandler(UserMessages.CountriesData, countriesResponse)
@@ -61,7 +62,12 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
             registry.registerMessageHandler(`[${single}]`, showCountryByFlag);
         });
 
-    listenTelegramUsersSubscriptionsChanges(telegramUsersSubscriptionsChangesHandler);
+    // listenTelegramUsersSubscriptionsChanges(
+    this.cachedCovid19CountriesData.subscribe(
+        getTelegramSubscriptionsHandler,
+        [SubscriptionType.Country]
+    );
+    // );
 
     bot.on('message', (message, ...args) => {
         logger.log('info', message);

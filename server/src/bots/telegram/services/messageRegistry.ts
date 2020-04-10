@@ -1,16 +1,16 @@
 import {getChatId} from "../utils/chat";
 import {logger} from "../../../utils/logger";
 
-export class MessageRegistry {
+class MessageRegistry {
     //TODO: change type to unknown and Handle casting to BotType 
     _bot: any;
     _cbQueryHandlers: { [regexp: string]: CallBackQueryHandler } = {};
     _messageHandlers: { [regexp: string]: CallBackQueryHandler } = {};
 
-    constructor(bot) {
+    public setBot(bot): void {
         this._bot = bot;
         this.registerCallBackQuery();
-    };
+    }
 
     public registerMessageHandler(regexp: string, callback: (bot: unknown, message: unknown, chatId: number) => unknown): MessageRegistry {
         this._messageHandlers[regexp] = callback;
@@ -22,6 +22,13 @@ export class MessageRegistry {
         this._cbQueryHandlers[message] = callback;
         return this;
     };
+
+    public sendUserNotification(chatId: number, notification: string): void {
+        this._bot.sendMessage(
+            chatId,
+            notification
+        );
+    }
 
     private registerCallBackQuery() {
         this._bot.on("callback_query", ({id, data, message, from}) => {
@@ -46,5 +53,7 @@ export class MessageRegistry {
         });
     }
 }
+
+export const registry = new MessageRegistry();
 
 type CallBackQueryHandler = (bot: any, message: any, chatId: unknown) => any

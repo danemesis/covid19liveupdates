@@ -1,8 +1,14 @@
 import * as firebase from 'firebase';
-import {UserSubscription} from "../../models/storage.models";
+import {UserSubscription} from "../../models/subscription.models";
+import {SubscriptionStorage} from "../../models/storage.models";
 import DataSnapshot = firebase.database.DataSnapshot;
 
-export const getStorage = <T>(messengerPrefix: string): Function => async <T>(): Promise<T> => {
+export const getFllStorage = async <T>(): Promise<T> => {
+    const snapshot: DataSnapshot = await firebase.database().ref().once('value');
+    return snapshot.val();
+};
+
+export const getMessengerStorage = <T>(messengerPrefix: string): Function => async <T>(): Promise<T> => {
     const snapshot: DataSnapshot = await firebase.database().ref(messengerPrefix).once('value');
     return snapshot.val();
 };
@@ -15,11 +21,12 @@ export const listenSubscriptionsChanges = (messengerPrefix: string): Function =>
         .on('value', cb);
 };
 
-export const getSubscriptions = (messengerPrefix: string) => async (): Promise<DataSnapshot> => {
-    return firebase.database().ref(`${messengerPrefix}/subscriptions`).once('value');
+export const getSubscriptions = (messengerPrefix: string) => async <T>(): Promise<SubscriptionStorage> => {
+    const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions`).once('value');
+    return snapshot.val();
 };
 
-export const getSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<T> => {
+export const getSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
     const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions/${chatId}`).once('value');
     return snapshot.val();
 };
