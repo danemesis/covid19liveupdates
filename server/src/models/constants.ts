@@ -6,7 +6,7 @@ export const CONSOLE_LOG_EASE_DELIMITER: string = '==============> ';
 export const CONSOLE_LOG_DELIMITER: string = '\n\n==============> ';
 
 export enum CustomSubscriptions {
-    SubscribeMeOn = 'Subscribe on'
+    SubscribeMeOn = `Subscribe on`
 }
 
 export enum UserRegExps {

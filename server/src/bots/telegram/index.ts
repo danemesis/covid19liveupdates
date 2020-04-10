@@ -46,10 +46,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserMessages.MySubscriptions, subscribingStrategyResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse);
     for (let continent in Continents) {
-        registry.registerMessageHandler(continent, countriesByContinent(continent));
+        registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
     }
-    for (let subscribeOn in CustomSubscriptions) {
-        registry.registerMessageHandler(subscribeOn, subscribingStrategyResponse)
+    for (let customSubscriptionsKey in CustomSubscriptions) {
+        registry.registerCallBackQueryHandler(CustomSubscriptions[customSubscriptionsKey], subscribingStrategyResponse)
     }
 
     getAvailableCountries()

@@ -2,13 +2,9 @@ import * as firebase from 'firebase';
 import {UserSubscription} from "../../models/storage.models";
 import DataSnapshot = firebase.database.DataSnapshot;
 
-export const getFullStorage = async (): Promise<unknown> => {
+export const getFullStorage = async <T>(): Promise<T> => {
     const snapshot: DataSnapshot = await firebase.database().ref('').once('value');
     return snapshot.val();
-};
-
-export const getUsersSubscriptions = async (): Promise<DataSnapshot> => {
-    return firebase.database().ref('subscriptions').once('value');
 };
 
 export const listenUsersSubscriptionsChanges = (
@@ -19,9 +15,18 @@ export const listenUsersSubscriptionsChanges = (
         .on('value', cb);
 };
 
-export const setUserSubscriptionToStorage = async (
+export const getUsersSubscriptions = async (): Promise<DataSnapshot> => {
+    return firebase.database().ref('subscriptions').once('value');
+};
+
+export const getUserSubscription = async <T>(chatId: number): Promise<T> => {
+    const snapshot = await firebase.database().ref(`subscriptions/${chatId}`).once('value');
+    return snapshot.val();
+};
+
+export const setUserSubscriptionToStorage = async <T>(
     {chat, subscriptionsOn}: UserSubscription
-): Promise<unknown> => {
+): Promise<T> => {
     return firebase.database()
         .ref('subscriptions/' + chat.id)
         .set(({

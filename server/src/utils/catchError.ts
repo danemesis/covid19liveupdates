@@ -1,4 +1,4 @@
-export const catchAsyncError = async (promiseLike: Promise<unknown>): Promise<[Error, unknown]> => {
+export const catchAsyncError = async <T>(promiseLike: Promise<T>): Promise<[Error, T]> => {
     try {
         const result = await promiseLike;
         return [undefined, result];

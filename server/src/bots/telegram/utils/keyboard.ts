@@ -1,5 +1,5 @@
 import {Cache} from "../../../utils/cache";
-import {Continents, UserMessages} from "../../../models/constants";
+import {Continents, CustomSubscriptions, UserMessages} from "../../../models/constants";
 import {InlineKeyboard, ReplyKeyboard} from "node-telegram-keyboard-wrapper";
 
 export const getFullMenuKeyboard = (chatId): unknown => {
@@ -23,7 +23,10 @@ export const getAfterCountryResponseInlineKeyboard = (country: string): unknown 
     const ik = new InlineKeyboard();
     ik
         .addRow(
-            {text: `Subscribe on ${country}`, callback_data: country},
+            {
+                text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
+                callback_data: `${CustomSubscriptions.SubscribeMeOn} ${country}`
+            },
         );
 
     return ik.build();

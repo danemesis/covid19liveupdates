@@ -1,6 +1,6 @@
 import {
     showMySubscriptionMessage,
-    subscribeCountryMessage,
+    subscribeError,
     subscriptionResultMessage
 } from "../../../messages/feature/subscribeMessage";
 import {
@@ -9,9 +9,10 @@ import {
     isMessageIsCommand,
     isMessageStartsWithCommand
 } from "../../../utils/incomingMessages";
-import {UserMessages, UserRegExps} from "../../../models/constants";
+import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
 import {subscribeOn} from "../../../services/domain/subscribe";
 import {catchAsyncError} from "../../../utils/catchError";
+import {getFullMenuKeyboard} from "../utils/keyboard";
 
 export const subscribingStrategyResponse = async (bot, message, chatId): Promise<void> => {
     console.log('INSIDE STRATEGY', message);
@@ -26,19 +27,25 @@ export const subscribingStrategyResponse = async (bot, message, chatId): Promise
         )
     }
 
-    console.log('SUBSCRIPTION START');
-    const [err, result] = await catchAsyncError(subscribeOn(message.chat, message.text));
-    console.log('SUBSCRIPTION RESULT', err, result);
+    const [err, result] = await catchAsyncError<string>(
+        subscribeOn(
+            message.chat,
+            message.reply_markup?.inline_keyboard?.[0]?.[0].text
+                .replace(`${CustomSubscriptions.SubscribeMeOn}`, '')
+                .trim()
+            ?? message.text
+        )
+    );
+    if (err) {
+        return bot.sendMessage(
+            chatId,
+            subscribeError(err.message)
+        )
+    }
 
     return bot.sendMessage(
         chatId,
-        subscriptionResultMessage(message)
-    )
-};
-
-export const subscribeCountryResponse = (bot, message, chatId): Promise<void> => {
-    return bot.sendMessage(
-        chatId,
-        subscribeCountryMessage(message)
+        subscriptionResultMessage(result),
+        getFullMenuKeyboard(chatId)
     )
 };
