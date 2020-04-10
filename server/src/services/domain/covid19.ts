@@ -40,10 +40,8 @@ class CachedCovid19CountriesData {
         return this.cachedAvailableCountriesData;
     }
 
-    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>],
-                private cachedAvailableCountriesData: Array<Country>) {
-        this.cachedCountriesData = [[]];
-        this.cachedAvailableCountriesData = [];
+    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [[]],
+                private cachedAvailableCountriesData: Array<Country> = []) {
     }
 
     public subscribe(cb: Function, subscriptionsType: Array<SubscriptionType>): void {
@@ -99,6 +97,7 @@ function getCovid19Data(): Promise<Array<[Country, Array<CountrySituationInfo>]>
 
 export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySituationInfo>]>> {
     const [lastFetchedTime, countriesSituation] = cachedCovid19CountriesData.countriesData ?? [];
+
 
     if (lastFetchedTime > Date.now() - TIMES.MILLISECONDS_IN_HOUR) {
         return Promise.resolve(countriesSituation);

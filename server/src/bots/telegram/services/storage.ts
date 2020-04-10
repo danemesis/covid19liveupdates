@@ -13,6 +13,7 @@ import {Country} from "../../../models/country.models";
 import {CountrySituationInfo} from "../../../models/covid19.models";
 import {getMessageForCountry} from "../../../messages/feature/countryMessages";
 import {registry} from "./messageRegistry";
+import {CONSOLE_LOG_DELIMITER, CONSOLE_LOG_EASE_DELIMITER} from "../../../models/constants";
 
 export const getTelegramFullStorage: Function = getMessengerStorage(TELEGRAM_PREFIX);
 export const getTelegramSubscriptions: Function = getSubscriptions(TELEGRAM_PREFIX);
@@ -49,11 +50,24 @@ export const getTelegramSubscriptionsHandler = async (countriesData: [number, Ar
                     }
 
                     const userSubscriptionCountryLastSituationInfo: CountrySituationInfo = userSubscriptionCountry[userSubscriptionCountry.length - 1];
+                    console.log(`${CONSOLE_LOG_EASE_DELIMITER}FROM NOTIFICATIONS, ${subscription}`);
 
-                    if (new Date(subscription.lastUpdate).toISOString().split('T')[0] < userSubscriptionCountryLastSituationInfo.date) {
+                    const userSubscriptionCountryLastSituationInfoDate = userSubscriptionCountryLastSituationInfo
+                        .date
+                        .split('-')
+                        .map(v => parseInt(v, 10));
+                    const userSubscriptionCountryLastGivenUpdate = (new Date(subscription.lastUpdate).toISOString().split('T')[0])
+                        .split('-')
+                        .map(v => parseInt(v, 10));
+
+                    if (userSubscriptionCountryLastSituationInfoDate.every((v, idx) => v > userSubscriptionCountryLastGivenUpdate[idx])) {
+                        console.log(`${CONSOLE_LOG_DELIMITER}FROM NOTIFICATIONS, INSIED`);
+                        console.log(subscription);
+                        console.log(userSubscriptionCountryLastSituationInfo);
+
                         userSubscriptionsUpdate = [
                             ...userSubscriptionsUpdate,
-                            getMessageForCountry({
+                            'New information 🔔 ' + getMessageForCountry({
                                 name: userSubscriptionCountryLastSituationInfo.name,
                                 confirmed: userSubscriptionCountryLastSituationInfo.confirmed,
                                 recovered: userSubscriptionCountryLastSituationInfo.recovered,

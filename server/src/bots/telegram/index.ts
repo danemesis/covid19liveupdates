@@ -5,7 +5,7 @@ import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
 import {Express} from "express";
 import {MessageRegistry, registry} from "./services/messageRegistry";
-import {getAvailableCountries,} from "../../services/domain/covid19";
+import {cachedCovid19CountriesData, getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
 import {assistantStrategyResponse} from "./botResponse/assistantResponse";
@@ -63,7 +63,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         });
 
     // listenTelegramUsersSubscriptionsChanges(
-    this.cachedCovid19CountriesData.subscribe(
+    cachedCovid19CountriesData.subscribe(
         getTelegramSubscriptionsHandler,
         [SubscriptionType.Country]
     );
