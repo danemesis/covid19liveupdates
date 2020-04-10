@@ -33,6 +33,7 @@ let envConfig = {
     FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET ?? '',
     FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID ?? '',
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID ?? '',
+    CHARTSAPI_URL: 'https://quickchart.io/chart',
     IsProduction() {
         return environmentName === "production";
     },

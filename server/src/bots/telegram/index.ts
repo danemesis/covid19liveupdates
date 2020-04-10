@@ -22,6 +22,7 @@ import {SubscriptionType} from "../../models/subscription.models";
 import {registry} from "./services/messageRegistry";
 import {subscriptionNotifierHandler} from "./services/subscriptionNotifierManager";
 import {unsubscribeStrategyResponse} from "./botResponse/unsubscribeResponse";
+import {showTrendsByCountry} from './botResponse/trendResponse';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -58,11 +59,13 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserMessages.SubscriptionManager, subscriptionManagerResponse)
         .registerMessageHandler(UserMessages.Existing, showExistingSubscriptionsResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
-        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse);
+        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse)
+        .registerMessageHandler(UserRegExps.Trends, showTrendsByCountry);
     registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
     registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
+
 
     // Feature: Countries / Country
     for (let continent in Continents) {

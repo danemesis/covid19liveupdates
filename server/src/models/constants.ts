@@ -18,6 +18,7 @@ export enum UserRegExps {
     CountriesData = '/countries',
     AvailableCountries = '/available',
     CountryData = '/country',
+    Trends = "/trends",
     Advice = '/advice',
     Subscribe = '/subscribe',
     Unsubscribe = '/unsubscribe',
