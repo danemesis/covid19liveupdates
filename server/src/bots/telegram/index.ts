@@ -1,5 +1,5 @@
 import {countriesByContinent, countriesResponse} from "./botResponse/countriesResponse";
-import {showCountryByFlag, showCountryByNameResponse} from "./botResponse/countryResponse";
+import {showCountryByFlag, showCountryByNameStrategyResponse} from "./botResponse/countryResponse";
 import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../models/constants";
 import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
@@ -13,10 +13,15 @@ import Config from "../../environments/environment";
 import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
 import {showAvailableCountriesResponse} from "./botResponse/availableResponse";
-import {subscribingStrategyResponse} from "./botResponse/subscribeResponse";
+import {
+    showExistingSubscriptionsResponse,
+    subscribingStrategyResponse,
+    subscriptionManagerResponse
+} from "./botResponse/subscribeResponse";
 import {SubscriptionType} from "../../models/subscription.models";
 import {registry} from "./services/messageRegistry";
-import {subscriptionNotifierHandler} from "./services/subscriptionNotifierHandler";
+import {subscriptionNotifierHandler} from "./services/subscriptionNotifierManager";
+import {buildUnsubscribeInlineResponse, unsubscribeStrategyResponse} from "./botResponse/unsubscribeResponse";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -34,26 +39,35 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     registry.setBot(bot); // TODO: DO IT COOLER
     registry
         .registerMessageHandler(UserRegExps.Start, startResponse)
+        // Feature: Countries / Country
         .registerMessageHandler(UserMessages.CountriesData, countriesResponse)
         .registerMessageHandler(UserRegExps.CountriesData, countriesResponse)
         .registerMessageHandler(UserMessages.AvailableCountries, showAvailableCountriesResponse)
         .registerMessageHandler(UserRegExps.AvailableCountries, showAvailableCountriesResponse)
-        .registerMessageHandler(UserRegExps.CountryData, showCountryByNameResponse)
+        .registerMessageHandler(UserRegExps.CountryData, showCountryByNameStrategyResponse)
+        // Feature: Advices
         .registerMessageHandler(UserMessages.GetAdvicesHowToBehave, showAdvicesHowToBehaveResponse)
         .registerMessageHandler(UserRegExps.Advice, showAdvicesHowToBehaveResponse)
+        // Feature: Help
         .registerMessageHandler(UserMessages.Help, showHelpInfoResponse)
         .registerMessageHandler(UserRegExps.Help, showHelpInfoResponse)
+        // Feature: Assistant
         .registerMessageHandler(UserMessages.Assistant, assistantStrategyResponse)
         .registerMessageHandler(UserRegExps.Assistant, assistantStrategyResponse)
-        .registerMessageHandler(UserMessages.SubscriptionManager, subscribingStrategyResponse)
-        .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse);
+        // Feature: Subscriptions
+        .registerMessageHandler(UserMessages.SubscriptionManager, subscriptionManagerResponse)
+        .registerMessageHandler(UserMessages.Existing, showExistingSubscriptionsResponse)
+        .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
+        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse);
+    registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
+    registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
+    registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
+
+    // Feature: Countries / Country
     for (let continent in Continents) {
         registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
     }
-    for (let customSubscriptionsKey in CustomSubscriptions) {
-        registry.registerCallBackQueryHandler(CustomSubscriptions[customSubscriptionsKey], subscribingStrategyResponse)
-    }
-
+    // Feature: Countries / Country
     getAvailableCountries()
         .then((countries: Array<Country>) => {
             const single = countries
@@ -64,6 +78,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
             registry.registerMessageHandler(`[~${single}~]`, showCountryByFlag);
         });
 
+    // Feature: Subscriptions
     cachedCovid19CountriesData.subscribe(
         subscriptionNotifierHandler,
         [SubscriptionType.Country]

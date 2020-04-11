@@ -17,8 +17,7 @@ export const updateTelegramSubscription: Function = updateSubscription(TELEGRAM_
 
 export const listenTelegramUsersSubscriptionsChanges: Function = listenSubscriptionsChanges(TELEGRAM_PREFIX);
 export const telegramUsersSubscriptionsChangesHandler = (a: firebase.database.DataSnapshot, b?: string | null): unknown => {
-    console.log('a', a, a.val());
-    console.log('b', b);
-
+    // a.val() will give you an updates on every change of Firebase, reactively
     return '';
 };
+

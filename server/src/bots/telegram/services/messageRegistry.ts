@@ -35,17 +35,17 @@ class MessageRegistry {
             this._bot.answerCallbackQuery(id, {text: 'In process...'})
                 .then(() => {
                     if (this._messageHandlers[data]) {
-                        return this._messageHandlers[data].call(this, this._bot, message, from.id)
+                        return this._messageHandlers[data].call(this, this._bot, message, from.id, data)
                     }
 
                     if (this._cbQueryHandlers[data]) {
-                        return this._cbQueryHandlers[data].call(this, this._bot, message, from.id)
+                        return this._cbQueryHandlers[data].call(this, this._bot, message, from.id, data)
                     }
 
                     const partialMatchCbHandlerKey = Object.keys(this._cbQueryHandlers)
                         .find((key: string) => (data as string).includes(key));
                     if (partialMatchCbHandlerKey) {
-                        return this._cbQueryHandlers[partialMatchCbHandlerKey].call(this, this._bot, message, from.id);
+                        return this._cbQueryHandlers[partialMatchCbHandlerKey].call(this, this._bot, message, from.id, data);
                     }
 
                     logger.log('error', `DIDN'T find handler for ${from.id}, ${data}, ${message}`);

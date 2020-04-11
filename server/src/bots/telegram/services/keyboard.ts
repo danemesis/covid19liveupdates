@@ -1,6 +1,7 @@
 import {Cache} from "../../../utils/cache";
 import {Continents, CustomSubscriptions, UserMessages} from "../../../models/constants";
 import {InlineKeyboard, ReplyKeyboard} from "node-telegram-keyboard-wrapper";
+import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from "../models";
 
 export const getFullMenuKeyboard = (chatId): unknown => {
     const rk = new ReplyKeyboard();
@@ -28,6 +29,45 @@ export const getAfterCountryResponseInlineKeyboard = (country: string): unknown 
                 callback_data: `${CustomSubscriptions.SubscribeMeOn} ${country}`
             },
         );
+
+    return ik.build();
+};
+
+export const getSubscriptionMessageInlineKeyboard = (): unknown => {
+    const ik = new InlineKeyboard();
+    ik
+        .addRow(
+            {
+                text: UserMessages.Existing,
+                callback_data: UserMessages.Existing
+            },
+            {
+                text: UserMessages.Unsubscribe,
+                callback_data: UserMessages.Unsubscribe
+            },
+        );
+
+    return ik.build();
+};
+
+export const getUnsubscribeMessageInlineKeyboard = (values: Array<string>): unknown => {
+    const ik = new InlineKeyboard();
+
+    let i: number = 0;
+    while (i < values.length) {
+        const rows = [];
+        let rowItem: number = 0;
+        while (!!values[i] && rowItem < UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER) {
+            rows.push(
+                {
+                    text: values[i],
+                    callback_data: values[i++],
+                }
+            );
+            rowItem += 1;
+        }
+        ik.addRow(...rows);
+    }
 
     return ik.build();
 };

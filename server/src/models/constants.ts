@@ -29,7 +29,7 @@ export enum UserMessages {
     AvailableCountries = 'Countries we track',
     GetAdvicesHowToBehave = 'Advice how not to 😷',
     SubscriptionManager = 'Subscriptions 💌',
-    Subscribe = 'Existing',
+    Existing = 'Existing',
     Unsubscribe = 'Unsubscribe',
     Help = 'ℹ What can you do?'
 }

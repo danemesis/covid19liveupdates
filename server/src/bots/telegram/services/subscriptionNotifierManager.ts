@@ -1,14 +1,20 @@
 import {Country} from "../../../models/country.models";
 import {CountrySituationInfo} from "../../../models/covid19.models";
 import {SubscriptionStorage} from "../../../models/storage.models";
-import {Subscription, SubscriptionType, UserSubscriptionNotification} from "../../../models/subscription.models";
+import {
+    Subscription,
+    SubscriptionType,
+    UserSubscription,
+    UserSubscriptionNotification
+} from "../../../models/subscription.models";
 import {CONSOLE_LOG_DELIMITER} from "../../../models/constants";
 import {registry} from "./messageRegistry";
 import {getTelegramSubscriptions, updateTelegramSubscription} from "./storage";
 import {catchAsyncError} from "../../../utils/catchError";
 import {logger} from "../../../utils/logger";
 import {getErrorMessage} from "../../../utils/getErrorMessage";
-import {showCountrySubscriptionMessage} from "../../../messages/feature/subscribeMessage";
+import {showCountrySubscriptionMessage} from "../../../messages/feature/subscribeMessages";
+import {getConcreteUserSubscriptions} from "../../../services/domain/subscriptions";
 
 export const subscriptionNotifierHandler = async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]): Promise<void> => {
     const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
@@ -61,7 +67,7 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
     }
 };
 
-export const getUserSubscriptionNotifications = (
+const getUserSubscriptionNotifications = (
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
     userSubscriptionsOn: Array<Subscription>
 ): Array<UserSubscriptionNotification> => {
@@ -106,5 +112,10 @@ export const getUserSubscriptionNotifications = (
         });
 
     return userSubscriptionNotifications;
+};
+
+export const getUserSubscriptions = async (chatId: number): Promise<UserSubscription> => {
+    const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
+    return getConcreteUserSubscriptions(chatId, allUsersSubscriptions);
 };
 
