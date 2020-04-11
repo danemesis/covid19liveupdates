@@ -4,7 +4,6 @@ import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../
 import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
 import {showHelpInfoResponse} from "./botResponse/helpResponse";
 import {Express} from "express";
-import {MessageRegistry, registry} from "./services/messageRegistry";
 import {cachedCovid19CountriesData, getAvailableCountries,} from "../../services/domain/covid19";
 import {Country} from "../../models/country.models";
 import {flag} from 'country-emoji';
@@ -15,8 +14,9 @@ import {logger} from "../../utils/logger";
 import {startResponse} from './botResponse/startResponse';
 import {showAvailableCountriesResponse} from "./botResponse/availableResponse";
 import {subscribingStrategyResponse} from "./botResponse/subscribeResponse";
-import {getTelegramSubscriptionsHandler} from "./services/storage";
 import {SubscriptionType} from "../../models/subscription.models";
+import {registry} from "./services/messageRegistry";
+import {subscriptionNotifierHandler} from "./services/subscriptionNotifierHandler";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -45,7 +45,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserRegExps.Help, showHelpInfoResponse)
         .registerMessageHandler(UserMessages.Assistant, assistantStrategyResponse)
         .registerMessageHandler(UserRegExps.Assistant, assistantStrategyResponse)
-        .registerMessageHandler(UserMessages.MySubscriptions, subscribingStrategyResponse)
+        .registerMessageHandler(UserMessages.SubscriptionManager, subscribingStrategyResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse);
     for (let continent in Continents) {
         registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
@@ -57,17 +57,17 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     getAvailableCountries()
         .then((countries: Array<Country>) => {
             const single = countries
-                .map(c => flag(c.name))
-                .join('|');
-            registry.registerMessageHandler(`[${single}]`, showCountryByFlag);
+                .map(c => flag(c.name)?.trim() ?? undefined)
+                .filter(v => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
+                .join('//');
+
+            registry.registerMessageHandler(`[~${single}~]`, showCountryByFlag);
         });
 
-    // listenTelegramUsersSubscriptionsChanges(
     cachedCovid19CountriesData.subscribe(
-        getTelegramSubscriptionsHandler,
+        subscriptionNotifierHandler,
         [SubscriptionType.Country]
     );
-    // );
 
     bot.on('message', (message, ...args) => {
         logger.log('info', message);

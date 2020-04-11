@@ -2,7 +2,8 @@ import {TelegramChat} from "../../bots/telegram/models";
 import {getAvailableCountries} from "./covid19";
 import {Country} from "../../models/country.models";
 import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
-import {SubscriptionType} from "../../models/subscription.models";
+import {SubscriptionType, UserSubscription} from "../../models/subscription.models";
+import {SubscriptionStorage} from "../../models/storage.models";
 
 /*
     @params
@@ -25,6 +26,7 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
         subscriptionsOn: [
             ...existingSubscriptions,
             {
+                active: true,
                 type: SubscriptionType.Country,
                 value: subscribeMeOnCountry.name,
                 lastUpdate: Date.now(),
@@ -33,4 +35,12 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
     });
 
     return subscribeMeOnCountry.name;
+};
+
+export const getUserSubscriptions = (
+    chatId: number, allUsersSubscriptions: SubscriptionStorage
+): UserSubscription => {
+    const userSubscriptionKey = Object.keys(allUsersSubscriptions)
+        .find(key => parseInt(key, 10) === chatId);
+    return allUsersSubscriptions[userSubscriptionKey];
 };

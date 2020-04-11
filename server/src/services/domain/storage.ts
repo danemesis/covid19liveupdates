@@ -41,3 +41,11 @@ export const setSubscription = (messengerPrefix: string) => async <T>(
             subscriptionsOn
         }))
 };
+
+export const updateSubscription = (messengerPrefix: string) => async <T>(
+    {chat, subscriptionsOn}: UserSubscription
+): Promise<T> => {
+    return firebase.database()
+        .ref(`${messengerPrefix}/subscriptions/${chat.id}/subscriptionsOn`)
+        .update(subscriptionsOn);
+};

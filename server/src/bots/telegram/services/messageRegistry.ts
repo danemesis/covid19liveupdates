@@ -2,7 +2,7 @@ import {getChatId} from "../utils/chat";
 import {logger} from "../../../utils/logger";
 
 class MessageRegistry {
-    //TODO: change type to unknown and Handle casting to BotType 
+    //TODO: change type to unknown and Handle casting to BotType
     _bot: any;
     _cbQueryHandlers: { [regexp: string]: CallBackQueryHandler } = {};
     _messageHandlers: { [regexp: string]: CallBackQueryHandler } = {};
@@ -23,8 +23,8 @@ class MessageRegistry {
         return this;
     };
 
-    public sendUserNotification(chatId: number, notification: string): void {
-        this._bot.sendMessage(
+    public sendUserNotification(chatId: number, notification: string): Promise<void> {
+        return this._bot.sendMessage(
             chatId,
             notification
         );

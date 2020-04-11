@@ -10,20 +10,22 @@ import {
     isMessageStartsWithCommand
 } from "../../../utils/incomingMessages";
 import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {subscribeOn} from "../../../services/domain/subscribe";
+import {getUserSubscriptions, subscribeOn} from "../../../services/domain/subscribe";
 import {catchAsyncError} from "../../../utils/catchError";
 import {getFullMenuKeyboard} from "../services/keyboard";
+import {getTelegramSubscriptions} from "../services/storage";
+import {SubscriptionStorage} from "../../../models/storage.models";
 
 export const subscribingStrategyResponse = async (bot, message, chatId): Promise<void> => {
-    console.log('INSIDE STRATEGY', message);
-
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
         || isMessageIsCommand(message.text, UserRegExps.Subscribe)
-        || isMatchingDashboardItem(message.text, UserMessages.MySubscriptions)
+        || isMatchingDashboardItem(message.text, UserMessages.SubscriptionManager)
     ) {
+        const allSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
+        const userSubscription = getUserSubscriptions(chatId, allSubscriptions);
         return bot.sendMessage(
             chatId,
-            showMySubscriptionMessage(message)
+            showMySubscriptionMessage(userSubscription)
         )
     }
 

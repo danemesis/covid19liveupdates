@@ -30,19 +30,31 @@ export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
 
 // TODO: Move messages to /messages/feature directory
 const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
+    if (!requestedCountry) {
+        // Because of
+        // [https://github.com/danbilokha/covid19liveupdates/issues/61]
+        // fix of https://github.com/danbilokha/covid19liveupdates/issues/58
+        // Reason, when we click on some Dashboard,
+        //      MessageRegistry.registerMessageHandler this._bot.onText(
+        // Regexp works not as we expect it to work
+        // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
+        return;
+    }
+
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
         .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
-    console.log('SOME PROBLEM?', foundCountrySituations);
-    const [foundCountry, foundSituation] = foundCountrySituations;
-
-    if (!foundCountry || !foundSituation?.length) {
+    if (!foundCountrySituations || !foundCountrySituations?.length
+        || !foundCountrySituations[0]
+        || !foundCountrySituations[1].length) {
         bot.sendMessage(
             chatId,
             `Sorry, but I cannot find anything for ${requestedCountry}. I will save your request and will work on it`
         );
         return;
     }
+
+    const [foundCountry, foundSituation] = foundCountrySituations;
 
     Cache.set(`${chatId}_commands_country`, flag(foundCountry.name));
 

@@ -18,8 +18,8 @@ export enum UserRegExps {
     AvailableCountries = '/available',
     CountryData = '/country',
     Advice = '/advice',
-    Unsubscribe = '/unsubscribe',
     Subscribe = '/subscribe',
+    Unsubscribe = '/unsubscribe',
     Help = '/help'
 }
 
@@ -28,7 +28,9 @@ export enum UserMessages {
     CountriesData = 'Countries data 🌍',
     AvailableCountries = 'Countries we track',
     GetAdvicesHowToBehave = 'Advice how not to 😷',
-    MySubscriptions = 'My subscriptions 💌',
+    SubscriptionManager = 'Subscriptions 💌',
+    Subscribe = 'Existing',
+    Unsubscribe = 'Unsubscribe',
     Help = 'ℹ What can you do?'
 }
 

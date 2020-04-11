@@ -14,7 +14,7 @@ export const getFullMenuKeyboard = (chatId): unknown => {
     rk
         .addRow(UserMessages.CountriesData, UserMessages.AvailableCountries)
         .addRow(UserMessages.Assistant, UserMessages.GetAdvicesHowToBehave)
-        .addRow(UserMessages.MySubscriptions, UserMessages.Help);
+        .addRow(UserMessages.SubscriptionManager, UserMessages.Help);
 
     return rk.open({resize_keyboard: true})
 };
