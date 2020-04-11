@@ -1,14 +1,11 @@
 import {TelegramChat} from "../../bots/telegram/models";
 import {getAvailableCountries} from "./covid19";
 import {Country} from "../../models/country.models";
-import {
-    getTelegramUserSubscriptions,
-    setTelegramSubscription,
-    updateTelegramSubscription
-} from "../../bots/telegram/services/storage";
+import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
 import {Subscription, SubscriptionType, UserSubscription} from "../../models/subscription.models";
 import {SubscriptionStorage} from "../../models/storage.models";
 import {catchAsyncError} from "../../utils/catchError";
+import {ALREADY_SUBSCRIBED_MESSAGE} from "../../messages/feature/subscribeMessages";
 
 /*
     @params
@@ -27,6 +24,14 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> = (await getTelegramUserSubscriptions(chat.id) ?? {})
         .subscriptionsOn ?? [];
+
+    const checkIfAlreadySubscribed = existingSubscriptions
+        .find((subscription: Subscription) => subscription.value === subscribeMeOn && subscription.active !== false);
+    if (!!checkIfAlreadySubscribed) {
+        // TODO: it's not actually error, re-write it be not an error
+        throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);
+    }
+
     await setTelegramSubscription({
         chat,
         subscriptionsOn: [
@@ -54,7 +59,6 @@ export const unsubscribeMeFrom = async (chat: TelegramChat, unsubscribeMeFrom: s
             }
             return subscription;
         });
-
     const [err, result] = await catchAsyncError(setTelegramSubscription({
         chat,
         subscriptionsOn: updatedSubscriptions

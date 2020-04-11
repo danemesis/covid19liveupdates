@@ -61,7 +61,7 @@ export const getUnsubscribeMessageInlineKeyboard = (values: Array<string>): unkn
             rows.push(
                 {
                     text: values[i],
-                    callback_data: values[i++],
+                    callback_data: `${CustomSubscriptions.UnsubscribeMeFrom} ${values[i++]}`,
                 }
             );
             rowItem += 1;

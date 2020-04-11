@@ -1,4 +1,5 @@
 import {
+    noSubscriptionsResponseMessage,
     showMySubscriptionMessage,
     subscribeError,
     subscriptionManagerResponseMessage,
@@ -17,6 +18,7 @@ import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from "../serv
 import {getTelegramSubscriptions} from "../services/storage";
 import {SubscriptionStorage} from "../../../models/storage.models";
 import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
+import {Subscription, UserSubscription} from "../../../models/subscription.models";
 
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(
@@ -28,10 +30,22 @@ export const subscriptionManagerResponse = async (bot, message, chatId): Promise
 
 export const showExistingSubscriptionsResponse = async (bot, message, chatId): Promise<void> => {
     const allSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
-    const userSubscription = getConcreteUserSubscriptions(chatId, allSubscriptions);
+    const userSubscription: UserSubscription = getConcreteUserSubscriptions(chatId, allSubscriptions);
+    const activeUserSubscription: UserSubscription = {
+        ...userSubscription,
+        subscriptionsOn: userSubscription.subscriptionsOn.filter((subscription: Subscription) => subscription.active !== false)
+    };
+
+    if (!activeUserSubscription?.subscriptionsOn?.length) {
+        return bot.sendMessage(
+            chatId,
+            noSubscriptionsResponseMessage()
+        )
+    }
+
     return bot.sendMessage(
         chatId,
-        showMySubscriptionMessage(userSubscription)
+        showMySubscriptionMessage(activeUserSubscription)
     );
 };
 

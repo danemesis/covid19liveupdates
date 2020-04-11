@@ -1,5 +1,5 @@
 import {getUserSubscriptions} from "../services/subscriptionNotifierManager";
-import {UserSubscription} from "../../../models/subscription.models";
+import {Subscription, UserSubscription} from "../../../models/subscription.models";
 import {
     getUnsubscribeResponseMessage,
     unSubscribeError,
@@ -16,9 +16,16 @@ import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/co
 import {catchAsyncError} from "../../../utils/catchError";
 import {unsubscribeMeFrom} from "../../../services/domain/subscriptions";
 import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
+import {noSubscriptionsResponseMessage} from "../../../messages/feature/subscribeMessages";
 
 export const buildUnsubscribeInlineResponse = async (bot, message, chatId): Promise<void> => {
     const userSubscription: UserSubscription = await getUserSubscriptions(chatId);
+    if (!userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active !== false).length) {
+        return bot.sendMessage(
+            chatId,
+            noSubscriptionsResponseMessage()
+        )
+    }
 
     return bot.sendMessage(
         chatId,
@@ -53,8 +60,8 @@ export const unsubscribeStrategyResponse = async (bot, message, chatId, ikCbData
         unsubscribeMeFrom(
             message.chat,
             getUserMessageFromIKorText(
-                ikCbData ?? message,
-                CustomSubscriptions.SubscribeMeOn, ''
+                message,
+                CustomSubscriptions.UnsubscribeMeFrom, ''
             )
         )
     );

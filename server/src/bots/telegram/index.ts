@@ -21,7 +21,7 @@ import {
 import {SubscriptionType} from "../../models/subscription.models";
 import {registry} from "./services/messageRegistry";
 import {subscriptionNotifierHandler} from "./services/subscriptionNotifierManager";
-import {buildUnsubscribeInlineResponse, unsubscribeStrategyResponse} from "./botResponse/unsubscribeResponse";
+import {unsubscribeStrategyResponse} from "./botResponse/unsubscribeResponse";
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -60,6 +60,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
         .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
+    registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
 

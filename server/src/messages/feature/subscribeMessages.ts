@@ -3,12 +3,18 @@ import {getMessageForCountry} from "./countryMessages";
 import {CountrySituationInfo} from "../../models/covid19.models";
 import {getDiffMessage} from "../covid19Messages";
 
+export const ALREADY_SUBSCRIBED_MESSAGE: string = 'You are already subscribed on the country';
+
 export const subscriptionManagerResponseMessage = (): string => {
     return `Easy way to manage your subscriptions 💌`
 };
 
+export const noSubscriptionsResponseMessage = (): string => {
+    return `It seems you haven't subscribed for any 🥺`
+};
+
 export const subscribeError = (message: string): string => {
-    return `${message}, sorry 🙇🏽‍♂️`
+    return `${message}, sorry 🙇🏽‍`
 };
 
 export const subscriptionResultMessage = (message: string): string => {
