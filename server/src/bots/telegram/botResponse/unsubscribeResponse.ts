@@ -60,7 +60,7 @@ export const unsubscribeStrategyResponse = async (bot, message, chatId, ikCbData
         unsubscribeMeFrom(
             message.chat,
             getUserMessageFromIKorText(
-                message,
+                ikCbData ?? message,
                 CustomSubscriptions.UnsubscribeMeFrom, ''
             )
         )

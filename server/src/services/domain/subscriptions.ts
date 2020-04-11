@@ -25,8 +25,9 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
     const existingSubscriptions: Array<Subscription> = (await getTelegramUserSubscriptions(chat.id) ?? {})
         .subscriptionsOn ?? [];
 
+    console.log('existingSubscriptions', existingSubscriptions);
     const checkIfAlreadySubscribed = existingSubscriptions
-        .find((subscription: Subscription) => subscription.value === subscribeMeOn && subscription.active !== false);
+        .find((subscription: Subscription) => subscription.value === subscribeMeOn && !!subscription.active);
     if (!!checkIfAlreadySubscribed) {
         // TODO: it's not actually error, re-write it be not an error
         throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);

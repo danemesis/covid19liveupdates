@@ -33,7 +33,7 @@ export const showExistingSubscriptionsResponse = async (bot, message, chatId): P
     const userSubscription: UserSubscription = getConcreteUserSubscriptions(chatId, allSubscriptions);
     const activeUserSubscription: UserSubscription = {
         ...userSubscription,
-        subscriptionsOn: userSubscription.subscriptionsOn.filter((subscription: Subscription) => subscription.active !== false)
+        subscriptionsOn: userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => !!subscription.active)
     };
 
     if (!activeUserSubscription?.subscriptionsOn?.length) {
