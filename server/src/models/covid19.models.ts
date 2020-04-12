@@ -24,3 +24,13 @@ export interface CountrySituation {
 export interface ContinentCountriesSituation {
     [continentName: string]: Array<CountrySituation>
 }
+
+export type CountryLiveInfoModel  = {
+        Country: string;
+        CountryCode: string;
+        Lat: string;
+        Lon: string;
+        Cases: number;
+        Status: string;
+        Date: string;
+}

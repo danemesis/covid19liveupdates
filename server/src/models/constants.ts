@@ -44,3 +44,10 @@ export enum Continents {
     Oceania = 'Oceania',
     Other = 'Other'
 }
+
+export enum Status {
+    Confirmed = 'confirmed',
+    Deaths = 'deaths',
+    Recovered = 'recovered'
+}
+

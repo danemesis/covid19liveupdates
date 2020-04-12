@@ -1,12 +1,38 @@
 import environments from "../../environments/environment";
 const stringifyObject = require('stringify-object');
+import {ChartModel} from '../../models/chart.models'
 
-const c={type:'bar',data:{labels:[2012,2013,2014,2015,2016],datasets:[{label:'Users',data:[120,60,50,180,120]}]}};
-const pretty = stringifyObject(c, {
-    indent: '',
-    singleQuotes: false
-});
-export function getCovidTrends(){
+export function getCovidTrends(inputData: ChartModel) {
 
-    return encodeURI(environments.CHARTSAPI_URL + '?c=' + pretty);
+    console.log("Creating URL from ", inputData);
+    const praparedInput =  
+        stringifyObject(
+            inputData, {
+                indent: '',
+                singleQuotes: false
+            }
+    );
+
+    console.log("FINAL URL", encodeURI(environments.CHARTSAPI_URL + '?c='+ praparedInput));
+    return encodeURI(environments.CHARTSAPI_URL + '?c='+ praparedInput);
 }
+
+
+const b = { 
+    type: 'line', 
+    data: { 
+        labels: ['January', 'February', 'March', 'April', 'May'], 
+        datasets: [
+            { label: 'Dogs', data: [50, 60, 70, 180, 190], 
+                fill: false, 
+                borderColor: 'blue' 
+            }, 
+            { 
+                label: 'Cats', 
+                data: [100, 200, 300, 400, 500], 
+                fill: false, 
+                borderColor: 'green' 
+            }
+        ]
+    }
+};
