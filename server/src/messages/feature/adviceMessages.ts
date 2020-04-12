@@ -2,11 +2,11 @@ export const encouragingMessage = (): string => `<a href="https://www.youtube.co
 
 export const suggestedBehaviors = (): string => `
 🚫🤦 Don't touch your face
-🚫🤧🤲 Don't sneeze into hands
+🚫🤧🤲 Don't sneeze on your hands
 ✅🤧💪 Do sneeze into your elbow
-🧼🖐⏲2️⃣0️⃣  Wash your hands regularly, for at least 20 seconds
-✅📦😌 If practical, have groceries and other items delivered to your home
-🚫🛒😡 When using local shops, don't buy literally everything on the shelves. Leave enough for others 💕
+🧼🖐⏲2️⃣0️⃣  Wash your hands regularly for at least 20 seconds
+✅📦😌 Avoid going to groceries without any urgent need; use delivery services as much as you can
+🚫🛒😡 Purchase consciously. Don't grab stuff compulsively from the shelves. Leave enough for others 💕
 `;
 
 export const socialDistancing = (): string => `
