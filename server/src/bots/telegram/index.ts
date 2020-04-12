@@ -63,6 +63,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
+    registry.registerCallBackQueryHandler(UserMessages.Help, showHelpInfoResponse);
 
     // Feature: Countries / Country
     for (const continent of Object.keys(Continents)) {
