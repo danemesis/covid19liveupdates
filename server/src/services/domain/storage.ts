@@ -26,17 +26,31 @@ export const getSubscriptions = (messengerPrefix: string) => async <T>(): Promis
     return snapshot.val();
 };
 
-export const getSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
+export const getActiveSubscriptions = (messengerPrefix: string) => async <T>(): Promise<SubscriptionStorage> => {
+    const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions`).once('value');
+
+    const activeSubscriptions: SubscriptionStorage = {};
+    for (const [chatId, userSubscription] of Object.entries(snapshot.val() as SubscriptionStorage)) {
+        activeSubscriptions[chatId] = {
+            ...userSubscription,
+            subscriptionsOn: userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
+        };
+    }
+
+    return activeSubscriptions;
+};
+
+export const getUserSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
     const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions/${chatId}`).once('value');
     return snapshot.val();
 };
 
-export const getActiveSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
+export const getActiveUserSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
     const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions/${chatId}`).once('value');
     const userSubscription: UserSubscription = snapshot.val() as UserSubscription;
     return {
         ...userSubscription,
-        subscriptionsOn: userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
+        subscriptionsOn: userSubscription?.subscriptionsOn?.filter((sub: Subscription) => sub.active)
     };
 };
 
@@ -49,12 +63,4 @@ export const setSubscription = (messengerPrefix: string) => async <T>(
             chat,
             subscriptionsOn
         }))
-};
-
-export const updateSubscription = (messengerPrefix: string) => async <T>(
-    {chat, subscriptionsOn}: UserSubscription
-): Promise<T> => {
-    return firebase.database()
-        .ref(`${messengerPrefix}/subscriptions/${chat.id}/subscriptionsOn`)
-        .update(subscriptionsOn);
 };

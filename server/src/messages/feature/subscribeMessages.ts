@@ -27,8 +27,8 @@ export const showMySubscriptionMessage = (userSubscription: UserSubscription): s
 };
 
 export const showCountrySubscriptionMessage = (
-    {name, confirmed, recovered, deaths, date}: CountrySituationInfo,
-    {confirmed: prevConfirmed, recovered: prevRecovered, deaths: prevDeaths, date: prevDate}: CountrySituationInfo
+    {name, confirmed, recovered, deaths, date}: Partial<CountrySituationInfo>,
+    {confirmed: prevConfirmed, recovered: prevRecovered, deaths: prevDeaths, date: prevDate}: Partial<CountrySituationInfo>
 ): string => {
     return `🔔 `
         + getMessageForCountry({
@@ -39,9 +39,10 @@ export const showCountrySubscriptionMessage = (
             lastUpdateDate: date,
         })
         + `\n\n📈 Country change, since ⏱️${prevDate}\n`
-        + getDiffMessage({confirmed, recovered, deaths}, {
-            confirmed: prevConfirmed,
-            recovered: prevRecovered,
-            deaths: prevDeaths
-        })
+        + getDiffMessage(
+            {confirmed, recovered, deaths},
+            {
+                confirmed: prevConfirmed, recovered: prevRecovered, deaths: prevDeaths
+            }
+        )
 };

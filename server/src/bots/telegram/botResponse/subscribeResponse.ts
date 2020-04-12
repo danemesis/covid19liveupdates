@@ -12,13 +12,12 @@ import {
     isMessageStartsWithCommand
 } from "../../../utils/incomingMessages";
 import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {getConcreteUserSubscriptions, subscribeOn} from "../../../services/domain/subscriptions";
+import {subscribeOn} from "../../../services/domain/subscriptions";
 import {catchAsyncError} from "../../../utils/catchError";
 import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from "../services/keyboard";
-import {getTelegramSubscriptions} from "../services/storage";
-import {SubscriptionStorage} from "../../../models/storage.models";
+import {getTelegramActiveUserSubscriptions} from "../services/storage";
 import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
-import {Subscription, UserSubscription} from "../../../models/subscription.models";
+import {UserSubscription} from "../../../models/subscription.models";
 import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
 
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {
@@ -30,13 +29,7 @@ export const subscriptionManagerResponse = async (bot, message, chatId): Promise
 };
 
 export const showExistingSubscriptionsResponse = async (bot, message, chatId): Promise<void> => {
-    const allSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
-    const userSubscription: UserSubscription = getConcreteUserSubscriptions(chatId, allSubscriptions);
-    const activeUserSubscription: UserSubscription = {
-        ...userSubscription,
-        subscriptionsOn: userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => !!subscription.active)
-    };
-
+    const activeUserSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(chatId);
     if (!activeUserSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
             chatId,
