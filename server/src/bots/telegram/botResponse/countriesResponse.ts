@@ -63,8 +63,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
 
     await bot.sendMessage(
         chatId,
-        getCountriesTableHTML({continent, continentTotalConfirmed, continentTotalRecovered, continentTotalDeath, portionMessage})
-        ,
+        getCountriesTableHTML({continent, continentTotalConfirmed, continentTotalRecovered, continentTotalDeath, portionMessage}),
         {parse_mode: 'HTML'}
     );
 };
