@@ -20,6 +20,7 @@ import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
 import {UserSubscription} from "../../../models/subscription.models";
 import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
 
+// TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(
         chatId,

@@ -86,8 +86,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     );
 
     bot.on('message', (message, ...args) => {
-        logger.log('info', message);
-        logger.log('info', args);
+        logger.log('info', {
+            ...message,
+            ...args,
+        });
     });
 
     bot.on("polling_error", (err) => logger.log('error', err));

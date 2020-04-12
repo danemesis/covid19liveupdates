@@ -7,6 +7,7 @@ import environments from './environments/environment';
 import {initFirebase} from "./services/infrastructure/firebase";
 import {CONSOLE_LOG_DELIMITER, CONSOLE_LOG_EASE_DELIMITER} from "./models/constants";
 import * as firebase from "firebase";
+import {checkCovid19Updates} from "./services/infrastructure/scheduler";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +37,8 @@ const server = app.listen(PORT, async () => {
     if (!isFirebaseInit) {
         console.log(`${CONSOLE_LOG_DELIMITER}Firebase did not start. Error ${e.name}, ${e.message}. Stack: ${e.stack}`);
     }
+
+    checkCovid19Updates();
 
     console.log(`${CONSOLE_LOG_DELIMITER}Starting Telegram bot`);
     runTelegramBot(app, appUrl);

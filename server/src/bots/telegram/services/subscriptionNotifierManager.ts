@@ -7,7 +7,6 @@ import {
     UserSubscription,
     UserSubscriptionNotification
 } from "../../../models/subscription.models";
-import {CONSOLE_LOG_DELIMITER} from "../../../models/constants";
 import {registry} from "./messageRegistry";
 import {getTelegramSubscriptions, setTelegramSubscription} from "./storage";
 import {catchAsyncError} from "../../../utils/catchError";
@@ -92,11 +91,6 @@ const getUserActiveSubscriptionNotifications = (
                     )) {
                     return;
                 }
-
-                console.log(`${CONSOLE_LOG_DELIMITER}FROM NOTIFICATIONS, INSIEDE`);
-
-                console.log(subscription);
-                console.log(subscriptionCountryLastInfo);
 
                 userSubscriptionNotifications = [
                     ...userSubscriptionNotifications,

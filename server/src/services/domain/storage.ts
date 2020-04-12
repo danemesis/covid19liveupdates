@@ -30,6 +30,7 @@ export const getActiveSubscriptions = (messengerPrefix: string) => async <T>(): 
     const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions`).once('value');
 
     const activeSubscriptions: SubscriptionStorage = {};
+    // TODO: Make filtering on Firebase level userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
     for (const [chatId, userSubscription] of Object.entries(snapshot.val() as SubscriptionStorage)) {
         activeSubscriptions[chatId] = {
             ...userSubscription,
