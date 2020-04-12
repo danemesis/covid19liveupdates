@@ -56,8 +56,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
 
     await bot.sendMessage(
         chatId,
-        getCountriesTableHTML({continent, portionMessage})
-        ,
+        getCountriesTableHTML({continent, portionMessage}),
         {parse_mode: 'HTML'}
     );
 };
