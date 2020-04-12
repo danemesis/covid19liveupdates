@@ -15,21 +15,21 @@ import {UserRegExps} from '../../../models/constants';
 export const showCountryByNameStrategyResponse = async (bot, message, chatId): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
-        : showCountry(
+        : showCountryResponse(
         bot,
+        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)),
         chatId,
-        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text))
         );
 
 export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
-    showCountry(
+    showCountryResponse(
         bot,
+        adaptCountryToSystemRepresentation(name(message.text)),
         chatId,
-        name(message.text)
     );
 
 // TODO: Move messages to /messages/feature directory
-const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
+export const showCountryResponse = async (bot, requestedCountry, chatId): Promise<void> => {
     if (!requestedCountry) {
         // Because of
         // [https://github.com/danbilokha/covid19liveupdates/issues/61]
@@ -41,8 +41,8 @@ const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
         return;
     }
 
-    const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
-    const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
+    const allCountriesSituations: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
+    const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountriesSituations
         .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
     if (!foundCountrySituations || !foundCountrySituations?.length
         || !foundCountrySituations[0]

@@ -9,7 +9,7 @@ export const getShowCountriesMessage = (countries: Array<Country>): string => {
                 .concat(countries.join('; '))
         )
         .join('\n');
-    const hint: string = `ℹ \n\nℹ i.e. /country ${countries[0].name}`;
+    const hint: string = `ℹ i.e. /country ${countries[0].name}`;
 
     return availableFor
         .concat(`\n\n${countriesList}`)

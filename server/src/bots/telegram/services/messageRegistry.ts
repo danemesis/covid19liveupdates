@@ -1,5 +1,18 @@
-import {getChatId} from '../utils/chat';
 import {logger} from '../../../utils/logger';
+import {TelegramMessage} from '../models';
+import {getChatId} from '../utils/chat';
+import {
+    getCountryByMessage,
+    getCountryNameByFlag,
+    isMessageCountryFlag
+} from '../../../utils/featureHelpers/isMessageCountry';
+import {showCountryResponse} from '../botResponse/countryResponse';
+import {catchAsyncError} from '../../../utils/catchError';
+import {Country} from '../../../models/country.models';
+import {adaptCountryToSystemRepresentation, getAvailableCountries} from '../../../services/domain/covid19';
+import {Answer} from '../../../models/knowledgebase/answer.models';
+import {fetchAnswer} from '../../../services/api/api-knowledgebase';
+import {assistantResponse} from '../botResponse/assistantResponse';
 
 class MessageRegistry {
     // TODO: change type to unknown and Handle casting to BotType
@@ -12,14 +25,13 @@ class MessageRegistry {
         this.registerCallBackQuery();
     }
 
-    public registerMessageHandler(regexp: string, callback: (bot: unknown, message: unknown, chatId: number) => unknown): MessageRegistry {
+    public registerMessageHandler(regexp: string, callback: (bot: unknown, message: TelegramMessage, chatId: number, ikCbData?: unknown) => unknown): MessageRegistry {
         this._messageHandlers[regexp] = callback;
-        this._bot.onText(new RegExp(regexp, 'g'), (message) => callback(this._bot, message, getChatId(message)));
         return this;
     };
 
-    public registerCallBackQueryHandler(message: string, callback: (bot: any, message: any, chatId: unknown) => any): MessageRegistry {
-        this._cbQueryHandlers[message] = callback;
+    public registerCallBackQueryHandler(regexp: string, callback: (bot: any, message: any, chatId: unknown) => any): MessageRegistry {
+        this._cbQueryHandlers[regexp] = callback;
         return this;
     };
 
@@ -30,27 +42,79 @@ class MessageRegistry {
         );
     }
 
+    public async runCommandHandler(message: TelegramMessage, ikCbData?: string): Promise<void> {
+        const runCheckupAgainstStr = ikCbData ? ikCbData : message.text;
+        const cbHandlers = ikCbData ? this._cbQueryHandlers : this._messageHandlers;
+
+        const suitableKeys: Array<string> = Object.keys(cbHandlers)
+            .filter((cbHandlerRegExpKey: string) =>
+                !!runCheckupAgainstStr.match(new RegExp(cbHandlerRegExpKey, 'g'))
+            );
+
+        if (suitableKeys.length === 0) {
+            logger.log(
+                'error',
+                `[INFO] Hasn't found handler key for ${runCheckupAgainstStr}`
+            );
+            // TODO: Consider, maybe there is a sense to check out our Inline callback commands as well
+            const [err, result] = await catchAsyncError(this.tryDeduceUserCommand(message));
+            if (!!err) {
+                logger.log(
+                    'error',
+                    `[ERROR] VERY BAD. Could not even deduce user's command for ${runCheckupAgainstStr}`
+                );
+            }
+            return;
+        }
+
+        if (suitableKeys.length > 1) {
+            logger.log(
+                'info',
+                `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(';\n')}`
+            );
+        }
+
+        return cbHandlers[suitableKeys[0]].call(this, this._bot, message, getChatId(message), ikCbData);
+    }
+
     private registerCallBackQuery() {
         this._bot.on('callback_query', ({id, data, message, from}) => {
-            this._bot.answerCallbackQuery(id, {text: 'In process...'})
+            this._bot.answerCallbackQuery(id, {text: `${data} in progress...`})
                 .then(() => {
-                    if (this._messageHandlers[data]) {
-                        return this._messageHandlers[data].call(this, this._bot, message, from.id, data)
-                    }
 
-                    if (this._cbQueryHandlers[data]) {
-                        return this._cbQueryHandlers[data].call(this, this._bot, message, from.id, data)
-                    }
-
-                    const partialMatchCbHandlerKey = Object.keys(this._cbQueryHandlers)
-                        .find((key: string) => (data as string).includes(key));
-                    if (partialMatchCbHandlerKey) {
-                        return this._cbQueryHandlers[partialMatchCbHandlerKey].call(this, this._bot, message, from.id, data);
-                    }
-
-                    logger.log('error', `DIDN'T find handler for ${from.id}, ${data}, ${message}`);
+                    return this.runCommandHandler(
+                        {
+                            ...message,
+                            from // As in cases of answerCallbackQuery original from in message will be bot sender,
+                            // But we do want it still to be user. Do we? :D
+                        },
+                        data
+                    )
                 });
         });
+    }
+
+    private async tryDeduceUserCommand({text, chat: {id: chatId}}: TelegramMessage): Promise<void> {
+        if (isMessageCountryFlag(text)) {
+            const countryName: string = getCountryNameByFlag(text);
+            return showCountryResponse(this._bot, countryName, chatId)
+        }
+
+        const countries: Array<Country> = await getAvailableCountries();
+        const country: Country | undefined = getCountryByMessage(
+            adaptCountryToSystemRepresentation(text),
+            countries
+        );
+        if (country) {
+            return showCountryResponse(this._bot, country.name, chatId)
+        }
+
+        const answers: Array<Answer> = await fetchAnswer(text);
+        if (answers?.length) {
+            return assistantResponse(this._bot, answers, chatId);
+        }
+
+        throw new Error(`Could not deduce command for message - ${text}`);
     }
 }
 

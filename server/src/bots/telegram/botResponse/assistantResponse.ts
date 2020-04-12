@@ -1,4 +1,3 @@
-import {getChatId} from '../utils/chat';
 import {fetchAnswer, fetchKnowledgeMetainformation} from '../../../services/api/api-knowledgebase';
 import {Answer} from '../../../models/knowledgebase/answer.models';
 import {
@@ -14,36 +13,41 @@ import {UserMessages} from '../../../models/constants';
 export const assistantStrategyResponse = (bot, message, chatId) => {
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
         || isMatchingDashboardItem(message.text, UserMessages.Assistant)) {
-        return showAssistantFeatures(bot, message)
+        return showAssistantFeatures(bot, message, chatId)
     }
 
     return answerOnQuestion(bot, message, chatId);
 };
 
-export const showAssistantFeatures = (bot, message) => {
-    fetchKnowledgeMetainformation()
-        .then((meta: KnowledgebaseMeta) =>
-            bot.sendMessage(
-                getChatId(message),
-                getAssistantFeaturesMessage(meta)
-            )
-        )
+export const showAssistantFeatures = async (bot, message, chatId) => {
+    const knowledgebaseMeta: KnowledgebaseMeta = await fetchKnowledgeMetainformation();
+    bot.sendMessage(
+        chatId,
+        getAssistantFeaturesMessage(knowledgebaseMeta)
+    )
 };
 
-export const answerOnQuestion = (bot, message, chatId) => {
+export const answerOnQuestion = async (bot, message, chatId) => {
     const question = textAfterUserCommand(message.text);
-    fetchAnswer(question)
-        .then((answers: Array<Answer>) => {
-            if (!answers.length) {
-                return bot.sendMessage(
-                    chatId,
-                    noAnswersOnQuestionMessage()
-                )
-            }
+    const answers: Array<Answer> = await fetchAnswer(question);
 
-            return bot.sendMessage(
-                chatId,
-                getAnswersOnQuestionMessage(answers)
-            );
-        });
+    if (!answers.length) {
+        return assistantNoAnswerResponse(bot, message, chatId);
+    }
+
+    return assistantResponse(bot, answers, chatId);
+};
+
+export const assistantNoAnswerResponse = async (bot, message, chatId) => {
+    return bot.sendMessage(
+        chatId,
+        noAnswersOnQuestionMessage()
+    )
+};
+
+export const assistantResponse = async (bot, answers, chatId) => {
+    return bot.sendMessage(
+        chatId,
+        getAnswersOnQuestionMessage(answers)
+    );
 };

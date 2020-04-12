@@ -4,7 +4,7 @@ import {
     getCovid19ExplanationVideo,
     socialDistancing,
     suggestedBehaviors
-} from "../../../messages/feature/adviceMessages";
+} from '../../../messages/feature/adviceMessages';
 
 export const showAdvicesHowToBehaveResponse = (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(
