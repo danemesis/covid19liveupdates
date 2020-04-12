@@ -31,8 +31,13 @@ const codesExplanations = new Map([
     ],
 ]);
 
+const USING_DATASOURCES: string =
+    `COVID-19 data source we are using is operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE).`
+    + `JSON-based wrap is provided by https://github.com/pomber/covid19 library. Information is updated daily.`;
+
 export const getHelpMessage = (): string => `ℹ Things I can do are\n${
     Object.values(UserRegExps)
         .map((userRegerxp: string, idx: number) => `${getNumberEmoji(idx)} ${userRegerxp} ${codesExplanations.get(userRegerxp)}`)
         .join('\n')
+        .concat(`\n\n${USING_DATASOURCES}`)
 }`;
