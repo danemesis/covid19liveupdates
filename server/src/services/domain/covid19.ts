@@ -1,13 +1,13 @@
-import {UserPresentationalCountryNameString} from "../../models/tsTypes.models";
-import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from "../../models/covid19.models";
-import {COVID19_FETCH_SALT, TIMES} from "../../models/constants";
-import {Country} from "../../models/country.models";
-import {fetchCovid19Data} from "../api/api-covid19";
-import {CountryLookup} from "../../models/country-code-lookup.models";
-import {getCountryNameFormat} from "../../utils/featureHelpers/country";
-import {getCountryByName, getDefaultCountry} from "./countryLookup";
-import {SubscriptionType} from "../../models/subscription.models";
-import {logger} from "../../utils/logger";
+import {UserPresentationalCountryNameString} from '../../models/tsTypes.models';
+import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from '../../models/covid19.models';
+import {COVID19_FETCH_SALT, TIMES} from '../../models/constants';
+import {Country} from '../../models/country.models';
+import {fetchCovid19Data} from '../api/api-covid19';
+import {CountryLookup} from '../../models/country-code-lookup.models';
+import {getCountryNameFormat} from '../../utils/featureHelpers/country';
+import {getCountryByName, getDefaultCountry} from './countryLookup';
+import {SubscriptionType} from '../../models/subscription.models';
+import {logger} from '../../utils/logger';
 
 // TODO: Improve Cached management
 class CachedCovid19CountriesData {

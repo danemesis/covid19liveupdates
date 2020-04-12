@@ -1,5 +1,5 @@
-import {Country} from "../../models/country.models";
-import {getCountriesByContinent} from "../../services/domain/countriesByContinent";
+import {Country} from '../../models/country.models';
+import {getCountriesByContinent} from '../../services/domain/countriesByContinent';
 
 const EXPLANATION_MESSAGE: string = 'To check country use: "/country [COUNTRY NAME]" template (Not case sensative)';
 

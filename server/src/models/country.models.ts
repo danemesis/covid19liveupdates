@@ -1,4 +1,4 @@
-import {UserPresentationalCountryNameString} from "./tsTypes.models";
+import {UserPresentationalCountryNameString} from './tsTypes.models';
 
 export interface Country {
     name: UserPresentationalCountryNameString;

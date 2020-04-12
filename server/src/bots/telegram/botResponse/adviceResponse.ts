@@ -3,7 +3,7 @@ import {
     encouragingMessage,
     socialDistancing,
     suggestedBehaviors
-} from "../../../messages/userMessage";
+} from '../../../messages/userMessage';
 
 export const showAdvicesHowToBehaveResponse = (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(

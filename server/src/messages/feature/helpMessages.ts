@@ -1,5 +1,5 @@
-import {UserRegExps} from "../../models/constants";
-import {getNumberEmoji} from "../../utils/emoji";
+import {UserRegExps} from '../../models/constants';
+import {getNumberEmoji} from '../../utils/emoji';
 
 const codesExplanations = new Map([
     [UserRegExps.Start,

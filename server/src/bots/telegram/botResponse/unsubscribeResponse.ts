@@ -1,23 +1,23 @@
-import {UserSubscription} from "../../../models/subscription.models";
+import {UserSubscription} from '../../../models/subscription.models';
 import {
     getUnsubscribeResponseMessage,
     unSubscribeError,
     unsubscribeResultMessage
-} from "../../../messages/feature/unsubscribeMessages";
-import {getFullMenuKeyboard, getUnsubscribeMessageInlineKeyboard} from "../services/keyboard";
+} from '../../../messages/feature/unsubscribeMessages';
+import {getFullMenuKeyboard, getUnsubscribeMessageInlineKeyboard} from '../services/keyboard';
 import {
     isCommandOnly,
     isMatchingDashboardItem,
     isMessageIsCommand,
     isMessageStartsWithCommand
-} from "../../../utils/incomingMessages";
-import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {catchAsyncError} from "../../../utils/catchError";
-import {unsubscribeMeFrom} from "../../../services/domain/subscriptions";
-import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
-import {noSubscriptionsResponseMessage} from "../../../messages/feature/subscribeMessages";
-import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
-import {getTelegramActiveUserSubscriptions} from "../services/storage";
+} from '../../../utils/incomingMessages';
+import {CustomSubscriptions, UserMessages, UserRegExps} from '../../../models/constants';
+import {catchAsyncError} from '../../../utils/catchError';
+import {unsubscribeMeFrom} from '../../../services/domain/subscriptions';
+import {getUserMessageFromIKorText} from '../utils/getUserMessageFromIKorText';
+import {noSubscriptionsResponseMessage} from '../../../messages/feature/subscribeMessages';
+import {removeCommandFromMessageIfExist} from '../../../utils/removeCommandFromMessageIfExist';
+import {getTelegramActiveUserSubscriptions} from '../services/storage';
 
 export const buildUnsubscribeInlineResponse = async (bot, message, chatId): Promise<void> => {
     const userSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(chatId);

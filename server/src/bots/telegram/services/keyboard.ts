@@ -1,7 +1,7 @@
-import {Cache} from "../../../utils/cache";
-import {Continents, CustomSubscriptions, UserMessages} from "../../../models/constants";
-import {InlineKeyboard, ReplyKeyboard} from "node-telegram-keyboard-wrapper";
-import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from "../models";
+import {Cache} from '../../../utils/cache';
+import {Continents, CustomSubscriptions, UserMessages} from '../../../models/constants';
+import {InlineKeyboard, ReplyKeyboard} from 'node-telegram-keyboard-wrapper';
+import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from '../models';
 
 export const getFullMenuKeyboard = (chatId): unknown => {
     const rk = new ReplyKeyboard();

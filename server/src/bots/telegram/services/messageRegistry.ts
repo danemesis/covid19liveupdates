@@ -1,8 +1,8 @@
-import {getChatId} from "../utils/chat";
-import {logger} from "../../../utils/logger";
+import {getChatId} from '../utils/chat';
+import {logger} from '../../../utils/logger';
 
 class MessageRegistry {
-    //TODO: change type to unknown and Handle casting to BotType
+    // TODO: change type to unknown and Handle casting to BotType
     _bot: any;
     _cbQueryHandlers: { [regexp: string]: CallBackQueryHandler } = {};
     _messageHandlers: { [regexp: string]: CallBackQueryHandler } = {};
@@ -31,7 +31,7 @@ class MessageRegistry {
     }
 
     private registerCallBackQuery() {
-        this._bot.on("callback_query", ({id, data, message, from}) => {
+        this._bot.on('callback_query', ({id, data, message, from}) => {
             this._bot.answerCallbackQuery(id, {text: 'In process...'})
                 .then(() => {
                     if (this._messageHandlers[data]) {

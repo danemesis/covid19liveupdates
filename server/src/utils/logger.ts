@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import {Loggly} from 'winston-loggly-bulk';
-import environment from "../environments/environment";
+import environment from '../environments/environment';
 
 if (environment.LOGGLY_TOKEN) {
     winston.add(new Loggly({
@@ -15,6 +15,7 @@ export const logger = {
     log(severity, message) {
         winston.log(severity, message);
         if (!environment.IsProduction()) {
+            // tslint:disable-next-line:no-console
             console.log(severity, message);
         }
     }

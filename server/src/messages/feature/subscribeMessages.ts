@@ -1,7 +1,7 @@
-import {Subscription, UserSubscription} from "../../models/subscription.models";
-import {getMessageForCountry} from "./countryMessages";
-import {CountrySituationInfo} from "../../models/covid19.models";
-import {getDiffMessage} from "../covid19Messages";
+import {Subscription, UserSubscription} from '../../models/subscription.models';
+import {getMessageForCountry} from './countryMessages';
+import {CountrySituationInfo} from '../../models/covid19.models';
+import {getDiffMessage} from '../covid19Messages';
 
 export const ALREADY_SUBSCRIBED_MESSAGE: string = 'You are already subscribed on the country';
 

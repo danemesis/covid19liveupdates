@@ -1,5 +1,5 @@
-import {TelegramChat} from "../bots/telegram/models";
-import {CountrySituationInfo} from "./covid19.models";
+import {TelegramChat} from '../bots/telegram/models';
+import {CountrySituationInfo} from './covid19.models';
 
 export enum SubscriptionType {
     TrackCountryUpdates = 'New country',
