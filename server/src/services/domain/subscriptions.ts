@@ -1,11 +1,11 @@
-import {TelegramChat} from "../../bots/telegram/models";
-import {getCountriesSituation} from "./covid19";
-import {Country} from "../../models/country.models";
-import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
-import {Subscription, SubscriptionType} from "../../models/subscription.models";
-import {catchAsyncError} from "../../utils/catchError";
-import {ALREADY_SUBSCRIBED_MESSAGE} from "../../messages/feature/subscribeMessages";
-import {CountrySituationInfo} from "../../models/covid19.models";
+import {TelegramChat} from '../../bots/telegram/models';
+import {getCountriesSituation} from './covid19';
+import {Country} from '../../models/country.models';
+import {getTelegramUserSubscriptions, setTelegramSubscription} from '../../bots/telegram/services/storage';
+import {Subscription, SubscriptionType} from '../../models/subscription.models';
+import {catchAsyncError} from '../../utils/catchError';
+import {ALREADY_SUBSCRIBED_MESSAGE} from '../../messages/feature/subscribeMessages';
+import {CountrySituationInfo} from '../../models/covid19.models';
 
 /*
     @params

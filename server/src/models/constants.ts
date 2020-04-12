@@ -14,7 +14,7 @@ export enum CustomSubscriptions {
 }
 
 export enum UserRegExps {
-    Start = "/start",
+    Start = '/start',
     Assistant = '/assistant',
     CountriesData = '/countries',
     AvailableCountries = '/available',

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 
-let pkg = require(__dirname + '/../../../../package.json');
+const pkg = require(__dirname + '/../../../../package.json');
 
 export let base = (req: Request, res: Response) => {
     res.json({

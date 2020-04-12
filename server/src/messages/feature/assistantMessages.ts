@@ -1,7 +1,7 @@
-import {Answer} from "../../models/knowledgebase/answer.models";
-import {KnowledgebaseMeta} from "../../models/knowledgebase/meta.models";
-import {getNumberEmoji} from "../../utils/emoji";
-import {UserRegExps} from "../../models/constants";
+import {Answer} from '../../models/knowledgebase/answer.models';
+import {KnowledgebaseMeta} from '../../models/knowledgebase/meta.models';
+import {getNumberEmoji} from '../../utils/emoji';
+import {UserRegExps} from '../../models/constants';
 
 export const getAssistantFeaturesMessage = ({questions, categories}: KnowledgebaseMeta): string => {
     const typicalQuestions: string = `\n\nTypically, people ask me🧐\n${questions.map((v, idx) => `${getNumberEmoji(idx)} ${v}`).join('\n')}`;

@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
-import {Answer, ApiAnswer} from "../../models/knowledgebase/answer.models";
-import environments from "../../environments/environment";
-import {KnowledgebaseMeta} from "../../models/knowledgebase/meta.models";
+import {Answer, ApiAnswer} from '../../models/knowledgebase/answer.models';
+import environments from '../../environments/environment';
+import {KnowledgebaseMeta} from '../../models/knowledgebase/meta.models';
 
 export function fetchKnowledgeMetainformation(): Promise<KnowledgebaseMeta> {
     return axios.get<KnowledgebaseMeta>(`${environments.KNOWLEDGEBASE_URL}/meta/all`, {

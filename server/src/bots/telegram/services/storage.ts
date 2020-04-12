@@ -1,4 +1,4 @@
-import {TELEGRAM_PREFIX} from "../models";
+import {TELEGRAM_PREFIX} from '../models';
 import {
     getActiveSubscriptions,
     getActiveUserSubscription,
@@ -7,8 +7,8 @@ import {
     getUserSubscription,
     listenSubscriptionsChanges,
     setSubscription,
-} from "../../../services/domain/storage";
-import * as firebase from "firebase";
+} from '../../../services/domain/storage';
+import * as firebase from 'firebase';
 
 export const getTelegramFullStorage: Function = getMessengerStorage(TELEGRAM_PREFIX);
 export const getTelegramSubscriptions: Function = getSubscriptions(TELEGRAM_PREFIX);

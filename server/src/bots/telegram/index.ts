@@ -1,27 +1,27 @@
-import {countriesByContinent, countriesResponse} from "./botResponse/countriesResponse";
-import {showCountryByFlag, showCountryByNameStrategyResponse} from "./botResponse/countryResponse";
-import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from "../../models/constants";
-import {showAdvicesHowToBehaveResponse} from "./botResponse/adviceResponse";
-import {showHelpInfoResponse} from "./botResponse/helpResponse";
-import {Express} from "express";
-import {cachedCovid19CountriesData, getAvailableCountries,} from "../../services/domain/covid19";
-import {Country} from "../../models/country.models";
+import {countriesByContinent, countriesResponse} from './botResponse/countriesResponse';
+import {showCountryByFlag, showCountryByNameStrategyResponse} from './botResponse/countryResponse';
+import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from '../../models/constants';
+import {showAdvicesHowToBehaveResponse} from './botResponse/adviceResponse';
+import {showHelpInfoResponse} from './botResponse/helpResponse';
+import {Express} from 'express';
+import {cachedCovid19CountriesData, getAvailableCountries,} from '../../services/domain/covid19';
+import {Country} from '../../models/country.models';
 import {flag} from 'country-emoji';
-import {assistantStrategyResponse} from "./botResponse/assistantResponse";
+import {assistantStrategyResponse} from './botResponse/assistantResponse';
 import * as TelegramBot from 'node-telegram-bot-api';
-import Config from "../../environments/environment";
-import {logger} from "../../utils/logger";
+import Config from '../../environments/environment';
+import {logger} from '../../utils/logger';
 import {startResponse} from './botResponse/startResponse';
-import {showAvailableCountriesResponse} from "./botResponse/availableResponse";
+import {showAvailableCountriesResponse} from './botResponse/availableResponse';
 import {
     showExistingSubscriptionsResponse,
     subscribingStrategyResponse,
     subscriptionManagerResponse
-} from "./botResponse/subscribeResponse";
-import {SubscriptionType} from "../../models/subscription.models";
-import {registry} from "./services/messageRegistry";
-import {subscriptionNotifierHandler} from "./services/subscriptionNotifierManager";
-import {unsubscribeStrategyResponse} from "./botResponse/unsubscribeResponse";
+} from './botResponse/subscribeResponse';
+import {SubscriptionType} from '../../models/subscription.models';
+import {registry} from './services/messageRegistry';
+import {subscriptionNotifierHandler} from './services/subscriptionNotifierManager';
+import {unsubscribeStrategyResponse} from './botResponse/unsubscribeResponse';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -65,7 +65,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
 
     // Feature: Countries / Country
-    for (let continent in Continents) {
+    for (const continent of Object.keys(Continents)) {
         registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
     }
     // Feature: Countries / Country
@@ -92,9 +92,9 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         });
     });
 
-    bot.on("polling_error", (err) => logger.log('error', err));
-    bot.on("webhook_error", (err) => logger.log('error', err));
-    bot.on("error", (err) => logger.log('error', err));
+    bot.on('polling_error', (err) => logger.log('error', err));
+    bot.on('webhook_error', (err) => logger.log('error', err));
+    bot.on('error', (err) => logger.log('error', err));
 }
 
 export {runTelegramBot};

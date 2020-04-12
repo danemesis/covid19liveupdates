@@ -1,9 +1,9 @@
-import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from "../../../models/covid19.models";
-import {getChatId} from "../utils/chat";
-import {getCountriesSituation} from "../../../services/domain/covid19";
-import {getTableHeader, getTableRowMessageForCountry} from "../../../messages/feature/countryMessages";
-import {Country} from "../../../models/country.models";
-import {getCountriesSumupMessage, getCountriesTableHTML} from "../../../messages/feature/countriesMessages";
+import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from '../../../models/covid19.models';
+import {getChatId} from '../utils/chat';
+import {getCountriesSituation} from '../../../services/domain/covid19';
+import {getTableHeader, getTableRowMessageForCountry} from '../../../messages/feature/countryMessages';
+import {Country} from '../../../models/country.models';
+import {getCountriesSumupMessage, getCountriesTableHTML} from '../../../messages/feature/countriesMessages';
 import {getContinentsInlineKeyboard} from '../services/keyboard';
 
 // TODO: Move this logic to domain and leave here only Telegram bot specific message response
@@ -58,7 +58,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
         chatId,
         getCountriesTableHTML({continent, portionMessage})
         ,
-        {parse_mode: "HTML"}
+        {parse_mode: 'HTML'}
     );
 };
 

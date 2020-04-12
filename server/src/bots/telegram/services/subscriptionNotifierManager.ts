@@ -1,19 +1,19 @@
-import {Country} from "../../../models/country.models";
-import {CountrySituationInfo} from "../../../models/covid19.models";
-import {SubscriptionStorage} from "../../../models/storage.models";
+import {Country} from '../../../models/country.models';
+import {CountrySituationInfo} from '../../../models/covid19.models';
+import {SubscriptionStorage} from '../../../models/storage.models';
 import {
     Subscription,
     SubscriptionType,
     UserSubscription,
     UserSubscriptionNotification
-} from "../../../models/subscription.models";
-import {registry} from "./messageRegistry";
-import {getTelegramSubscriptions, setTelegramSubscription} from "./storage";
-import {catchAsyncError} from "../../../utils/catchError";
-import {logger} from "../../../utils/logger";
-import {getErrorMessage} from "../../../utils/getLoggerMessages";
-import {isCountrySituationHasChangedSinceLastData} from "../../../services/domain/subscriptions";
-import {showCountrySubscriptionMessage} from "../../../messages/feature/subscribeMessages";
+} from '../../../models/subscription.models';
+import {registry} from './messageRegistry';
+import {getTelegramSubscriptions, setTelegramSubscription} from './storage';
+import {catchAsyncError} from '../../../utils/catchError';
+import {logger} from '../../../utils/logger';
+import {getErrorMessage} from '../../../utils/getLoggerMessages';
+import {isCountrySituationHasChangedSinceLastData} from '../../../services/domain/subscriptions';
+import {showCountrySubscriptionMessage} from '../../../messages/feature/subscribeMessages';
 
 export const subscriptionNotifierHandler = async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]): Promise<void> => {
     const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
@@ -25,7 +25,7 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
     );
 
     for (const [chatId, userSubscription] of Object.entries(allUsersSubscriptions)) {
-        let userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
+        const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
             countriesInfoMap,
             userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
         );

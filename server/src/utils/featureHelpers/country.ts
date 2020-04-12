@@ -1,4 +1,4 @@
-import {UpperCaseString, UserPresentationalCountryNameString} from "../../models/tsTypes.models";
+import {UpperCaseString, UserPresentationalCountryNameString} from '../../models/tsTypes.models';
 
 const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseString, string>([
     ['US', 'United States'],

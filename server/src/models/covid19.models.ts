@@ -1,4 +1,4 @@
-import {Country} from "./country.models";
+import {Country} from './country.models';
 
 export interface ApiCountriesCovid19Situation {
     [country: string]: Array<ApiCovid19Situation>;

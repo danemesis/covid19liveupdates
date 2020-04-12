@@ -1,6 +1,6 @@
 import * as firebase from 'firebase';
-import {Subscription, UserSubscription} from "../../models/subscription.models";
-import {SubscriptionStorage} from "../../models/storage.models";
+import {Subscription, UserSubscription} from '../../models/subscription.models';
+import {SubscriptionStorage} from '../../models/storage.models';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export const getFllStorage = async <T>(): Promise<T> => {

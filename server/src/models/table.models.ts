@@ -16,7 +16,7 @@ export const tableConfig = {
         width: 8
     },
     singleLine: false,
-    border: getBorderCharacters("void")
+    border: getBorderCharacters('void')
 };
 
 export function table(tableBase: Array<Array<string>>, config: any): string {

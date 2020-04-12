@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "array-type": false,
+    "no-var-requires": false,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "no-shadowed-variable": false,
+    "ordered-imports": false,
+    "interface-name": [true, "never-prefix"],
+    "no-implicit-dependencies": [true, "dev"]
+  }
+}

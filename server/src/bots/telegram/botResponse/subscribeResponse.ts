@@ -4,21 +4,21 @@ import {
     subscribeError,
     subscriptionManagerResponseMessage,
     subscriptionResultMessage
-} from "../../../messages/feature/subscribeMessages";
+} from '../../../messages/feature/subscribeMessages';
 import {
     isCommandOnly,
     isMatchingDashboardItem,
     isMessageIsCommand,
     isMessageStartsWithCommand
-} from "../../../utils/incomingMessages";
-import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {subscribeOn} from "../../../services/domain/subscriptions";
-import {catchAsyncError} from "../../../utils/catchError";
-import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from "../services/keyboard";
-import {getTelegramActiveUserSubscriptions} from "../services/storage";
-import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
-import {UserSubscription} from "../../../models/subscription.models";
-import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
+} from '../../../utils/incomingMessages';
+import {CustomSubscriptions, UserMessages, UserRegExps} from '../../../models/constants';
+import {subscribeOn} from '../../../services/domain/subscriptions';
+import {catchAsyncError} from '../../../utils/catchError';
+import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from '../services/keyboard';
+import {getTelegramActiveUserSubscriptions} from '../services/storage';
+import {getUserMessageFromIKorText} from '../utils/getUserMessageFromIKorText';
+import {UserSubscription} from '../../../models/subscription.models';
+import {removeCommandFromMessageIfExist} from '../../../utils/removeCommandFromMessageIfExist';
 
 // TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {

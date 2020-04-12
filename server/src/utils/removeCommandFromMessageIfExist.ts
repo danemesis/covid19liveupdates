@@ -1,6 +1,6 @@
-import {isMessageStartsWithCommand} from "./incomingMessages";
-import {getInfoMessage} from "./getLoggerMessages";
-import {logger} from "./logger";
+import {isMessageStartsWithCommand} from './incomingMessages';
+import {getInfoMessage} from './getLoggerMessages';
+import {logger} from './logger';
 
 export const removeCommandFromMessageIfExist = (message: string, command: string): string => {
     if (!isMessageStartsWithCommand(message)) {
