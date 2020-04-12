@@ -26,10 +26,9 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
     }
 
     // TODO: Remove Telegram dependency
-    const existingSubscriptions: Array<Subscription> = (await getTelegramActiveUserSubscriptions(chat.id) ?? {})
+    const existingSubscriptions: Array<Subscription> = (await getTelegramUserSubscriptions(chat.id) ?? {})
         .subscriptionsOn ?? [];
 
-    console.log('existingSubscriptions', existingSubscriptions);
     const checkIfAlreadySubscribed = existingSubscriptions
         .find((subscription: Subscription) => subscription.value === subscribeMeOn);
     if (!!checkIfAlreadySubscribed) {
@@ -57,14 +56,19 @@ export const unsubscribeMeFrom = async (chat: TelegramChat, unsubscribeMeFrom: s
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> = (await getTelegramUserSubscriptions(chat.id) ?? {})
         .subscriptionsOn ?? [];
+    let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions
         .map((subscription: Subscription) => {
             if (subscription.value === unsubscribeMeFrom) {
+                foundSubscription = subscription;
                 subscription.active = false;
             }
             return subscription;
         });
-    console.log('updatedSubscriptions', unsubscribeMeFrom, updatedSubscriptions);
+    if (!foundSubscription) {
+        throw new Error('I was not able to find your subscription');
+    }
+
     const [err, result] = await catchAsyncError(setTelegramSubscription({
         chat,
         subscriptionsOn: updatedSubscriptions

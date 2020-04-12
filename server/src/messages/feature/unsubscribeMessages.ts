@@ -3,7 +3,7 @@ export const getUnsubscribeResponseMessage = (): string => {
 };
 
 export const unSubscribeError = (message: string): string => {
-    return `${message}`
+    return `${message}, sorry 🙇🏽`
 };
 
 export const unsubscribeResultMessage = (message: string): string => {

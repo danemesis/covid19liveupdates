@@ -17,6 +17,7 @@ import {catchAsyncError} from "../../../utils/catchError";
 import {unsubscribeMeFrom} from "../../../services/domain/subscriptions";
 import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
 import {noSubscriptionsResponseMessage} from "../../../messages/feature/subscribeMessages";
+import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
 
 export const buildUnsubscribeInlineResponse = async (bot, message, chatId): Promise<void> => {
     const userSubscription: UserSubscription = await getUserSubscriptions(chatId);
@@ -59,10 +60,13 @@ export const unsubscribeStrategyResponse = async (bot, message, chatId, ikCbData
     const [err, result] = await catchAsyncError<string>(
         unsubscribeMeFrom(
             message.chat,
-            getUserMessageFromIKorText(
-                ikCbData ?? message,
-                CustomSubscriptions.UnsubscribeMeFrom,
-                ''
+            removeCommandFromMessageIfExist(
+                getUserMessageFromIKorText(
+                    ikCbData ?? message,
+                    CustomSubscriptions.UnsubscribeMeFrom,
+                    ''
+                ),
+                UserRegExps.Unsubscribe
             )
         )
     );

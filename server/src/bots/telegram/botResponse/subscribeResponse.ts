@@ -19,6 +19,7 @@ import {getTelegramSubscriptions} from "../services/storage";
 import {SubscriptionStorage} from "../../../models/storage.models";
 import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
 import {Subscription, UserSubscription} from "../../../models/subscription.models";
+import {removeCommandFromMessageIfExist} from "../../../utils/removeCommandFromMessageIfExist";
 
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(
@@ -62,7 +63,10 @@ export const subscribingStrategyResponse = async (bot, message, chatId, ikCbData
     const [err, result] = await catchAsyncError<string>(
         subscribeOn(
             message.chat,
-            getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, '')
+            removeCommandFromMessageIfExist(
+                getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, ''),
+                UserRegExps.Subscribe
+            )
         )
     );
     if (err) {

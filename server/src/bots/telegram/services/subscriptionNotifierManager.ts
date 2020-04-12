@@ -12,7 +12,7 @@ import {registry} from "./messageRegistry";
 import {getTelegramSubscriptions, updateTelegramSubscription} from "./storage";
 import {catchAsyncError} from "../../../utils/catchError";
 import {logger} from "../../../utils/logger";
-import {getErrorMessage} from "../../../utils/getErrorMessage";
+import {getErrorMessage} from "../../../utils/getLoggerMessages";
 import {showCountrySubscriptionMessage} from "../../../messages/feature/subscribeMessages";
 import {getConcreteUserSubscriptions} from "../../../services/domain/subscriptions";
 
