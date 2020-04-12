@@ -10,6 +10,10 @@
       true,
       "single"
     ],
+    "ban-types": [false, ["Function", "Use () => void instead."], ["Function"]],
+    "adjacent-overload-signatures": false,
+    "no-submodule-imports": false,
+    "unified-signatures": false,
     "no-shadowed-variable": false,
     "ordered-imports": false,
     "interface-name": [true, "never-prefix"],
