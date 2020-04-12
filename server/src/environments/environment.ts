@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 
 const environmentName = process.env.ENVIRONMENT_NAME ?? 'development';
 
@@ -10,7 +10,7 @@ if (environmentName === 'development') {
 
 const tags = process.env.LOGGLY_TAGS && Array.isArray(process.env.LOGGLY_TAGS)
     ? process.env.LOGGLY_TAGS
-    : ["covid19liveupd"];
+    : ['covid19liveupd'];
 
 tags.push('containerV' + process.env.CONTAINER_VERSION, 'pkgV' + process.env.npm_package_version, environmentName);
 
@@ -36,10 +36,10 @@ let envConfig = {
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID ?? '',
     CHARTSAPI_URL: 'https://quickchart.io/chart',
     IsProduction() {
-        return environmentName === "production";
+        return environmentName === 'production';
     },
     IsDevelopment() {
-        return environmentName === "development";
+        return environmentName === 'development';
     },
     IsNgRokMode() {
         return this.IsDevelopment();

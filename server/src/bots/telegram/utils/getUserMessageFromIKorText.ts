@@ -1,5 +1,5 @@
-import {TelegramMessage, TelegramMessageReplyMarkup} from "../models";
-import {isNullOrUndefined} from "../../../utils/isNullOrUndefined";
+import {TelegramMessage, TelegramMessageReplyMarkup} from '../models';
+import {isNullOrUndefined} from '../../../utils/isNullOrUndefined';
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
 // otherwise @param ikCbData will be null

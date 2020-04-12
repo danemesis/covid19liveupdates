@@ -1,4 +1,4 @@
-import {Modify} from "../tsTypes.models";
+import {Modify} from '../tsTypes.models';
 
 export interface ApiAnswer {
     category: string;

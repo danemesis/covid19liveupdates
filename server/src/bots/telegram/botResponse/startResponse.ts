@@ -1,5 +1,5 @@
 import {getFullMenuKeyboard} from '../services/keyboard';
-import {greetUser} from "../../../messages/userMessage";
+import {greetUser} from '../../../messages/userMessage';
 import {showHelpInfoResponse} from './helpResponse';
 
 export const startResponse = async (bot, message, chatId) => {

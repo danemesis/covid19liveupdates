@@ -3,9 +3,9 @@ export const getUnsubscribeResponseMessage = (): string => {
 };
 
 export const unSubscribeError = (message: string): string => {
-    return `${message}`
+    return `${message}, sorry 🙇🏽`
 };
 
 export const unsubscribeResultMessage = (message: string): string => {
-    return `You have been unsubscribe from ${message}`;
+    return `You have been unsubscribed from ${message}`;
 };

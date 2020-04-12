@@ -1,5 +1,5 @@
-import {CountrySituationInfo} from "../models/covid19.models";
-import {addNumberChangeSymbol} from "../utils/addNumberChangeSymbol";
+import {CountrySituationInfo} from '../models/covid19.models';
+import {addNumberChangeSymbol} from '../utils/addNumberChangeSymbol';
 
 export const getActiveCases = (totalConfirmed: number,
                                totalRecovered: number,

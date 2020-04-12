@@ -4,22 +4,23 @@ import {
     subscribeError,
     subscriptionManagerResponseMessage,
     subscriptionResultMessage
-} from "../../../messages/feature/subscribeMessages";
+} from '../../../messages/feature/subscribeMessages';
 import {
     isCommandOnly,
     isMatchingDashboardItem,
     isMessageIsCommand,
     isMessageStartsWithCommand
-} from "../../../utils/incomingMessages";
-import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {getConcreteUserSubscriptions, subscribeOn} from "../../../services/domain/subscriptions";
-import {catchAsyncError} from "../../../utils/catchError";
-import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from "../services/keyboard";
-import {getTelegramSubscriptions} from "../services/storage";
-import {SubscriptionStorage} from "../../../models/storage.models";
-import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
-import {Subscription, UserSubscription} from "../../../models/subscription.models";
+} from '../../../utils/incomingMessages';
+import {CustomSubscriptions, UserMessages, UserRegExps} from '../../../models/constants';
+import {subscribeOn} from '../../../services/domain/subscriptions';
+import {catchAsyncError} from '../../../utils/catchError';
+import {getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard} from '../services/keyboard';
+import {getTelegramActiveUserSubscriptions} from '../services/storage';
+import {getUserMessageFromIKorText} from '../utils/getUserMessageFromIKorText';
+import {UserSubscription} from '../../../models/subscription.models';
+import {removeCommandFromMessageIfExist} from '../../../utils/removeCommandFromMessageIfExist';
 
+// TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse = async (bot, message, chatId): Promise<void> => {
     return bot.sendMessage(
         chatId,
@@ -29,13 +30,7 @@ export const subscriptionManagerResponse = async (bot, message, chatId): Promise
 };
 
 export const showExistingSubscriptionsResponse = async (bot, message, chatId): Promise<void> => {
-    const allSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
-    const userSubscription: UserSubscription = getConcreteUserSubscriptions(chatId, allSubscriptions);
-    const activeUserSubscription: UserSubscription = {
-        ...userSubscription,
-        subscriptionsOn: userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => !!subscription.active)
-    };
-
+    const activeUserSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(chatId);
     if (!activeUserSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
             chatId,
@@ -62,7 +57,10 @@ export const subscribingStrategyResponse = async (bot, message, chatId, ikCbData
     const [err, result] = await catchAsyncError<string>(
         subscribeOn(
             message.chat,
-            getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, '')
+            removeCommandFromMessageIfExist(
+                getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, ''),
+                UserRegExps.Subscribe
+            )
         )
     );
     if (err) {

@@ -1,4 +1,5 @@
-import {TelegramChat} from "../bots/telegram/models";
+import {TelegramChat} from '../bots/telegram/models';
+import {CountrySituationInfo} from './covid19.models';
 
 export enum SubscriptionType {
     TrackCountryUpdates = 'New country',
@@ -11,7 +12,8 @@ export interface Subscription {
     active: boolean;
     type: SubscriptionType;
     value: string;
-    lastUpdate: Date;
+    lastReceivedData: CountrySituationInfo;
+    lastUpdate: number; // Date.now()
 }
 
 export interface UserSubscription {

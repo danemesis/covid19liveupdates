@@ -1,20 +1,19 @@
-import {Country} from "../../../models/country.models";
-import {CountrySituationInfo} from "../../../models/covid19.models";
-import {SubscriptionStorage} from "../../../models/storage.models";
+import {Country} from '../../../models/country.models';
+import {CountrySituationInfo} from '../../../models/covid19.models';
+import {SubscriptionStorage} from '../../../models/storage.models';
 import {
     Subscription,
     SubscriptionType,
     UserSubscription,
     UserSubscriptionNotification
-} from "../../../models/subscription.models";
-import {CONSOLE_LOG_DELIMITER} from "../../../models/constants";
-import {registry} from "./messageRegistry";
-import {getTelegramSubscriptions, updateTelegramSubscription} from "./storage";
-import {catchAsyncError} from "../../../utils/catchError";
-import {logger} from "../../../utils/logger";
-import {getErrorMessage} from "../../../utils/getErrorMessage";
-import {showCountrySubscriptionMessage} from "../../../messages/feature/subscribeMessages";
-import {getConcreteUserSubscriptions} from "../../../services/domain/subscriptions";
+} from '../../../models/subscription.models';
+import {registry} from './messageRegistry';
+import {getTelegramSubscriptions, setTelegramSubscription} from './storage';
+import {catchAsyncError} from '../../../utils/catchError';
+import {logger} from '../../../utils/logger';
+import {getErrorMessage} from '../../../utils/getLoggerMessages';
+import {isCountrySituationHasChangedSinceLastData} from '../../../services/domain/subscriptions';
+import {showCountrySubscriptionMessage} from '../../../messages/feature/subscribeMessages';
 
 export const subscriptionNotifierHandler = async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]): Promise<void> => {
     const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
@@ -26,11 +25,10 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
     );
 
     for (const [chatId, userSubscription] of Object.entries(allUsersSubscriptions)) {
-        let userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserSubscriptionNotifications(
+        const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
             countriesInfoMap,
-            userSubscription.subscriptionsOn
+            userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
         );
-
 
         if (!!userSubscriptionsUpdate?.length) {
             const [sendingNotificationErr, sendingNotificationResult] = await catchAsyncError(registry.sendUserNotification(
@@ -40,23 +38,27 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
                         subUp.subscriptionMessage
                     ).join('\n\n'),
             ));
-
             if (!!sendingNotificationErr) {
                 return logger.log('error', `${getErrorMessage(sendingNotificationErr)}. User ${chatId} notifications has not been send`);
             }
 
-            const subscriptionsOn = userSubscriptionsUpdate
-                .map((subUp: UserSubscriptionNotification) => ({
-                        ...subUp.subscription,
-                        lastUpdate: Date.now(),
-                    })
-                );
+            const mergeAllUserSubscriptions: Array<Subscription> = (userSubscription as UserSubscription)
+                .subscriptionsOn
+                .map((sub: Subscription) => {
+                    const updateUserSub = userSubscriptionsUpdate
+                        .find(({subscription: {value, type, active}}: UserSubscriptionNotification) =>
+                            active === sub.active && type === sub.type && value === sub.value);
+                    if (updateUserSub) {
+                        return updateUserSub.subscription;
+                    }
 
-            const [updatingUserSubscriptionErr, updatingUserSubscriptionResult] = await catchAsyncError(updateTelegramSubscription({
+                    return sub;
+                });
+
+            const [updatingUserSubscriptionErr, updatingUserSubscriptionResult] = await catchAsyncError(setTelegramSubscription({
                 chat: userSubscription.chat,
-                subscriptionsOn
+                subscriptionsOn: mergeAllUserSubscriptions
             }));
-
             if (!!updatingUserSubscriptionErr) {
                 return logger.log(
                     'error',
@@ -67,14 +69,13 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
     }
 };
 
-const getUserSubscriptionNotifications = (
+const getUserActiveSubscriptionNotifications = (
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
-    userSubscriptionsOn: Array<Subscription>
+    userActiveSubscriptions: Array<Subscription>
 ): Array<UserSubscriptionNotification> => {
     let userSubscriptionNotifications: Array<UserSubscriptionNotification> = [];
 
-    userSubscriptionsOn
-        .filter(subscription => subscription.active !== false)
+    userActiveSubscriptions
         .forEach((subscription: Subscription) => {
             if (subscription.type === SubscriptionType.Country) { // TODO: Take into account timezone
                 const userSubscriptionCountry = countriesInfoMap.get(subscription.value.toLocaleLowerCase());
@@ -83,39 +84,31 @@ const getUserSubscriptionNotifications = (
                 }
 
                 const subscriptionCountryLastInfo: CountrySituationInfo = userSubscriptionCountry[userSubscriptionCountry.length - 1];
-
-                const subscriptionCountryLastUpdate = subscriptionCountryLastInfo
-                    .date
-                    .split('-')
-                    .map(v => parseInt(v, 10));
-                const userSubscriptionCountryLastGivenUpdate = (new Date(subscription.lastUpdate).toISOString().split('T')[0])
-                    .split('-')
-                    .map(v => parseInt(v, 10));
-
-                if (subscriptionCountryLastUpdate.every((v, idx) => v > userSubscriptionCountryLastGivenUpdate[idx])) {
-                    console.log(`${CONSOLE_LOG_DELIMITER}FROM NOTIFICATIONS, INSIED`);
-                    console.log(subscription);
-                    console.log(subscriptionCountryLastInfo);
-
-                    userSubscriptionNotifications = [
-                        ...userSubscriptionNotifications,
-                        {
-                            subscription,
-                            subscriptionMessage: showCountrySubscriptionMessage(
-                                subscriptionCountryLastInfo,
-                                userSubscriptionCountry[userSubscriptionCountry.length - 2]
-                            )
-                        },
-                    ]
+                if (subscription.lastReceivedData
+                    && !isCountrySituationHasChangedSinceLastData(
+                        subscriptionCountryLastInfo,
+                        subscription.lastReceivedData
+                    )) {
+                    return;
                 }
+
+                userSubscriptionNotifications = [
+                    ...userSubscriptionNotifications,
+                    {
+                        subscription: {
+                            ...subscription,
+                            lastReceivedData: subscriptionCountryLastInfo,
+                            lastUpdate: Date.now(),
+                        },
+                        subscriptionMessage: showCountrySubscriptionMessage(
+                            subscriptionCountryLastInfo,
+                            subscription.lastReceivedData ?? {}
+                        )
+                    },
+                ]
             }
         });
 
     return userSubscriptionNotifications;
-};
-
-export const getUserSubscriptions = async (chatId: number): Promise<UserSubscription> => {
-    const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
-    return getConcreteUserSubscriptions(chatId, allUsersSubscriptions);
 };
 

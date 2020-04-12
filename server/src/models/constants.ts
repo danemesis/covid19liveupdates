@@ -3,6 +3,7 @@ export const TIMES = {
     MILLISECONDS_IN_MINUTE: 60000,
     MILLISECONDS_IN_HOUR: 3600000,
 };
+export const COVID19_FETCH_SALT = TIMES.MILLISECONDS_IN_MINUTE;
 
 export const CONSOLE_LOG_EASE_DELIMITER: string = '==============> ';
 export const CONSOLE_LOG_DELIMITER: string = '\n\n==============> ';
@@ -13,7 +14,7 @@ export enum CustomSubscriptions {
 }
 
 export enum UserRegExps {
-    Start = "/start",
+    Start = '/start',
     Assistant = '/assistant',
     CountriesData = '/countries',
     AvailableCountries = '/available',

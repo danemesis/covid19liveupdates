@@ -1,12 +1,13 @@
-import {UserPresentationalCountryNameString} from "../../models/tsTypes.models";
-import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from "../../models/covid19.models";
-import {TIMES} from "../../models/constants";
-import {Country} from "../../models/country.models";
-import {fetchCovid19Data} from "../api/api-covid19";
-import {CountryLookup} from "../../models/country-code-lookup.models";
-import {getCountryNameFormat} from "../../utils/featureHelpers/country";
-import {getCountryByName, getDefaultCountry} from "./countryLookup";
-import {SubscriptionType} from "../../models/subscription.models";
+import {UserPresentationalCountryNameString} from '../../models/tsTypes.models';
+import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from '../../models/covid19.models';
+import {COVID19_FETCH_SALT, TIMES} from '../../models/constants';
+import {Country} from '../../models/country.models';
+import {fetchCovid19Data} from '../api/api-covid19';
+import {CountryLookup} from '../../models/country-code-lookup.models';
+import {getCountryNameFormat} from '../../utils/featureHelpers/country';
+import {getCountryByName, getDefaultCountry} from './countryLookup';
+import {SubscriptionType} from '../../models/subscription.models';
+import {logger} from '../../utils/logger';
 
 // TODO: Improve Cached management
 class CachedCovid19CountriesData {
@@ -95,11 +96,17 @@ function getCovid19Data(): Promise<Array<[Country, Array<CountrySituationInfo>]>
         });
 }
 
+export function tryToUpdateCovid19Cache(): Promise<void> {
+    return getCovid19Data()
+        .then(v => undefined)
+        .catch(e => logger.log('error', `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`));
+}
+
 export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySituationInfo>]>> {
     const [lastFetchedTime, countriesSituation] = cachedCovid19CountriesData.countriesData ?? [];
 
 
-    if (lastFetchedTime > Date.now() - TIMES.MILLISECONDS_IN_HOUR) {
+    if (lastFetchedTime > Date.now() - TIMES.MILLISECONDS_IN_HOUR - COVID19_FETCH_SALT) {
         return Promise.resolve(countriesSituation);
     }
 

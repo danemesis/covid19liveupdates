@@ -1,7 +1,7 @@
-import {Cache} from "../../../utils/cache";
-import {Continents, CustomSubscriptions, UserMessages} from "../../../models/constants";
-import {InlineKeyboard, ReplyKeyboard} from "node-telegram-keyboard-wrapper";
-import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from "../models";
+import {Cache} from '../../../utils/cache';
+import {Continents, CustomSubscriptions, UserMessages} from '../../../models/constants';
+import {InlineKeyboard, ReplyKeyboard} from 'node-telegram-keyboard-wrapper';
+import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from '../models';
 
 export const getFullMenuKeyboard = (chatId): unknown => {
     const rk = new ReplyKeyboard();
@@ -73,6 +73,26 @@ export const getUnsubscribeMessageInlineKeyboard = (values: Array<string>): unkn
 };
 
 export const getContinentsInlineKeyboard = (): unknown => {
+    const ik = new InlineKeyboard();
+    ik
+        .addRow(
+            {text: Continents.Europe, callback_data: Continents.Europe},
+            {text: Continents.Asia, callback_data: Continents.Asia}
+        )
+        .addRow(
+            {text: Continents.Africa, callback_data: Continents.Africa},
+            {text: Continents.Americas, callback_data: Continents.Americas},
+        )
+        .addRow(
+            {text: Continents.Other, callback_data: Continents.Other},
+            {text: Continents.Oceania, callback_data: Continents.Oceania},
+        );
+
+    return ik.build();
+};
+
+
+export const getHowToAdviceInlineKeyboard = (): unknown => {
     const ik = new InlineKeyboard();
     ik
         .addRow(

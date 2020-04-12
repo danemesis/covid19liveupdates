@@ -1,16 +1,16 @@
-import {ApiCovid19Situation, CountrySituationInfo} from "../../../models/covid19.models";
-import {adaptCountryToSystemRepresentation, getCountriesSituation} from "../../../services/domain/covid19";
-import {Country} from "../../../models/country.models";
+import {ApiCovid19Situation, CountrySituationInfo} from '../../../models/covid19.models';
+import {adaptCountryToSystemRepresentation, getCountriesSituation} from '../../../services/domain/covid19';
+import {Country} from '../../../models/country.models';
 import {
     getMessageForCountry,
     getMessageForUserInputWithoutCountryName
-} from "../../../messages/feature/countryMessages";
-import {Cache} from "../../../utils/cache";
+} from '../../../messages/feature/countryMessages';
+import {Cache} from '../../../utils/cache';
 import {flag, name} from 'country-emoji';
 import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
-import {textAfterUserCommand} from "../../../utils/textAfterCommand";
-import {isMessageIsCommand} from "../../../utils/incomingMessages";
-import {UserRegExps} from "../../../models/constants";
+import {textAfterUserCommand} from '../../../utils/textAfterCommand';
+import {isMessageIsCommand} from '../../../utils/incomingMessages';
+import {UserRegExps} from '../../../models/constants';
 
 export const showCountryByNameStrategyResponse = async (bot, message, chatId): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)

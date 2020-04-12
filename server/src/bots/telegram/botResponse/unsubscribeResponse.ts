@@ -1,26 +1,27 @@
-import {getUserSubscriptions} from "../services/subscriptionNotifierManager";
-import {Subscription, UserSubscription} from "../../../models/subscription.models";
+import {UserSubscription} from '../../../models/subscription.models';
 import {
     getUnsubscribeResponseMessage,
     unSubscribeError,
     unsubscribeResultMessage
-} from "../../../messages/feature/unsubscribeMessages";
-import {getFullMenuKeyboard, getUnsubscribeMessageInlineKeyboard} from "../services/keyboard";
+} from '../../../messages/feature/unsubscribeMessages';
+import {getFullMenuKeyboard, getUnsubscribeMessageInlineKeyboard} from '../services/keyboard';
 import {
     isCommandOnly,
     isMatchingDashboardItem,
     isMessageIsCommand,
     isMessageStartsWithCommand
-} from "../../../utils/incomingMessages";
-import {CustomSubscriptions, UserMessages, UserRegExps} from "../../../models/constants";
-import {catchAsyncError} from "../../../utils/catchError";
-import {unsubscribeMeFrom} from "../../../services/domain/subscriptions";
-import {getUserMessageFromIKorText} from "../utils/getUserMessageFromIKorText";
-import {noSubscriptionsResponseMessage} from "../../../messages/feature/subscribeMessages";
+} from '../../../utils/incomingMessages';
+import {CustomSubscriptions, UserMessages, UserRegExps} from '../../../models/constants';
+import {catchAsyncError} from '../../../utils/catchError';
+import {unsubscribeMeFrom} from '../../../services/domain/subscriptions';
+import {getUserMessageFromIKorText} from '../utils/getUserMessageFromIKorText';
+import {noSubscriptionsResponseMessage} from '../../../messages/feature/subscribeMessages';
+import {removeCommandFromMessageIfExist} from '../../../utils/removeCommandFromMessageIfExist';
+import {getTelegramActiveUserSubscriptions} from '../services/storage';
 
 export const buildUnsubscribeInlineResponse = async (bot, message, chatId): Promise<void> => {
-    const userSubscription: UserSubscription = await getUserSubscriptions(chatId);
-    if (!userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active !== false).length) {
+    const userSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(chatId);
+    if (!userSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
             chatId,
             noSubscriptionsResponseMessage()
@@ -33,7 +34,6 @@ export const buildUnsubscribeInlineResponse = async (bot, message, chatId): Prom
         getUnsubscribeMessageInlineKeyboard(
             userSubscription
                 .subscriptionsOn
-                .filter(v => v.active !== false)
                 .map(v => v.value)
         )
     )
@@ -59,10 +59,13 @@ export const unsubscribeStrategyResponse = async (bot, message, chatId, ikCbData
     const [err, result] = await catchAsyncError<string>(
         unsubscribeMeFrom(
             message.chat,
-            getUserMessageFromIKorText(
-                ikCbData ?? message,
-                CustomSubscriptions.UnsubscribeMeFrom,
-                ''
+            removeCommandFromMessageIfExist(
+                getUserMessageFromIKorText(
+                    ikCbData ?? message,
+                    CustomSubscriptions.UnsubscribeMeFrom,
+                    ''
+                ),
+                UserRegExps.Unsubscribe
             )
         )
     );

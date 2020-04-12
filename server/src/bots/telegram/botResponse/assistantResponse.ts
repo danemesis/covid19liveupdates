@@ -1,15 +1,15 @@
-import {getChatId} from "../utils/chat";
-import {fetchAnswer, fetchKnowledgeMetainformation} from "../../../services/api/api-knowledgebase";
-import {Answer} from "../../../models/knowledgebase/answer.models";
+import {getChatId} from '../utils/chat';
+import {fetchAnswer, fetchKnowledgeMetainformation} from '../../../services/api/api-knowledgebase';
+import {Answer} from '../../../models/knowledgebase/answer.models';
 import {
     getAnswersOnQuestionMessage,
     getAssistantFeaturesMessage,
     noAnswersOnQuestionMessage
-} from "../../../messages/feature/assistantMessages";
-import {textAfterUserCommand} from "../../../utils/textAfterCommand";
-import {isCommandOnly, isMatchingDashboardItem, isMessageStartsWithCommand} from "../../../utils/incomingMessages";
-import {KnowledgebaseMeta} from "../../../models/knowledgebase/meta.models";
-import {UserMessages} from "../../../models/constants";
+} from '../../../messages/feature/assistantMessages';
+import {textAfterUserCommand} from '../../../utils/textAfterCommand';
+import {isCommandOnly, isMatchingDashboardItem, isMessageStartsWithCommand} from '../../../utils/incomingMessages';
+import {KnowledgebaseMeta} from '../../../models/knowledgebase/meta.models';
+import {UserMessages} from '../../../models/constants';
 
 export const assistantStrategyResponse = (bot, message, chatId) => {
     if ((isMessageStartsWithCommand(message.text) && isCommandOnly(message.text))
