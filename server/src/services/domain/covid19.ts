@@ -41,7 +41,7 @@ class CachedCovid19CountriesData {
         return this.cachedAvailableCountriesData;
     }
 
-    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [[]],
+    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [0,[]],
                 private cachedAvailableCountriesData: Array<Country> = []) {
     }
 
