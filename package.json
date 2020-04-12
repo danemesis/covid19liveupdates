@@ -6,7 +6,8 @@
   "scripts": {
     "start:watch": "ts-node-dev --respawn --transpileOnly server/src/index.ts",
     "start:inspect": "ts-node-dev --inspect --respawn --transpileOnly server/src/index.ts",
-    "lint": "tslint \"server/src/**/*.ts\" --fix"
+    "lint": "tslint \"server/src/**/*.ts\"",
+    "lint:fix": "tslint \"server/src/**/*.ts\" --fix"
   },
   "homepage": "https://github.com/danbilokha/covid19liveupdates",
   "bugs": {
@@ -34,7 +35,17 @@
       "url": "https://github.com/danbilokha"
     }
   ],
-  "author": "Danylo Bilokha & Julia Melnychenko",
+  "lint-staged": {
+    "server/src/**/*.ts": [
+      "npm run lint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "author": "Danylo Bilokha, Julia Melnychenko, Vovi Kovi",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^13.9.1",
@@ -62,7 +73,9 @@
     "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
+    "husky": "^4.2.5",
     "jest": "^25.1.0",
+    "lint-staged": "^10.1.3",
     "mocha": "^7.1.0",
     "ngrok": "^3.2.7",
     "supertest": "^4.0.2",
