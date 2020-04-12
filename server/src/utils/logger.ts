@@ -2,7 +2,6 @@ import * as winston from 'winston';
 import {Loggly} from 'winston-loggly-bulk';
 import environment from "../environments/environment";
 
-
 if (environment.LOGGLY_TOKEN) {
     winston.add(new Loggly({
         token: environment.LOGGLY_TOKEN,
