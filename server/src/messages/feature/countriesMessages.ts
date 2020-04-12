@@ -12,5 +12,7 @@ export const getCountriesSumupMessage = (
 
 export const getCountriesTableHTML = ({
                                           continent,
+                                          continentTotalConfirmed, continentTotalRecovered, continentTotalDeath,
                                           portionMessage,
-                                      }): string => `🗺️ ${continent}\n\n<pre>${table(portionMessage, tableConfig)}</pre>`;
+                                      }): string => `🗺️ ${continent}: Total Active: ${continentTotalConfirmed} Total Recovered: ${continentTotalRecovered} Total Death: ${continentTotalDeath}
+                                       \n<pre>${table(portionMessage, tableConfig)}</pre>`;
