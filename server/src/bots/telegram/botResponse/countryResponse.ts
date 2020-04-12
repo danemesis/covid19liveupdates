@@ -7,16 +7,16 @@ import {
 } from "../../../messages/feature/countryMessages";
 import {Cache} from "../../../utils/cache";
 import {flag, name} from 'country-emoji';
-import {getKeyboard} from '../utils/keyboard';
+import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
 import {textAfterUserCommand} from "../../../utils/textAfterCommand";
 import {isMessageIsCommand} from "../../../utils/incomingMessages";
 import {UserRegExps} from "../../../models/constants";
 
-export const showCountryByName = async (bot, message, chatId): Promise<void> =>
+export const showCountryByNameStrategyResponse = async (bot, message, chatId): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
         : showCountry(
-            bot,
+        bot,
         chatId,
         adaptCountryToSystemRepresentation(textAfterUserCommand(message.text))
         );
@@ -30,18 +30,31 @@ export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
 
 // TODO: Move messages to /messages/feature directory
 const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
+    if (!requestedCountry) {
+        // Because of
+        // [https://github.com/danbilokha/covid19liveupdates/issues/61]
+        // fix of https://github.com/danbilokha/covid19liveupdates/issues/58
+        // Reason, when we click on some Dashboard,
+        //      MessageRegistry.registerMessageHandler this._bot.onText(
+        // Regexp works not as we expect it to work
+        // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
+        return;
+    }
+
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
         .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
-    const [foundCountry, foundSituation] = foundCountrySituations;
-
-    if (!foundCountry || !foundSituation?.length) {
+    if (!foundCountrySituations || !foundCountrySituations?.length
+        || !foundCountrySituations[0]
+        || !foundCountrySituations[1].length) {
         bot.sendMessage(
             chatId,
             `Sorry, but I cannot find anything for ${requestedCountry}. I will save your request and will work on it`
         );
         return;
     }
+
+    const [foundCountry, foundSituation] = foundCountrySituations;
 
     Cache.set(`${chatId}_commands_country`, flag(foundCountry.name));
 
@@ -65,6 +78,6 @@ const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
             deaths: totalDeaths,
             lastUpdateDate: foundSituation[foundSituation.length - 1].date
         }),
-        getKeyboard(chatId)
+        getAfterCountryResponseInlineKeyboard(foundCountry.name)
     );
-}
+};

@@ -1,15 +1,56 @@
 import {UserPresentationalCountryNameString} from "../../models/tsTypes.models";
 import {ApiCountriesCovid19Situation, ApiCovid19Situation, CountrySituationInfo} from "../../models/covid19.models";
-import {TIMES} from "../../models/constants";
+import {COVID19_FETCH_SALT, TIMES} from "../../models/constants";
 import {Country} from "../../models/country.models";
 import {fetchCovid19Data} from "../api/api-covid19";
 import {CountryLookup} from "../../models/country-code-lookup.models";
 import {getCountryNameFormat} from "../../utils/featureHelpers/country";
 import {getCountryByName, getDefaultCountry} from "./countryLookup";
+import {SubscriptionType} from "../../models/subscription.models";
+import {logger} from "../../utils/logger";
 
-let availableContinents: Array<string> = [];
-let availableCountries: Array<Country> = [];
-let cachedCountriesResponse: [number, Array<[Country, Array<CountrySituationInfo>]>];
+// TODO: Improve Cached management
+class CachedCovid19CountriesData {
+    private subscribers: Array<[Array<SubscriptionType>, Function]> = [];
+
+    public set countriesData(countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]) {
+        this.cachedCountriesData = countriesData;
+
+        this.subscribers.forEach(([subscriptionsType, cb]: [Array<SubscriptionType>, Function]) => {
+            if (subscriptionsType.some((subscriptionType: SubscriptionType) => subscriptionType !== SubscriptionType.TrackCountryUpdates)) {
+                cb(this.countriesData);
+            }
+        })
+    }
+
+    public get countriesData(): [number, Array<[Country, Array<CountrySituationInfo>]>] {
+        return this.cachedCountriesData;
+    }
+
+    public set availableCountriesData(countries: Array<Country>) {
+        this.cachedAvailableCountriesData = countries;
+
+        this.subscribers.forEach(([subscriptionsType, cb]: [Array<SubscriptionType>, Function]) => {
+            if (subscriptionsType.some((subscriptionType: SubscriptionType) => subscriptionType === SubscriptionType.TrackCountryUpdates)) {
+                cb(this.availableCountriesData);
+            }
+        })
+    }
+
+    public get availableCountriesData(): Array<Country> {
+        return this.cachedAvailableCountriesData;
+    }
+
+    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [[]],
+                private cachedAvailableCountriesData: Array<Country> = []) {
+    }
+
+    public subscribe(cb: Function, subscriptionsType: Array<SubscriptionType>): void {
+        this.subscribers = [...this.subscribers, [subscriptionsType, cb]];
+    }
+}
+
+export const cachedCovid19CountriesData = new CachedCovid19CountriesData();
 
 export const adaptCountryToSystemRepresentation =
     (country: string): UserPresentationalCountryNameString => getCountryNameFormat(
@@ -48,17 +89,24 @@ function getCovid19Data(): Promise<Array<[Country, Array<CountrySituationInfo>]>
     return fetchCovid19Data()
         .then((apiCountriesSituation: ApiCountriesCovid19Situation) => {
             const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = adaptApiCountriesResponse(apiCountriesSituation);
-            availableCountries = countriesSituation.map(([country]) => country);
-            cachedCountriesResponse = [Date.now(), countriesSituation];
+            cachedCovid19CountriesData.availableCountriesData = countriesSituation.map(([country]) => country);
+            cachedCovid19CountriesData.countriesData = [Date.now(), countriesSituation];
 
             return countriesSituation;
         });
 }
 
-export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySituationInfo>]>> {
-    const [lastFetchedTime, countriesSituation] = cachedCountriesResponse ?? [];
+export function tryToUpdateCovid19Cache(): Promise<void> {
+    return getCovid19Data()
+        .then(v => undefined)
+        .catch(e => logger.log('error', `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`));
+}
 
-    if (lastFetchedTime > Date.now() - TIMES.MILLISECONDS_IN_HOUR) {
+export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySituationInfo>]>> {
+    const [lastFetchedTime, countriesSituation] = cachedCovid19CountriesData.countriesData ?? [];
+
+
+    if (lastFetchedTime > Date.now() - TIMES.MILLISECONDS_IN_HOUR - COVID19_FETCH_SALT) {
         return Promise.resolve(countriesSituation);
     }
 
@@ -66,8 +114,8 @@ export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySi
 }
 
 export function getAvailableCountries(): Promise<Array<Country>> {
-    if (!!availableCountries?.length) {
-        return Promise.resolve(availableCountries);
+    if (!!cachedCovid19CountriesData.availableCountriesData?.length) {
+        return Promise.resolve(cachedCovid19CountriesData.availableCountriesData);
     }
 
     return getCovid19Data()

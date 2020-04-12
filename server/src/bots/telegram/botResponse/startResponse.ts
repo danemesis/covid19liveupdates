@@ -1,13 +1,13 @@
-import {getKeyboard} from '../utils/keyboard';
+import {getFullMenuKeyboard} from '../services/keyboard';
 import {greetUser} from "../../../messages/userMessage";
-import {showHelpInfo} from './helpResponse';
+import {showHelpInfoResponse} from './helpResponse';
 
 export const startResponse = async (bot, message, chatId) => {
     await bot.sendMessage(
         message.chat.id,
         `${greetUser(message.from)}`,
-        getKeyboard(message)
+        getFullMenuKeyboard(message)
     );
 
-    await showHelpInfo(bot, message, chatId);
+    await showHelpInfoResponse(bot, message, chatId);
 };
