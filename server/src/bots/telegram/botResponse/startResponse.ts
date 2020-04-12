@@ -4,7 +4,7 @@ import {showHelpInfoResponse} from './helpResponse';
 
 export const startResponse = async (bot, message, chatId) => {
     await bot.sendMessage(
-        message.chat.id,
+        chatId,
         `${greetUser(message.from)}`,
         getFullMenuKeyboard(message)
     );

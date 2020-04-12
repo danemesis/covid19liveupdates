@@ -13,6 +13,7 @@ import {adaptCountryToSystemRepresentation, getAvailableCountries} from '../../.
 import {Answer} from '../../../models/knowledgebase/answer.models';
 import {fetchAnswer} from '../../../services/api/api-knowledgebase';
 import {assistantResponse} from '../botResponse/assistantResponse';
+import {noResponse} from '../botResponse/noResponse';
 
 class MessageRegistry {
     // TODO: change type to unknown and Handle casting to BotType
@@ -94,27 +95,29 @@ class MessageRegistry {
         });
     }
 
-    private async tryDeduceUserCommand({text, chat: {id: chatId}}: TelegramMessage): Promise<void> {
-        if (isMessageCountryFlag(text)) {
-            const countryName: string = getCountryNameByFlag(text);
+    private async tryDeduceUserCommand(message: TelegramMessage): Promise<void> {
+        const chatId = getChatId(message);
+        if (isMessageCountryFlag(message.text)) {
+            const countryName: string = getCountryNameByFlag(message.text);
             return showCountryResponse(this._bot, countryName, chatId)
         }
 
         const countries: Array<Country> = await getAvailableCountries();
         const country: Country | undefined = getCountryByMessage(
-            adaptCountryToSystemRepresentation(text),
+            adaptCountryToSystemRepresentation(message.text),
             countries
         );
         if (country) {
             return showCountryResponse(this._bot, country.name, chatId)
         }
 
-        const answers: Array<Answer> = await fetchAnswer(text);
+        const answers: Array<Answer> = await fetchAnswer(message.text);
         if (answers?.length) {
             return assistantResponse(this._bot, answers, chatId);
         }
 
-        throw new Error(`Could not deduce command for message - ${text}`);
+        return noResponse(this._bot, message, chatId);
+        // throw new Error(`Could not deduce command for message - ${message.text}`);
     }
 }
 
