@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import {UserSubscription} from "../../models/subscription.models";
+import {Subscription, UserSubscription} from "../../models/subscription.models";
 import {SubscriptionStorage} from "../../models/storage.models";
 import DataSnapshot = firebase.database.DataSnapshot;
 
@@ -29,6 +29,15 @@ export const getSubscriptions = (messengerPrefix: string) => async <T>(): Promis
 export const getSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
     const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions/${chatId}`).once('value');
     return snapshot.val();
+};
+
+export const getActiveSubscription = (messengerPrefix: string) => async <T>(chatId: number): Promise<UserSubscription> => {
+    const snapshot = await firebase.database().ref(`${messengerPrefix}/subscriptions/${chatId}`).once('value');
+    const userSubscription: UserSubscription = snapshot.val() as UserSubscription;
+    return {
+        ...userSubscription,
+        subscriptionsOn: userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
+    };
 };
 
 export const setSubscription = (messengerPrefix: string) => async <T>(

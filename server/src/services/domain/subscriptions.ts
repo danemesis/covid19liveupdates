@@ -1,7 +1,11 @@
 import {TelegramChat} from "../../bots/telegram/models";
 import {getAvailableCountries} from "./covid19";
 import {Country} from "../../models/country.models";
-import {getTelegramUserSubscriptions, setTelegramSubscription} from "../../bots/telegram/services/storage";
+import {
+    getTelegramActiveUserSubscriptions,
+    getTelegramUserSubscriptions,
+    setTelegramSubscription
+} from "../../bots/telegram/services/storage";
 import {Subscription, SubscriptionType, UserSubscription} from "../../models/subscription.models";
 import {SubscriptionStorage} from "../../models/storage.models";
 import {catchAsyncError} from "../../utils/catchError";
@@ -22,12 +26,12 @@ export const subscribeOn = async (chat: TelegramChat, subscribeMeOn: string): Pr
     }
 
     // TODO: Remove Telegram dependency
-    const existingSubscriptions: Array<Subscription> = (await getTelegramUserSubscriptions(chat.id) ?? {})
+    const existingSubscriptions: Array<Subscription> = (await getTelegramActiveUserSubscriptions(chat.id) ?? {})
         .subscriptionsOn ?? [];
 
     console.log('existingSubscriptions', existingSubscriptions);
     const checkIfAlreadySubscribed = existingSubscriptions
-        .find((subscription: Subscription) => subscription.value === subscribeMeOn && !!subscription.active);
+        .find((subscription: Subscription) => subscription.value === subscribeMeOn);
     if (!!checkIfAlreadySubscribed) {
         // TODO: it's not actually error, re-write it be not an error
         throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);
@@ -60,6 +64,7 @@ export const unsubscribeMeFrom = async (chat: TelegramChat, unsubscribeMeFrom: s
             }
             return subscription;
         });
+    console.log('updatedSubscriptions', unsubscribeMeFrom, updatedSubscriptions);
     const [err, result] = await catchAsyncError(setTelegramSubscription({
         chat,
         subscriptionsOn: updatedSubscriptions

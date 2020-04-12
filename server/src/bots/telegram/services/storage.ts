@@ -1,5 +1,6 @@
 import {TELEGRAM_PREFIX} from "../models";
 import {
+    getActiveSubscription,
     getMessengerStorage,
     getSubscription,
     getSubscriptions,
@@ -12,6 +13,7 @@ import * as firebase from "firebase";
 export const getTelegramFullStorage: Function = getMessengerStorage(TELEGRAM_PREFIX);
 export const getTelegramSubscriptions: Function = getSubscriptions(TELEGRAM_PREFIX);
 export const getTelegramUserSubscriptions: Function = getSubscription(TELEGRAM_PREFIX);
+export const getTelegramActiveUserSubscriptions: Function = getActiveSubscription(TELEGRAM_PREFIX);
 export const setTelegramSubscription: Function = setSubscription(TELEGRAM_PREFIX);
 export const updateTelegramSubscription: Function = updateSubscription(TELEGRAM_PREFIX);
 
