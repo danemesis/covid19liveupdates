@@ -17,7 +17,6 @@ tags.push('containerV' + process.env.CONTAINER_VERSION, 'pkgV' + process.env.npm
 let envConfig = {
     ENV: environmentName,
     COVID19API_URL: process.env.COUNTRIESDATA_URL,
-    ALTERNATIVECOVID19API_URL: process.env.ALTERNATIVECOVID19API_URL || 'https://api.covid19api.com',
     KNOWLEDGEBASE_URL: process.env.KNOWLEDGEBASE_URL,
     KNOWLEDGEBASE_SECRET_KEY: process.env.KNOWLEDGEBASE_SECRET_KEY,
     TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
