@@ -1,7 +1,7 @@
 # folders
 node_modules/
 dist/
-server/src/environments/dev.config.json
+coverage/
 
 # ide & other stuff files
 .idea/
