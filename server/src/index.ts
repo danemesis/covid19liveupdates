@@ -11,6 +11,7 @@ import {checkCovid19Updates} from './services/infrastructure/scheduler';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const environmentName = process.env.ENVIRONMENT_NAME;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -22,7 +23,7 @@ const server = app.listen(PORT, async () => {
     console.log(
         ('App is running at http://localhost:%d in %s mode'),
         PORT,
-        app.get('env'),
+        environmentName,
     );
     // tslint:disable-next-line:no-console
     console.log('\nPress CTRL-C to stop');

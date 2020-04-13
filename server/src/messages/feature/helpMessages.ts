@@ -1,7 +1,7 @@
 import {UserRegExps} from '../../models/constants';
 import {getNumberEmoji} from '../../utils/emoji';
 
-const codesExplanations = new Map([
+const codesExplanations: Map<string, string> = new Map<string, string>([
     [UserRegExps.Start,
         'My greetings 👋'
     ],
@@ -37,7 +37,8 @@ const USING_DATASOURCES: string =
 
 export const getHelpMessage = (): string => `ℹ Things I can do are\n${
     Object.values(UserRegExps)
-        .map((userRegerxp: string, idx: number) => `${getNumberEmoji(idx)} ${userRegerxp} ${codesExplanations.get(userRegerxp)}`)
+        .map((userRegerxp: string, idx: number) =>
+            `${getNumberEmoji(idx)} ${userRegerxp} ${codesExplanations.get(userRegerxp)}`)
         .join('\n')
         .concat(`\n\n${USING_DATASOURCES}`)
 }`;

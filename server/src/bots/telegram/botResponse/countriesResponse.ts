@@ -15,6 +15,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
     countriesSituation
         .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
             const {confirmed, recovered, deaths} = situations[situations.length - 1];
+
             const countrySituationResult: CountrySituation = {
                 lastUpdateDate: situations[situations.length - 1].date,
                 country,
@@ -22,7 +23,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
                 recovered,
                 deaths
             };
-            const prevCountriesResult = continentCountries[country.continent]
+            const prevCountriesResult: Array<CountrySituation> = continentCountries[country.continent]
                 ? continentCountries[country.continent]
                 : [];
             continentCountries[country.continent] = [
@@ -32,6 +33,9 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
         });
 
     const portionMessage = [getTableHeader()];
+    let continentTotalConfirmed: number = 0;
+    let continentTotalRecovered: number = 0;
+    let continentTotalDeath: number = 0;
 
     portionMessage.push();
     continentCountries[continent]
@@ -43,6 +47,9 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
                       recovered,
                       deaths
                   }: CountrySituation) => {
+                continentTotalConfirmed += confirmed;
+                continentTotalRecovered += recovered;
+                continentTotalDeath += deaths;
             portionMessage.push(
                 getTableRowMessageForCountry({
                     name,
@@ -56,7 +63,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
 
     await bot.sendMessage(
         chatId,
-        getCountriesTableHTML({continent, portionMessage}),
+        getCountriesTableHTML({continent, continentTotalConfirmed, continentTotalRecovered, continentTotalDeath, portionMessage}),
         {parse_mode: 'HTML'}
     );
 };
