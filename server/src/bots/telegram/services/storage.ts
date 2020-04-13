@@ -17,7 +17,7 @@ export const getTelegramActiveSubscriptions: Function = getActiveSubscriptions(T
 export const getTelegramUserSubscriptions: Function = getUserSubscription(TELEGRAM_PREFIX);
 export const getTelegramActiveUserSubscriptions: Function = getActiveUserSubscription(TELEGRAM_PREFIX);
 export const setTelegramSubscription: Function = setSubscription(TELEGRAM_PREFIX);
-export const setTelegramQueryToAnalyseSubscription: Function = setQueryToAnalyse(TELEGRAM_PREFIX);
+export const setTelegramQueryToAnalyse: Function = setQueryToAnalyse(TELEGRAM_PREFIX);
 
 export const listenTelegramUsersSubscriptionsChanges: Function = listenSubscriptionsChanges(TELEGRAM_PREFIX);
 export const telegramUsersSubscriptionsChangesHandler = (a: firebase.database.DataSnapshot, b?: string | null): unknown => {

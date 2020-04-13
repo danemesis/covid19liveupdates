@@ -76,6 +76,6 @@ export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
     // different messengers intersection here
 ): Promise<T> => {
     return firebase.database()
-        .ref(`${messengerPrefix}/unansweredQueries/${message.message_id}`)
+        .ref(`${messengerPrefix}/analyse/${message.message_id}`)
         .set((message))
 };
