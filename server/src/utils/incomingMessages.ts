@@ -1,7 +1,4 @@
 import {UserMessages, UserRegExps} from '../models/constants';
-import { ExceptionHandler } from 'winston';
-
-
 
 export const isMessageStartsWithCommand = (text: string): boolean => text?.[0] === '/';
 export const isMessageIsCommand = (text: string, command: UserRegExps): boolean => text.trim() === command;
