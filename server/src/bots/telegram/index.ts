@@ -19,9 +19,10 @@ import {
     subscriptionManagerResponse
 } from './botResponse/subscribeResponse';
 import {SubscriptionType} from '../../models/subscription.models';
-import {registry} from './services/messageRegistry';
+import {registry, WithCommandArgument} from './services/messageRegistry';
 import {subscriptionNotifierHandler} from './services/subscriptionNotifierManager';
 import {unsubscribeStrategyResponse} from './botResponse/unsubscribeResponse';
+import {showTrendsByCountry} from './botResponse/trendResponse';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -37,6 +38,8 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     });
 
     registry.setBot(bot); // TODO: DO IT COOLER
+    registry.addSingelParameterCommands([UserRegExps.CountryData, UserRegExps.Trends]);
+
     registry
         .registerMessageHandler(UserRegExps.Start, startResponse)
         // Feature: Countries / Country
@@ -58,11 +61,14 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserMessages.SubscriptionManager, subscriptionManagerResponse)
         .registerMessageHandler(UserMessages.Existing, showExistingSubscriptionsResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
-        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse);
+        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse)
+        .registerMessageHandler(UserRegExps.Trends, WithCommandArgument(showTrendsByCountry));
     registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
     registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
+    registry.registerCallBackQueryHandler(UserRegExps.Trends, WithCommandArgument(showTrendsByCountry));
+
 
     // Feature: Countries / Country
     for (const continent of Object.keys(Continents)) {
