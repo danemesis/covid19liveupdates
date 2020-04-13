@@ -1,10 +1,9 @@
-import environments from "../../environments/environment";
+import environments from '../../environments/environment';
 const stringifyObject = require('stringify-object');
 import {ChartModel} from '../../models/chart.models'
 
 export function getCovidTrends(inputData: ChartModel) {
 
-    console.log("Creating URL from ", inputData);
     const praparedInput =  
         stringifyObject(
             inputData, {
@@ -13,7 +12,6 @@ export function getCovidTrends(inputData: ChartModel) {
             }
     );
 
-    console.log("FINAL URL", encodeURI(environments.CHARTSAPI_URL + '?c='+ praparedInput));
     return encodeURI(environments.CHARTSAPI_URL + '?c='+ praparedInput);
 }
 
