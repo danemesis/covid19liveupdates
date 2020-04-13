@@ -1,8 +1,8 @@
 import environments from '../../environments/environment';
-const stringifyObject = require('stringify-object');
+import * as stringifyObject from 'stringify-object';
 import {ChartModel} from '../../models/chart.models'
 
-export function getCovidTrends(inputData: ChartModel) {
+export function getCovidTrends(inputData: ChartModel): string{
 
     const praparedInput =  
         stringifyObject(

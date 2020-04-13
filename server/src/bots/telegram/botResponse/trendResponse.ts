@@ -1,10 +1,9 @@
 import {getCovidTrends} from '../../../services/api/api-chart'
-import {ChartModel} from '../../../models/chart.models'
 import {Now, addDays} from '../../../utils/dateUtils'
-import {Status} from '../../../models/constants'
 import {CountrySituationInfo} from '../../../models/covid19.models';
 import {Country} from '../../../models/country.models';
 import {getCountriesSituation} from '../../../services/domain/covid19';
+import {Transform} from '../../../services/domain/chart';
 
 export const showTrendsByCountry = async (bot, message, chatId, requestedCountry): Promise<void> =>
 {
@@ -31,31 +30,4 @@ export const showTrendsByCountry = async (bot, message, chatId, requestedCountry
     bot.sendMessage(chatId, getCovidTrends(Transform(lastWeekSituation)));
 
     }
-
-    function Transform(situations:  CountrySituationInfo[]): ChartModel{
-        const days = situations.map(x => x.date);
-        return { 
-            type: 'line', 
-            data: { 
-                labels: days, 
-                datasets: [
-                    { label: Status.Confirmed, data: situations.map(x => x.confirmed), 
-                        fill: false, 
-                        borderColor: 'blue' 
-                    }, 
-                    { 
-                        label: Status.Deaths, 
-                        data: situations.map(x => x.deaths), 
-                        fill: false, 
-                        borderColor: 'red' 
-                    },
-                    { 
-                        label: Status.Recovered, 
-                        data: situations.map(x => x.recovered), 
-                        fill: false, 
-                        borderColor: 'green' 
-                    }
-                ]
-            }
-        };
-    }
+    

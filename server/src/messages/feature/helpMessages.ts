@@ -17,6 +17,9 @@ const codesExplanations = new Map([
     [UserRegExps.CountryData,
         `Show data for any country. Just follow a pattern ${UserRegExps.CountryData} [country name]`]
     ,
+    [UserRegExps.Trends,
+        `Can provide you with chart for weekly trend in any country. Just follow a pattern ${UserRegExps.Trends} [country name]`]
+    ,
     [UserRegExps.Advice,
         'I have some good advices for you how to stay safe & sound'
     ],
