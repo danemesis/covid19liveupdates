@@ -1,7 +1,7 @@
 FROM node:10 as web
 
 WORKDIR /usr/src/app
-ENV ENVIRONMENT_NAME 'production'
+# ENV ENVIRONMENT_NAME 'production'
 ENV CONTAINER_VERSION '1.5.0'
 
 COPY package*.json ./

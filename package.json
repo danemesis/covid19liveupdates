@@ -4,6 +4,9 @@
   "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
+    "test-cli": "jest --forceExit --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch",
     "build": "webpack --config webpack.config.js",
     "start:watch": "ts-node-dev --respawn --transpileOnly server/src/index.ts",
     "start:inspect": "ts-node-dev --inspect --respawn --transpileOnly server/src/index.ts",
@@ -14,37 +17,6 @@
   "bugs": {
     "url": "https://github.com/danbilokha/covid19liveupdates/issues",
     "email": "danbilokha@gmail.com"
-  },
-  "keywords": [
-    "covid19",
-    "coronavirus"
-  ],
-  "contributors": [
-    {
-      "name": "Julia Melnychenko",
-      "email": "julia.frontend@gmail.com",
-      "url": "https://github.com/jmelnich"
-    },
-    {
-      "name": "Vladimir Kovalenko",
-      "email": "proladge@gmail.com",
-      "url": "https://github.com/Proladge"
-    },
-    {
-      "name": "Danylo Bilokha",
-      "email": "danbilokha@gmail.com",
-      "url": "https://github.com/danbilokha"
-    }
-  ],
-  "lint-staged": {
-    "server/src/**/*.ts": [
-      "npm run lint"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "author": "Danylo Bilokha, Julia Melnychenko, Vovi Kovi",
   "license": "ISC",
@@ -78,17 +50,48 @@
     "@types/jest": "^25.1.4",
     "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.9",
+    "coveralls": "^3.0.11",
     "husky": "^4.2.5",
-    "jest": "^25.1.0",
+    "jest": "^25.3.0",
     "lint-staged": "^10.1.3",
     "mocha": "^7.1.0",
     "supertest": "^4.0.2",
-    "ts-jest": "^25.2.1",
+    "ts-jest": "^25.3.1",
     "ts-loader": "^6.2.1",
     "ts-node-dev": "^1.0.0-pre.44",
     "tslint": "^6.1.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.3"
+  },
+  "keywords": [
+    "covid19",
+    "coronavirus"
+  ],
+  "contributors": [
+    {
+      "name": "Julia Melnychenko",
+      "email": "julia.frontend@gmail.com",
+      "url": "https://github.com/jmelnich"
+    },
+    {
+      "name": "Vladimir Kovalenko",
+      "email": "proladge@gmail.com",
+      "url": "https://github.com/Proladge"
+    },
+    {
+      "name": "Danylo Bilokha",
+      "email": "danbilokha@gmail.com",
+      "url": "https://github.com/danbilokha"
+    }
+  ],
+  "lint-staged": {
+    "server/src/**/*.ts": [
+      "npm run lint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
