@@ -1,0 +1,25 @@
+{
+  "files": [
+    "server/src/index.ts"
+  ],
+  "include": [
+    "server/**/*.ts"
+  ],
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "outDir": "dist",
+    "rootDir": "server",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "removeComments": true,
+    "typeRoots": [ "node_modules/@types" ],
+    "paths": {
+      "*": [
+        "node_modules/@types/*",
+        "./server/types/*"
+      ]
+    }
+  }
+}

@@ -5,7 +5,7 @@ import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from '../models';
 
 export const getFullMenuKeyboard = (chatId): unknown => {
     const rk = new ReplyKeyboard();
-    const latestSelectedCountries = Cache
+    const latestSelectedCountries: Array<string> = Cache
         .get(`${chatId}_commands_country`);
 
     if (latestSelectedCountries.length > 0) {
