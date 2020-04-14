@@ -19,6 +19,7 @@ export enum UserRegExps {
     CountriesData = '/countries',
     AvailableCountries = '/available',
     CountryData = '/country',
+    Trends = '/trends',
     Advice = '/advice',
     Subscribe = '/subscribe',
     Unsubscribe = '/unsubscribe',
@@ -44,3 +45,10 @@ export enum Continents {
     Oceania = 'Oceania',
     Other = 'Other'
 }
+
+export enum Status {
+    Confirmed = 'confirmed',
+    Deaths = 'deaths',
+    Recovered = 'recovered'
+}
+

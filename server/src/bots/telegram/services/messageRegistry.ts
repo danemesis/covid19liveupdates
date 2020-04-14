@@ -7,13 +7,14 @@ import {
     isMessageCountryFlag
 } from '../../../utils/featureHelpers/isMessageCountry';
 import {showCountryResponse} from '../botResponse/countryResponse';
-import {catchAsyncError} from '../../../utils/catchError';
 import {Country} from '../../../models/country.models';
 import {adaptCountryToSystemRepresentation, getAvailableCountries} from '../../../services/domain/covid19';
 import {Answer} from '../../../models/knowledgebase/answer.models';
 import {fetchAnswer} from '../../../services/api/api-knowledgebase';
 import {assistantResponse} from '../botResponse/assistantResponse';
 import {noResponse} from '../botResponse/noResponse';
+import {UserRegExps} from '../../../models/constants';
+import {LogglyTypes} from '../../../models/loggly.models';
 
 class MessageRegistry {
     // TODO: change type to unknown and Handle casting to BotType
@@ -21,17 +22,24 @@ class MessageRegistry {
     _cbQueryHandlers: { [regexp: string]: CallBackQueryHandler } = {};
     _messageHandlers: { [regexp: string]: CallBackQueryHandler } = {};
 
+    _singleParameterCommandRegex: RegExp;
+
     public setBot(bot): void {
         this._bot = bot;
         this.registerCallBackQuery();
     }
 
-    public registerMessageHandler(regexp: string, callback: (bot: unknown, message: TelegramMessage, chatId: number, ikCbData?: unknown) => unknown): MessageRegistry {
+    public addSingleParameterCommands(commands: Array<UserRegExps>) {
+        this._singleParameterCommandRegex =
+            new RegExp(`(?<command>${commands.join('|\\')})\\s(?<firstargument>.*)`);
+    }
+
+    public registerMessageHandler(regexp: string, callback: CallBackQueryHandler): MessageRegistry {
         this._messageHandlers[regexp] = callback;
         return this;
     };
 
-    public registerCallBackQueryHandler(regexp: string, callback: (bot: any, message: any, chatId: unknown) => any): MessageRegistry {
+    public registerCallBackQueryHandler(regexp: string, callback: CallBackQueryHandler): MessageRegistry {
         this._cbQueryHandlers[regexp] = callback;
         return this;
     };
@@ -53,25 +61,16 @@ class MessageRegistry {
             );
 
         if (suitableKeys.length === 0) {
-            logger.log(
-                'error',
-                `[INFO] Hasn't found handler key for ${runCheckupAgainstStr}`
-            );
-            // TODO: Consider, maybe there is a sense to check out our Inline callback commands as well
-            const [err, result] = await catchAsyncError(this.tryDeduceUserCommand(message));
-            if (!!err) {
-                logger.log(
-                    'error',
-                    `[ERROR] VERY BAD. Could not even deduce user's command for ${runCheckupAgainstStr}`
-                );
-            }
-            return;
+            return this.tryDeduceUserCommand(message);
         }
 
         if (suitableKeys.length > 1) {
             logger.log(
                 'info',
-                `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(';\n')}`
+                {
+                    type: LogglyTypes.MoreThenOneAvailableResponse,
+                    message: `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(';\n')}`
+                }
             );
         }
 
@@ -97,6 +96,7 @@ class MessageRegistry {
 
     private async tryDeduceUserCommand(message: TelegramMessage): Promise<void> {
         const chatId = getChatId(message);
+
         if (isMessageCountryFlag(message.text)) {
             const countryName: string = getCountryNameByFlag(message.text);
             return showCountryResponse(this._bot, countryName, chatId)
@@ -117,10 +117,49 @@ class MessageRegistry {
         }
 
         return noResponse(this._bot, message, chatId);
-        // throw new Error(`Could not deduce command for message - ${message.text}`);
     }
 }
 
 export const registry = new MessageRegistry();
 
-type CallBackQueryHandler = (bot: any, message: any, chatId: unknown) => any
+type CallBackQueryHandler = (
+    bot: unknown,
+    message: TelegramMessage,
+    chatId: number,
+    commandArgument?: string
+) => unknown;
+
+export const withCommandArgument = (handlerFn: CallBackQueryHandler): unknown => {
+    const context = registry;
+    return (bot: any, message: TelegramMessage, chatId: unknown, ikCbData?: string): unknown => {
+        try {
+            const commandArgument: string = getArgFromMessage.call(context, ikCbData ?? message.text);
+            return handlerFn.call(context, bot, message, chatId, commandArgument)
+        } catch (err) {
+            logger.log('warn', {
+                ...message,
+                type: LogglyTypes.CommandError,
+                message: err.message,
+            });
+        }
+    }
+}
+
+function getArgFromMessage(messageText: string): string {
+    if (!messageText) {
+        throw new Error('message could not be empty');
+    }
+
+    const execResult = this._singleParameterCommandRegex.exec(messageText);
+    if (!execResult) {
+        throw new Error('Please input any command from available');
+    }
+
+    /* tslint:disable:no-string-literal */
+    if (execResult.groups['command'] && !execResult.groups['firstargument']) {
+        throw new Error(`please provide argument for \\${execResult.groups['command']}`);
+    }
+
+    return execResult.groups['firstargument'];
+    /* tslint:enable:no-string-literal */
+}

@@ -1,4 +1,6 @@
 export enum LogglyTypes {
+    CommandError= 'CommandError',
+    MoreThenOneAvailableResponse = 'MoreThenOneAvailableResponse',
     NoSuitableResponseToUser = 'NoSuitableResponseToUser'
 }
 
