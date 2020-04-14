@@ -9,7 +9,7 @@ export const noResponse = async (bot, message: TelegramMessage, chatId: number):
         'error',
         {
             ...message,
-            type: LogglyTypes.NoSuitableResponseToUser,
+            type: LogglyTypes.NoSuitableResponseToUserError,
         }
     );
 

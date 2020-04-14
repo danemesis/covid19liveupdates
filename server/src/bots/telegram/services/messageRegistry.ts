@@ -68,7 +68,7 @@ class MessageRegistry {
             logger.log(
                 'info',
                 {
-                    type: LogglyTypes.MoreThenOneAvailableResponse,
+                    type: LogglyTypes.MoreThenOneAvailableResponseError,
                     message: `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(';\n')}`
                 }
             );

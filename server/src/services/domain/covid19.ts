@@ -8,6 +8,7 @@ import {getCountryNameFormat} from '../../utils/featureHelpers/country';
 import {getCountryByName, getDefaultCountry} from './countryLookup';
 import {SubscriptionType} from '../../models/subscription.models';
 import {logger} from '../../utils/logger';
+import {LogglyTypes} from '../../models/loggly.models';
 
 // TODO: Improve Cached management
 class CachedCovid19CountriesData {
@@ -41,7 +42,7 @@ class CachedCovid19CountriesData {
         return this.cachedAvailableCountriesData;
     }
 
-    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [0,[]],
+    constructor(private cachedCountriesData: [number, Array<[Country, Array<CountrySituationInfo>]>] = [0, []],
                 private cachedAvailableCountriesData: Array<Country> = []) {
     }
 
@@ -99,7 +100,13 @@ function getCovid19Data(): Promise<Array<[Country, Array<CountrySituationInfo>]>
 export function tryToUpdateCovid19Cache(): Promise<void> {
     return getCovid19Data()
         .then(v => undefined)
-        .catch(e => logger.log('error', `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`));
+        .catch(e => logger.log(
+            'error',
+            {
+                type: LogglyTypes.Covid19DataUpdateError,
+                message: `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`,
+            }
+        ));
 }
 
 export function getCountriesSituation(): Promise<Array<[Country, Array<CountrySituationInfo>]>> {

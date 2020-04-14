@@ -14,6 +14,7 @@ import {logger} from '../../../utils/logger';
 import {getErrorMessage} from '../../../utils/getLoggerMessages';
 import {isCountrySituationHasChangedSinceLastData} from '../../../services/domain/subscriptions';
 import {showCountrySubscriptionMessage} from '../../../messages/feature/subscribeMessages';
+import {LogglyTypes} from '../../../models/loggly.models';
 
 export const subscriptionNotifierHandler = async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]): Promise<void> => {
     const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
@@ -39,7 +40,13 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
                     ).join('\n\n'),
             ));
             if (!!sendingNotificationErr) {
-                return logger.log('error', `${getErrorMessage(sendingNotificationErr)}. User ${chatId} notifications has not been send`);
+                return logger.log(
+                    'error',
+                    {
+                        type: LogglyTypes.SubscriptionNotifierError,
+                        message: `${getErrorMessage(sendingNotificationErr)}. User ${chatId} notifications has not been send`
+                    }
+                );
             }
 
             const mergeAllUserSubscriptions: Array<Subscription> = (userSubscription as UserSubscription)
@@ -62,7 +69,10 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
             if (!!updatingUserSubscriptionErr) {
                 return logger.log(
                     'error',
-                    `${getErrorMessage(updatingUserSubscriptionErr)}. User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`
+                    {
+                        type: LogglyTypes.SubscriptionNotifierError,
+                        message: `${getErrorMessage(updatingUserSubscriptionErr)}. User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
+                    }
                 );
             }
         }
