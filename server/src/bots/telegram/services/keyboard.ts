@@ -116,3 +116,11 @@ export const getHowToAdviceInlineKeyboard = (): unknown => {
 
     return ik.build();
 };
+
+export const getHelpProposalInlineKeyboard = (): unknown => {
+    const ik = new InlineKeyboard();
+    ik
+        .addRow({text: UserMessages.Help, callback_data: UserMessages.Help});
+
+    return ik.build();
+};

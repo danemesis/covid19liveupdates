@@ -5,6 +5,7 @@ import {getTableHeader, getTableRowMessageForCountry} from '../../../messages/fe
 import {Country} from '../../../models/country.models';
 import {getCountriesSumupMessage, getCountriesTableHTML} from '../../../messages/feature/countriesMessages';
 import {getContinentsInlineKeyboard} from '../services/keyboard';
+import {CallBackQueryHandler} from '../models';
 
 // TODO: Move this logic to domain and leave here only Telegram bot specific message response
 // Sending response itself
@@ -70,7 +71,7 @@ export const countriesByContinent = (continent) => async (bot, message, chatId) 
 
 // TODO: Move this logic to domain and leave here only Telegram bot specific message response
 // Sending response itself
-export const countriesResponse = async (bot, message) => {
+export const countriesResponse: CallBackQueryHandler = async (bot, message, chatId) => {
     const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const continentCountries: ContinentCountriesSituation = {};
     let worldTotalConfirmed = 0;
@@ -102,8 +103,8 @@ export const countriesResponse = async (bot, message) => {
         });
 
     // Send overall world info,
-    await bot.sendMessage(
-        getChatId(message),
+    return bot.sendMessage(
+        chatId,
         getCountriesSumupMessage(
             worldTotalConfirmed,
             worldTotalRecovered,

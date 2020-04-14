@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import {Subscription, UserSubscription} from '../../models/subscription.models';
 import {SubscriptionStorage} from '../../models/storage.models';
+import {TelegramMessage} from '../../bots/telegram/models';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export const getFllStorage = async <T>(): Promise<T> => {
@@ -68,4 +69,13 @@ export const setSubscription = (messengerPrefix: string) => async <T>(
             chat,
             subscriptionsOn
         }))
+};
+
+export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
+    message: TelegramMessage // I think it's OK to have this dependency here, we can have
+    // different messengers intersection here
+): Promise<T> => {
+    return firebase.database()
+        .ref(`${messengerPrefix}/analyse/${message.message_id}`)
+        .set((message))
 };

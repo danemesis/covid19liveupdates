@@ -19,7 +19,7 @@ import {
     subscriptionManagerResponse
 } from './botResponse/subscribeResponse';
 import {SubscriptionType} from '../../models/subscription.models';
-import {registry, WithCommandArgument} from './services/messageRegistry';
+import {registry, withCommandArgument} from './services/messageRegistry';
 import {subscriptionNotifierHandler} from './services/subscriptionNotifierManager';
 import {unsubscribeStrategyResponse} from './botResponse/unsubscribeResponse';
 import {showTrendsByCountry} from './botResponse/trendResponse';
@@ -38,7 +38,10 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     });
 
     registry.setBot(bot); // TODO: DO IT COOLER
-    registry.addSingelParameterCommands([UserRegExps.CountryData, UserRegExps.Trends]);
+    registry.addSingleParameterCommands([
+        UserRegExps.CountryData,
+        UserRegExps.Trends
+    ]);
 
     registry
         .registerMessageHandler(UserRegExps.Start, startResponse)
@@ -62,12 +65,13 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
         .registerMessageHandler(UserMessages.Existing, showExistingSubscriptionsResponse)
         .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
         .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse)
-        .registerMessageHandler(UserRegExps.Trends, WithCommandArgument(showTrendsByCountry));
+        .registerMessageHandler(UserRegExps.Trends, withCommandArgument(showTrendsByCountry));
     registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
     registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
     registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
     registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
-    registry.registerCallBackQueryHandler(UserRegExps.Trends, WithCommandArgument(showTrendsByCountry));
+    registry.registerCallBackQueryHandler(UserMessages.Help, showHelpInfoResponse);
+    registry.registerCallBackQueryHandler(UserRegExps.Trends, withCommandArgument(showTrendsByCountry));
 
 
     // Feature: Countries / Country
@@ -94,8 +98,8 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     bot.on('message', (message, ...args) => {
         logger.log('info', {
             ...message,
-            ...args,
         });
+        registry.runCommandHandler(message);
     });
 
     bot.on('polling_error', (err) => logger.log('error', err));

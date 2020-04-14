@@ -2,6 +2,8 @@ import {UpperCaseString, UserPresentationalCountryNameString} from '../../models
 
 const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseString, string>([
     ['US', 'United States'],
+    ['USA', 'United States'],
+    ['RUSSIAN FEDERATION', 'Russia'],
     ['UNITED KINGDOM', 'United Kingdom'],
     ['UNITED ARAB EMIRATES', 'United Arab Emirates'],
     ['BOSNIA AND HERZEGOVINA', 'Bosnia and Herzegovina'],
