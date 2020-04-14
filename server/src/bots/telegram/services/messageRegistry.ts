@@ -1,5 +1,5 @@
 import {logger} from '../../../utils/logger';
-import {TelegramMessage} from '../models';
+import {CallBackQueryHandlerWithCommandArgument, TelegramBot, TelegramMessage} from '../models';
 import {getChatId} from '../utils/chat';
 import {
     getCountryByMessage,
@@ -19,8 +19,8 @@ import {LogglyTypes} from '../../../models/loggly.models';
 class MessageRegistry {
     // TODO: change type to unknown and Handle casting to BotType
     _bot: any;
-    _cbQueryHandlers: { [regexp: string]: CallBackQueryHandler } = {};
-    _messageHandlers: { [regexp: string]: CallBackQueryHandler } = {};
+    _cbQueryHandlers: { [regexp: string]: CallBackQueryHandlerWithCommandArgument } = {};
+    _messageHandlers: { [regexp: string]: CallBackQueryHandlerWithCommandArgument } = {};
 
     _singleParameterCommandRegex: RegExp;
 
@@ -34,12 +34,12 @@ class MessageRegistry {
             new RegExp(`(?<command>${commands.join('|\\')})\\s(?<firstargument>.*)`);
     }
 
-    public registerMessageHandler(regexp: string, callback: CallBackQueryHandler): MessageRegistry {
+    public registerMessageHandler(regexp: string, callback: CallBackQueryHandlerWithCommandArgument): MessageRegistry {
         this._messageHandlers[regexp] = callback;
         return this;
     };
 
-    public registerCallBackQueryHandler(regexp: string, callback: CallBackQueryHandler): MessageRegistry {
+    public registerCallBackQueryHandler(regexp: string, callback: CallBackQueryHandlerWithCommandArgument): MessageRegistry {
         this._cbQueryHandlers[regexp] = callback;
         return this;
     };
@@ -74,7 +74,14 @@ class MessageRegistry {
             );
         }
 
-        return cbHandlers[suitableKeys[0]].call(this, this._bot, message, getChatId(message), ikCbData);
+        return cbHandlers[suitableKeys[0]]
+            .call(
+                this,
+                this._bot,
+                message,
+                getChatId(message),
+                ikCbData
+            );
     }
 
     private registerCallBackQuery() {
@@ -122,16 +129,9 @@ class MessageRegistry {
 
 export const registry = new MessageRegistry();
 
-type CallBackQueryHandler = (
-    bot: unknown,
-    message: TelegramMessage,
-    chatId: number,
-    commandArgument?: string
-) => unknown;
-
-export const withCommandArgument = (handlerFn: CallBackQueryHandler): unknown => {
+export const withCommandArgument = (handlerFn: CallBackQueryHandlerWithCommandArgument): CallBackQueryHandlerWithCommandArgument => {
     const context = registry;
-    return (bot: any, message: TelegramMessage, chatId: unknown, ikCbData?: string): unknown => {
+    return (bot: TelegramBot, message: TelegramMessage, chatId: number, ikCbData?: string): unknown => {
         try {
             const commandArgument: string = getArgFromMessage.call(context, ikCbData ?? message.text);
             return handlerFn.call(context, bot, message, chatId, commandArgument)

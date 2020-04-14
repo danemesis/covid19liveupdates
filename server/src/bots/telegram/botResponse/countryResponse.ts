@@ -11,25 +11,36 @@ import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
 import {textAfterUserCommand} from '../../../utils/textAfterCommand';
 import {isMessageIsCommand} from '../../../utils/incomingMessages';
 import {UserRegExps} from '../../../models/constants';
+import {CallBackQueryHandler} from '../models';
 
-export const showCountryByNameStrategyResponse = async (bot, message, chatId): Promise<void> =>
+export const showCountryByNameStrategyResponse: CallBackQueryHandler = async (
+    bot,
+    message,
+    chatId
+): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
-        : showCountryResponse(
-        bot,
+        : showCountryResponse(bot,
         adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)),
-        chatId,
-        );
+        chatId,);
 
-export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
+export const showCountryByFlag: CallBackQueryHandler = async (
+    bot,
+    message,
+    chatId
+): Promise<void> =>
     showCountryResponse(
         bot,
         adaptCountryToSystemRepresentation(name(message.text)),
         chatId,
     );
 
-// TODO: Move messages to /messages/feature directory
-export const showCountryResponse = async (bot, requestedCountry, chatId): Promise<void> => {
+// TODO: Split and move messages to /messages/feature and /domain directories
+export const showCountryResponse = async (
+    bot,
+    requestedCountry,
+    chatId
+): Promise<void> => {
     if (!requestedCountry) {
         // Because of
         // [https://github.com/danbilokha/covid19liveupdates/issues/61]

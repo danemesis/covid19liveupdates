@@ -5,18 +5,19 @@ import {Country} from '../../../models/country.models';
 import {getCountriesSituation} from '../../../services/domain/covid19';
 import {Transform} from '../../../services/domain/chart';
 
-export const showTrendsByCountry = async (bot, message, chatId, requestedCountry): Promise<void> => {
+export const showTrendsByCountry = async (bot, message, chatId, requestedCountry): Promise<unknown> => {
     const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
     const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
-        .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
+        .find(([receivedCountry, situations]) =>
+            receivedCountry.name === requestedCountry
+        );
     if (!foundCountrySituations || !foundCountrySituations?.length
         || !foundCountrySituations[0]
         || !foundCountrySituations[1].length) {
-        bot.sendMessage(
+        return bot.sendMessage(
             chatId,
             `Sorry, but I cannot find anything for ${requestedCountry}. I will save your request and will work on it`
         );
-        return;
     }
 
     const [foundCountry, foundSituation] = foundCountrySituations;
@@ -26,6 +27,5 @@ export const showTrendsByCountry = async (bot, message, chatId, requestedCountry
         return date < Now && date > addDays(Now, -7);
     });
 
-    bot.sendMessage(chatId, getCovidTrends(Transform(lastWeekSituation)));
-
+    return bot.sendMessage(chatId, getCovidTrends(Transform(lastWeekSituation)));
 }

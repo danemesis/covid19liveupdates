@@ -5,8 +5,13 @@ import {
     socialDistancing,
     suggestedBehaviors
 } from '../../../messages/feature/adviceMessages';
+import {CallBackQueryHandler} from '../models';
 
-export const showAdvicesHowToBehaveResponse = (bot, message, chatId): Promise<void> => {
+export const showAdvicesHowToBehaveResponse: CallBackQueryHandler = async (
+    bot,
+    message,
+    chatId
+): Promise<void> => {
     return bot.sendMessage(
         chatId,
         `ℹ Suggested Behaviors for ${getCovid19ExplanationVideo()}
