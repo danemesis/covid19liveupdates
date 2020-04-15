@@ -27,5 +27,5 @@ export const showTrendsByCountry = async (bot, message, chatId, requestedCountry
         return date < Now && date > addDays(Now, -7);
     });
 
-    return bot.sendMessage(chatId, getCovidTrends(Transform(lastWeekSituation)));
+    return bot.sendPhoto(chatId, getCovidTrends(Transform(lastWeekSituation)))
 }
