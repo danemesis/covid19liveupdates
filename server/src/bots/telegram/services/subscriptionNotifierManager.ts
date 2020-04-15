@@ -26,58 +26,78 @@ export const subscriptionNotifierHandler = async (countriesData: [number, Array<
     );
 
     for (const [chatId, userSubscription] of Object.entries(allUsersSubscriptions)) {
-        const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
-            countriesInfoMap,
-            userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
+        const [err, result] = await catchAsyncError(
+            getAndSendUserNotificationSubscriptions(countriesInfoMap, userSubscription, chatId)
         );
-
-        if (!!userSubscriptionsUpdate?.length) {
-            const [sendingNotificationErr, sendingNotificationResult] = await catchAsyncError(registry.sendUserNotification(
-                parseInt(chatId, 10),
-                userSubscriptionsUpdate
-                    .map((subUp: UserSubscriptionNotification) =>
-                        subUp.subscriptionMessage
-                    ).join('\n\n'),
-            ));
-            if (!!sendingNotificationErr) {
-                return logger.log(
-                    'error',
-                    {
-                        type: LogglyTypes.SubscriptionNotifierError,
-                        message: `${getErrorMessage(sendingNotificationErr)}. User ${chatId} notifications has not been send`
-                    }
-                );
-            }
-
-            const mergeAllUserSubscriptions: Array<Subscription> = (userSubscription as UserSubscription)
-                .subscriptionsOn
-                .map((sub: Subscription) => {
-                    const updateUserSub = userSubscriptionsUpdate
-                        .find(({subscription: {value, type, active}}: UserSubscriptionNotification) =>
-                            active === sub.active && type === sub.type && value === sub.value);
-                    if (updateUserSub) {
-                        return updateUserSub.subscription;
-                    }
-
-                    return sub;
-                });
-
-            const [updatingUserSubscriptionErr, updatingUserSubscriptionResult] = await catchAsyncError(setTelegramSubscription({
-                chat: userSubscription.chat,
-                subscriptionsOn: mergeAllUserSubscriptions
-            }));
-            if (!!updatingUserSubscriptionErr) {
-                return logger.log(
-                    'error',
-                    {
-                        type: LogglyTypes.SubscriptionNotifierError,
-                        message: `${getErrorMessage(updatingUserSubscriptionErr)}. User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
-                    }
-                );
-            }
+        if (err) {
+            logger.log(
+                'error',
+                {
+                    type: LogglyTypes.SubscriptionNotifierGeneralError,
+                    message: `${getErrorMessage(err)}. General subscriptionNotifierHandler, sending user ${chatId} notification  failed`
+                }
+            );
+            continue;
         }
     }
 };
+
+const getAndSendUserNotificationSubscriptions = async (
+    countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
+    userSubscription: UserSubscription,
+    chatId: string,
+) => {
+    const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
+        countriesInfoMap,
+        userSubscription.subscriptionsOn.filter((sub: Subscription) => sub.active)
+    );
+
+    if (!!userSubscriptionsUpdate?.length) {
+        const [sendingNotificationErr, sendingNotificationResult] = await catchAsyncError(registry.sendUserNotification(
+            parseInt(chatId, 10),
+            userSubscriptionsUpdate
+                .map((subUp: UserSubscriptionNotification) =>
+                    subUp.subscriptionMessage
+                ).join('\n\n'),
+        ));
+        if (!!sendingNotificationErr) {
+            return logger.log(
+                'error',
+                {
+                    type: LogglyTypes.SubscriptionNotifierError,
+                    message: `${getErrorMessage(sendingNotificationErr)}. User ${chatId} notifications has not been send`
+                }
+            );
+        }
+
+        const mergeAllUserSubscriptions: Array<Subscription> = (userSubscription as UserSubscription)
+            .subscriptionsOn
+            .map((sub: Subscription) => {
+                const updateUserSub = userSubscriptionsUpdate
+                    .find(({subscription: {value, type, active}}: UserSubscriptionNotification) =>
+                        active === sub.active && type === sub.type && value === sub.value);
+                if (updateUserSub) {
+                    return updateUserSub.subscription;
+                }
+
+                return sub;
+            });
+
+        const [updatingUserSubscriptionErr, updatingUserSubscriptionResult] = await catchAsyncError(setTelegramSubscription({
+            chat: userSubscription.chat,
+            subscriptionsOn: mergeAllUserSubscriptions
+        }));
+        if (!!updatingUserSubscriptionErr) {
+            return logger.log(
+                'error',
+                {
+                    type: LogglyTypes.SubscriptionNotifierError,
+                    message: `${getErrorMessage(updatingUserSubscriptionErr)}. User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
+                }
+            );
+        }
+    }
+}
 
 const getUserActiveSubscriptionNotifications = (
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,

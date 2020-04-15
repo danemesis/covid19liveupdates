@@ -23,6 +23,10 @@ import {registry, withCommandArgument} from './services/messageRegistry';
 import {subscriptionNotifierHandler} from './services/subscriptionNotifierManager';
 import {unsubscribeStrategyResponse} from './botResponse/unsubscribeResponse';
 import {showTrendsByCountry} from './botResponse/trendResponse';
+import {CountrySituationInfo} from '../../models/covid19.models';
+import {catchAsyncError} from '../../utils/catchError';
+import {LogglyTypes} from '../../models/loggly.models';
+import {getErrorMessage} from '../../utils/getLoggerMessages';
 
 function runTelegramBot(app: Express, ngRokUrl: string) {
     // Create a bot that uses 'polling' to fetch new updates
@@ -91,7 +95,18 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
 
     // Feature: Subscriptions
     cachedCovid19CountriesData.subscribe(
-        subscriptionNotifierHandler,
+        async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]) => {
+            const [err, result] = await catchAsyncError(subscriptionNotifierHandler(countriesData));
+            if (err) {
+                logger.log(
+                    'error',
+                    {
+                        type: LogglyTypes.SubscriptionNotifierHandlerError,
+                        message: `${getErrorMessage(err)}. subscriptionNotifierHandler failed`
+                    }
+                );
+            }
+        },
         [SubscriptionType.Country]
     );
 

@@ -3,6 +3,8 @@ export enum LogglyTypes {
     Covid19DataUpdateError = '[Error]Covid19DataUpdate',
     MoreThenOneAvailableResponseError = '[Error]MoreThenOneAvailableResponse',
     NoSuitableResponseToUserError = '[Error]NoSuitableResponseToUser',
+    SubscriptionNotifierHandlerError = '[Error]SubscriptionNotifierHandler',
+    SubscriptionNotifierGeneralError = '[Error]SubscriptionNotifierGeneralError',
     SubscriptionNotifierError = '[Error]SubscriptionNotifier',
     Covid19DataUpdateInfo = '[Info]Covid19DataUpdate',
     RemoveCommandFromMessageIfExistInfo = '[Info]removeCommandFromMessageIfExist',
