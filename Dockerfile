@@ -2,7 +2,7 @@ FROM node:10 as web
 
 WORKDIR /usr/src/app
 ENV ENVIRONMENT_NAME 'production'
-ENV CONTAINER_VERSION '2.0.0'
+ENV CONTAINER_VERSION '2.0.1'
 
 COPY package*.json ./
 RUN npm install --production
