@@ -96,9 +96,7 @@ function runTelegramBot(app: Express, ngRokUrl: string) {
     );
 
     bot.on('message', (message, ...args) => {
-        logger.log('info', {
-            ...message,
-        });
+        logger.log('info', message);
         registry.runCommandHandler(message);
     });
 
