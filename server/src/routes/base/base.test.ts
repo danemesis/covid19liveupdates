@@ -1,6 +1,6 @@
-import { expect } from 'chai';
+import * as request from 'supertest';
+import {expect} from 'chai';
 import * as app from '../../index';
-import {request} from 'https';
 
 describe('GET /', () => {
     it('should return 200 OK', () => {

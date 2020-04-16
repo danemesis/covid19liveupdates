@@ -14,5 +14,5 @@ export const getCountriesTableHTML = ({
                                           continent,
                                           continentTotalConfirmed, continentTotalRecovered, continentTotalDeath,
                                           portionMessage,
-                                      }): string => `🗺️ ${continent}: Total Active: ${continentTotalConfirmed} Total Recovered: ${continentTotalRecovered} Total Death: ${continentTotalDeath}
+                                      }): string => `🗺️ ${continent}. Total active: ${continentTotalConfirmed}, recovered: ${continentTotalRecovered}, death: ${continentTotalDeath}
                                        \n<pre>${table(portionMessage, tableConfig)}</pre>`;

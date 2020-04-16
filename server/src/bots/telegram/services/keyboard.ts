@@ -1,5 +1,5 @@
 import {Cache} from '../../../utils/cache';
-import {Continents, CustomSubscriptions, UserMessages} from '../../../models/constants';
+import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from '../../../models/constants';
 import {InlineKeyboard, ReplyKeyboard} from 'node-telegram-keyboard-wrapper';
 import {UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER} from '../models';
 
@@ -27,7 +27,13 @@ export const getAfterCountryResponseInlineKeyboard = (country: string): unknown 
             {
                 text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
                 callback_data: `${CustomSubscriptions.SubscribeMeOn} ${country}`
-            },
+            }
+        )
+        .addRow(
+            {
+                text: `Show weekly chart`,
+                callback_data: `${UserRegExps.Trends} ${country}`
+            }
         );
 
     return ik.build();
@@ -107,6 +113,14 @@ export const getHowToAdviceInlineKeyboard = (): unknown => {
             {text: Continents.Other, callback_data: Continents.Other},
             {text: Continents.Oceania, callback_data: Continents.Oceania},
         );
+
+    return ik.build();
+};
+
+export const getHelpProposalInlineKeyboard = (): unknown => {
+    const ik = new InlineKeyboard();
+    ik
+        .addRow({text: UserMessages.Help, callback_data: UserMessages.Help});
 
     return ik.build();
 };

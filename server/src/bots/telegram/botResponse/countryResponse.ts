@@ -11,25 +11,36 @@ import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
 import {textAfterUserCommand} from '../../../utils/textAfterCommand';
 import {isMessageIsCommand} from '../../../utils/incomingMessages';
 import {UserRegExps} from '../../../models/constants';
+import {CallBackQueryHandler} from '../models';
 
-export const showCountryByNameStrategyResponse = async (bot, message, chatId): Promise<void> =>
+export const showCountryByNameStrategyResponse: CallBackQueryHandler = async (
+    bot,
+    message,
+    chatId
+): Promise<void> =>
     isMessageIsCommand(message.text, UserRegExps.CountryData)
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
-        : showCountry(
-        bot,
-        chatId,
-        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text))
-        );
+        : showCountryResponse(bot,
+        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)),
+        chatId,);
 
-export const showCountryByFlag = async (bot, message, chatId): Promise<void> =>
-    showCountry(
+export const showCountryByFlag: CallBackQueryHandler = async (
+    bot,
+    message,
+    chatId
+): Promise<void> =>
+    showCountryResponse(
         bot,
+        adaptCountryToSystemRepresentation(name(message.text)),
         chatId,
-        name(message.text)
     );
 
-// TODO: Move messages to /messages/feature directory
-const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
+// TODO: Split and move messages to /messages/feature and /domain directories
+export const showCountryResponse = async (
+    bot,
+    requestedCountry,
+    chatId
+): Promise<void> => {
     if (!requestedCountry) {
         // Because of
         // [https://github.com/danbilokha/covid19liveupdates/issues/61]
@@ -41,8 +52,8 @@ const showCountry = async (bot, chatId, requestedCountry): Promise<void> => {
         return;
     }
 
-    const allCountries: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
-    const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountries
+    const allCountriesSituations: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
+    const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountriesSituations
         .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
     if (!foundCountrySituations || !foundCountrySituations?.length
         || !foundCountrySituations[0]

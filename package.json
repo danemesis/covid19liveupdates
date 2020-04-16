@@ -1,9 +1,12 @@
 {
   "name": "covid19liveupdates",
-  "version": "1.1.0",
+  "version": "2.1.0",
   "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
+    "versionTest": "test",
+    "release:production-iam-sure": "npm run build && cd infrastructure/ && release.bat",
+    "release:demo": "npm run build && cd infrastructure/ && demo-release.bat",
     "test-cli": "jest --forceExit --coverage --coverageReporters=text-lcov | coveralls",
     "test": "jest --forceExit",
     "test:watch": "jest --watch",
@@ -34,6 +37,7 @@
     "node-telegram-bot-api": "^0.40.0",
     "node-telegram-keyboard-wrapper": "^2.0.1",
     "nodemon": "^2.0.2",
+    "stringify-object": "^3.3.0",
     "table": "^5.4.6",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
