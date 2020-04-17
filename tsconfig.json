@@ -9,12 +9,15 @@
     "module": "commonjs",
     "target": "es6",
     "outDir": "dist",
-    "rootDir": "server",
+    "rootDir": "./",
     "sourceMap": true,
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "moduleResolution": "node",
     "removeComments": true,
-    "typeRoots": [ "node_modules/@types" ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "paths": {
       "*": [
         "node_modules/@types/*",

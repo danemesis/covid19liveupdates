@@ -1,4 +1,4 @@
-const ngrok = require('ngrok');
+import * as ngrok from 'ngrok';
 
 export const runNgrok = async (appPort) => {
     return ngrok.connect(appPort);
