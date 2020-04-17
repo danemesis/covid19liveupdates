@@ -9,7 +9,7 @@ import {CONSOLE_LOG_DELIMITER, CONSOLE_LOG_EASE_DELIMITER} from './models/consta
 import * as firebase from 'firebase';
 import {checkCovid19Updates} from './services/infrastructure/scheduler';
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 3000;
 const environmentName = process.env.ENVIRONMENT_NAME;
 
