@@ -4,8 +4,8 @@
   "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
-    "release:production-iam-sure": "npm run build && cd infrastructure/ && release.bat",
-    "release:demo": "npm run build && cd infrastructure/ && demo-release.bat",
+    "release:production-iam-sure": "npm run build && cd infrastructure/ && release.bat covid19liveupdbot",
+    "release:demo": "npm run build && cd infrastructure/ && release.bat demo-covid19livebot",
     "test-cli": "jest --forceExit --coverage --coverageReporters=text-lcov | coveralls",
     "test": "jest --forceExit",
     "test:watch": "jest --watch",

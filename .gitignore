@@ -1,7 +1,10 @@
 # folders
 node_modules/
 dist/
+
+#coverage
 coverage/
+.coveralls.yml
 
 # ide & other stuff files
 .idea/

@@ -1,0 +1,32 @@
+name: Reporsts
+
+on: ["push", "pull_request"]
+
+jobs:
+  reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use NodeJs
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Remove & re-install packages
+      - run: npm ci
+      - run: npm test
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            parallel: true
+            path-to-lcov: ./coverage/lcov.info # optional (default value)
+
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            parallel-finished: true
+

@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/danbilokha/covid19liveupdates/badge.svg?branch=master)](https://coveralls.io/github/danbilokha/covid19liveupdates?branch=master)
+
 # covid19liveupdates
 Bot for covid19 data updates in:
 
