@@ -10,7 +10,7 @@ export type CallBackQueryHandlerWithCommandArgument = (
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    commandArgument: string
+    parameterAfterCommand?: string
 ) => unknown;
 
 export const TELEGRAM_PREFIX: string = 'telegram';

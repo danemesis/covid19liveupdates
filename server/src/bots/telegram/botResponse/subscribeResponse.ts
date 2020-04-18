@@ -5,13 +5,7 @@ import {
     subscriptionManagerResponseMessage,
     subscriptionResultMessage,
 } from '../../../messages/feature/subscribeMessages';
-import {
-    isCommandOnly,
-    isMatchingDashboardItem,
-    isMessageIsCommand,
-    isMessageStartsWithCommand,
-} from '../../../utils/incomingMessages';
-import { CustomSubscriptions, UserMessages, UserRegExps } from '../../../models/constants';
+import { CustomSubscriptions, UserRegExps } from '../../../models/constants';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
@@ -20,6 +14,7 @@ import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText'
 import { UserSubscription } from '../../../models/subscription.models';
 import { removeCommandFromMessageIfExist } from '../../../utils/removeCommandFromMessageIfExist';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
 
 // TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse = async (
@@ -51,17 +46,13 @@ export const showExistingSubscriptionsResponse = async (
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
 // otherwise @param ikCbData will be null
-export const subscribingStrategyResponse = async (
-    bot,
-    message,
-    chatId,
-    ikCbData?: string
+export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number,
+    parameterAfterCommand?: string
 ): Promise<TelegramBot.Message> => {
-    if (
-        (isMessageStartsWithCommand(message.text) && isCommandOnly(message.text)) ||
-        isMessageIsCommand(message.text, UserRegExps.Subscribe) ||
-        isMatchingDashboardItem(message.text, UserMessages.SubscriptionManager)
-    ) {
+    if (!parameterAfterCommand) {
         return showExistingSubscriptionsResponse(bot, message, chatId);
     }
 

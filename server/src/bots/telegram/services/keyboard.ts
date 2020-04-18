@@ -18,7 +18,7 @@ export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
     }
 
     rk.addRow(UserMessages.CountriesData, UserMessages.AvailableCountries)
-        .addRow(UserMessages.Assistant, UserMessages.GetAdvicesHowToBehave)
+        .addRow(UserMessages.Assistant, UserMessages.GetAdviceHowToBehave)
         .addRow(UserMessages.SubscriptionManager, UserMessages.Help);
 
     return rk.open({ resize_keyboard: true });
@@ -32,7 +32,7 @@ export const getAfterCountryResponseInlineKeyboard = (
         text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
         callback_data: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
     }).addRow({
-        text: `Show weekly chart`,
+        text: 'Show weekly chart',
         callback_data: `${UserRegExps.Trends} ${country}`,
     });
 
@@ -44,7 +44,7 @@ export const getSubscriptionMessageInlineKeyboard = (): TelegramBot.SendMessageO
     ik.addRow(
         {
             text: UserMessages.Existing,
-            callback_data: UserMessages.Existing,
+            callback_data: `${UserMessages.Existing}`,
         },
         {
             text: UserMessages.Unsubscribe,
@@ -97,7 +97,11 @@ export const getContinentsInlineKeyboard = (): TelegramBot.SendMessageOptions =>
 
 export const getHelpProposalInlineKeyboard = (): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
-    ik.addRow({ text: UserMessages.Help, callback_data: UserMessages.Help });
+
+    ik.addRow({
+        text: UserMessages.Help,
+        callback_data: UserMessages.Help,
+    });
 
     return ik.build();
 };

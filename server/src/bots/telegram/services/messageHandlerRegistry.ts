@@ -16,39 +16,28 @@ import { Answer } from '../../../models/knowledgebase/answer.models';
 import { fetchAnswer } from '../../../services/api/api-knowledgebase';
 import { assistantResponse } from '../botResponse/assistantResponse';
 import { noResponse } from '../botResponse/noResponse';
-import { UserRegExps } from '../../../models/constants';
 import { LogglyTypes } from '../../../models/loggly.models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { getInfoMessage } from '../../../utils/getErrorMessages';
 
 export class MessageHandlerRegistry {
-    _cbQueryHandlers: { [regexp: string]: CallBackQueryHandlerWithCommandArgument } = {};
     _messageHandlers: { [regexp: string]: CallBackQueryHandlerWithCommandArgument } = {};
-
-    _singleParameterCommandRegex: RegExp;
+    _singleParameterAfterCommands: Array<string> = [];
 
     constructor(private readonly bot: TelegramBot) {
         this.registerCallBackQuery();
     }
 
-    public addSingleParameterCommands(commands: Array<UserRegExps>) {
-        this._singleParameterCommandRegex = new RegExp(
-            `(?<command>${commands.join('|\\')})\\s(?<firstargument>.*)`
-        );
-    }
-
     public registerMessageHandler(
-        regexp: string,
+        regexps: Array<string>,
         callback: CallBackQueryHandlerWithCommandArgument
     ): MessageHandlerRegistry {
-        this._messageHandlers[regexp] = callback;
-        return this;
-    }
+        this._singleParameterAfterCommands = [...this._singleParameterAfterCommands, ...regexps];
 
-    public registerCallBackQueryHandler(
-        regexp: string,
-        callback: CallBackQueryHandlerWithCommandArgument
-    ): MessageHandlerRegistry {
-        this._cbQueryHandlers[regexp] = callback;
+        regexps.forEach(
+            (regexp: string) =>
+                (this._messageHandlers[regexp] = withSingleParameterAfterCommand(this, callback))
+        );
         return this;
     }
 
@@ -63,8 +52,10 @@ export class MessageHandlerRegistry {
         message: TelegramBot.Message,
         ikCbData?: string
     ): Promise<TelegramBot.Message> {
+        logger.log('info', message);
+
         const runCheckupAgainstStr = ikCbData ? ikCbData : message.text;
-        const cbHandlers = ikCbData ? this._cbQueryHandlers : this._messageHandlers;
+        const cbHandlers = this._messageHandlers;
 
         const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
             (cbHandlerRegExpKey: string) =>
@@ -84,6 +75,9 @@ export class MessageHandlerRegistry {
             });
         }
 
+        // This statement will invoke wrapper (withSingleParameterAfterCommand)
+        // around original handler which is defined by default in
+        // this.registerMessageHandler
         return cbHandlers[suitableKeys[0]].call(
             this,
             this.bot,
@@ -134,7 +128,10 @@ export class MessageHandlerRegistry {
     }
 }
 
-export const withCommandArgument = (
+// This function is wrapper around the original User's query handler
+// It adds an additional parameter (if such exist) to original handler,
+// which will be an parameter following after command
+export const withSingleParameterAfterCommand = (
     context: MessageHandlerRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
 ): CallBackQueryHandlerWithCommandArgument => {
@@ -145,13 +142,14 @@ export const withCommandArgument = (
         ikCbData?: string
     ): unknown => {
         try {
-            const commandArgument: string = getArgFromMessage.call(
+            const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage.call(
                 context,
                 ikCbData ?? message.text
             );
-            return handlerFn.call(context, bot, message, chatId, commandArgument);
+
+            return handlerFn.call(context, bot, message, chatId, userEnteredArgumentAfterCommand);
         } catch (err) {
-            logger.log('warn', {
+            logger.log('error', {
                 ...message,
                 type: LogglyTypes.CommandError,
                 message: err.message,
@@ -160,19 +158,31 @@ export const withCommandArgument = (
     };
 };
 
-function getArgFromMessage(messageText: string): string {
-    if (!messageText) {
-        throw new Error('message could not be empty');
-    }
+// Check out how it works here
+// https://codepen.io/belokha/pen/xxwOdWg?editors=0012
+function getParameterAfterCommandFromMessage(
+    userFullInput: string | undefined
+): string | undefined {
+    const makeMagicOverUserFullInput: string = this._singleParameterAfterCommands.find(
+        (parameter) => parameter === userFullInput
+    )
+        ? userFullInput + ' ' // Problem is that userInput is the same as RegExp it returns null, but when it has
+        : // at least one whitespace it is not null
+          // https://codepen.io/belokha/pen/xxwOdWg?editors=0012, Example 5.
+          userFullInput;
 
-    const execResult = this._singleParameterCommandRegex.exec(messageText);
+    const execResult = new RegExp(
+        `(?<command>${this._singleParameterAfterCommands.join('|\\')})\\s(?<firstargument>.*)`
+    ).exec(makeMagicOverUserFullInput);
     if (!execResult) {
-        throw new Error('Please input any command from available');
+        logger.log('info', getInfoMessage('Entered unsupported command'));
+        return undefined;
     }
 
     /* tslint:disable:no-string-literal */
     if (execResult.groups['command'] && !execResult.groups['firstargument']) {
-        throw new Error(`please provide argument for \\${execResult.groups['command']}`);
+        logger.log('info', getInfoMessage(`No parameter for ${execResult.groups['command']}`));
+        return undefined;
     }
 
     return execResult.groups['firstargument'];
