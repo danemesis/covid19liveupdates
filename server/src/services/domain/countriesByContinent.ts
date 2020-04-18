@@ -1,7 +1,9 @@
 import { Country } from '../../models/country.models';
 import { ContinentsCountries } from '../../models/continent.models';
 
-export const getCountriesByContinent = (countries: Array<Country>): ContinentsCountries => {
+export const getCountriesByContinent = (
+    countries: Array<Country>
+): ContinentsCountries => {
     const continentsCountries: ContinentsCountries = {};
 
     countries.forEach(({ name, continent }: Country) => {
@@ -13,7 +15,6 @@ export const getCountriesByContinent = (countries: Array<Country>): ContinentsCo
         }
 
         continentsCountries[continent] = [name];
-        return;
     });
 
     return continentsCountries;

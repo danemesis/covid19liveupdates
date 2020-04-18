@@ -5,10 +5,10 @@ import {
     socialDistancing,
     suggestedBehaviors,
 } from '../../../messages/feature/adviceMessages';
-import { CallBackQueryHandler } from '../models';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 
-export const showAdvicesHowToBehaveResponse: CallBackQueryHandler = async (
+export const showAdvicesHowToBehaveResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot,
     message,
     chatId

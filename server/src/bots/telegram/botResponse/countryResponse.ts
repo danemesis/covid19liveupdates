@@ -1,4 +1,7 @@
-import { ApiCovid19Situation, CountrySituationInfo } from '../../../models/covid19.models';
+import {
+    ApiCovid19Situation,
+    CountrySituationInfo,
+} from '../../../models/covid19.models';
 import {
     adaptCountryToSystemRepresentation,
     getCountriesSituation,
@@ -14,10 +17,10 @@ import { getAfterCountryResponseInlineKeyboard } from '../services/keyboard';
 import { textAfterUserCommand } from '../../../utils/textAfterCommand';
 import { isMessageIsCommand } from '../../../utils/incomingMessages';
 import { UserRegExps } from '../../../models/constants';
-import { CallBackQueryHandler } from '../models';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 
-export const showCountryByNameStrategyResponse: CallBackQueryHandler = async (
+export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot,
     message,
     chatId
@@ -26,16 +29,22 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandler = async (
         ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
         : showCountryResponse(
               bot,
-              adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)),
+              adaptCountryToSystemRepresentation(
+                  textAfterUserCommand(message.text)
+              ),
               chatId
           );
 
-export const showCountryByFlag: CallBackQueryHandler = async (
+export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async (
     bot,
     message,
     chatId
 ): Promise<TelegramBot.Message> =>
-    showCountryResponse(bot, adaptCountryToSystemRepresentation(name(message.text)), chatId);
+    showCountryResponse(
+        bot,
+        adaptCountryToSystemRepresentation(name(message.text)),
+        chatId
+    );
 
 // TODO: Split and move messages to /messages/feature and /domain directories
 export const showCountryResponse = async (
@@ -62,7 +71,8 @@ export const showCountryResponse = async (
         Country,
         Array<CountrySituationInfo>
     ] = allCountriesSituations.find(
-        ([receivedCountry, situations]) => receivedCountry.name === requestedCountry
+        ([receivedCountry, situations]) =>
+            receivedCountry.name === requestedCountry
     );
     if (
         !foundCountrySituations ||

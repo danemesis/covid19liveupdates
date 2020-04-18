@@ -1,11 +1,5 @@
 import * as TelegramBot from 'node-telegram-bot-api';
 
-export type CallBackQueryHandler = (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-) => unknown;
-
 export type CallBackQueryHandlerWithCommandArgument = (
     bot: TelegramBot,
     message: TelegramBot.Message,
