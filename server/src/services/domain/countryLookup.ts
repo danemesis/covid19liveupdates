@@ -1,4 +1,4 @@
-import {CountryLookup} from '../../models/country-code-lookup.models';
+import { CountryLookup } from '../../models/country-code-lookup.models';
 import * as lookup from 'country-code-lookup';
 
 const COUNTRIES_LOOKUP_LIST: Array<CountryLookup> = lookup.countries;
@@ -12,14 +12,14 @@ export const getDefaultCountry = (name): CountryLookup => ({
     iso2: 'Other',
     iso3: 'Other',
     isoNo: 'Other',
-    internet: 'Other'
+    internet: 'Other',
 });
 
 export const getCountryByName = (name: string): CountryLookup => {
     /* tslint:disable:prefer-for-of */
     for (let i = 0; i < COUNTRIES_LOOKUP_LIST.length; i++) {
         if (COUNTRIES_LOOKUP_LIST[i].country.toLocaleLowerCase() === name.toLocaleLowerCase()) {
-            return COUNTRIES_LOOKUP_LIST[i]
+            return COUNTRIES_LOOKUP_LIST[i];
         }
     }
 
