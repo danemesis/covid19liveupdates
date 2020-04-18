@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 import { Subscription, UserSubscription } from '../../models/subscription.models';
 import { SubscriptionStorage } from '../../models/storage.models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import {User} from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export const getFllStorage = async <T>(): Promise<T> => {
@@ -101,4 +102,16 @@ export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
     // different messengers intersection here
 ): Promise<T> => {
     return firebase.database().ref(`${messengerPrefix}/analyse/${message.message_id}`).set(message);
+};
+
+export const getUser = (messengerPrefix: string) => async <T>(chatId: number): Promise<User> => {
+    const snapshot = await firebase.database()
+        .ref(`${messengerPrefix}/users/${chatId}`).once('value');
+    return snapshot.val() ?? {};
+};
+
+export const addUser = (messengerPrefix: string) => async <T>(user: User): Promise<T> => {
+    return firebase.database()
+        .ref(`${messengerPrefix}/users/${user.chatId}`)
+        .set((user))
 };
