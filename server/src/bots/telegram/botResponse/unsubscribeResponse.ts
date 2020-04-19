@@ -42,16 +42,16 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    parameterAfterCommand?: string
+    commandParameter?: string
 ): Promise<TelegramBot.Message> => {
     // If it's called from InlineKeyboard, then @param ikCbData will be available
     // otherwise @param ikCbData will be null
-    if (!parameterAfterCommand) {
+    if (!commandParameter) {
         return buildUnsubscribeInlineResponse(bot, message, chatId);
     }
 
     const [err, result] = await catchAsyncError<string>(
-        unsubscribeMeFrom(message.chat, parameterAfterCommand)
+        unsubscribeMeFrom(message.chat, commandParameter)
     );
     if (err) {
         return bot.sendMessage(chatId, unSubscribeErrorMessage(err.message));

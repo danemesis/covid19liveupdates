@@ -23,9 +23,9 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    parameterAfterCommand?: string
+    commandParameter?: string
 ): Promise<TelegramBot.Message> => {
-    if (!parameterAfterCommand) {
+    if (!commandParameter) {
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
 
@@ -33,7 +33,7 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
         bot,
         message,
         chatId,
-        adaptCountryToSystemRepresentation(parameterAfterCommand)
+        adaptCountryToSystemRepresentation(commandParameter)
     );
 };
 

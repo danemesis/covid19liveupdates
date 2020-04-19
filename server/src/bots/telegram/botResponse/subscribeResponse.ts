@@ -53,9 +53,9 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    parameterAfterCommand?: string
+    commandParameter?: string
 ): Promise<TelegramBot.Message> => {
-    if (!parameterAfterCommand) {
+    if (!commandParameter) {
         return showExistingSubscriptionsResponse(bot, message, chatId);
     }
 

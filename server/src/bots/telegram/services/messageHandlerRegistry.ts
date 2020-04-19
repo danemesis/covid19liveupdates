@@ -148,9 +148,11 @@ export class MessageHandlerRegistry {
     }
 }
 
-// This function is wrapper around the original User's query handler
-// It adds an additional parameter (if such exist) to original handler,
-// which will be an parameter following after command
+/**
+ * This function is wrapper around the original User's query handler
+ * It adds an additional parameter (if such exist) to original handler,
+ * which will be an parameter following after command
+ */
 export const withSingleParameterAfterCommand = (
     context: MessageHandlerRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
@@ -186,8 +188,10 @@ export const withSingleParameterAfterCommand = (
     };
 };
 
-// Check out how it works here
-// https://codepen.io/belokha/pen/xxwOdWg?editors=0012
+/**
+ * Check out how it works here
+ * https://codepen.io/belokha/pen/xxwOdWg?editors=0012
+ */
 function getParameterAfterCommandFromMessage(
     userFullInput: string | undefined
 ): string | undefined {
@@ -205,7 +209,7 @@ function getParameterAfterCommandFromMessage(
         )})\\s(?<firstargument>.*)`
     ).exec(makeMagicOverUserFullInput);
     if (!execResult) {
-        logger.log('info', getInfoMessage('Entered unsupported command'));
+        logger.log('warn', getInfoMessage('Entered unsupported command'));
         return undefined;
     }
 

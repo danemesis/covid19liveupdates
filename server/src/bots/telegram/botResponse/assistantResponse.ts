@@ -43,13 +43,13 @@ export const assistantStrategyResponse: CallBackQueryHandlerWithCommandArgument 
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    parameterAfterCommand?: string
+    commandParameter?: string
 ): Promise<TelegramBot.Message> => {
-    if (!parameterAfterCommand) {
+    if (!commandParameter) {
         return showAssistantFeatures(bot, message, chatId);
     }
 
-    const answers: Array<Answer> = await fetchAnswer(parameterAfterCommand);
+    const answers: Array<Answer> = await fetchAnswer(commandParameter);
     if (!answers.length) {
         return assistantNoAnswerResponse(bot, chatId);
     }
