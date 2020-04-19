@@ -46,13 +46,7 @@ export const showCountrySubscriptionMessage = (
 ): string => {
     return (
         `🔔 ` +
-        getCountryMessage({
-            name,
-            confirmed,
-            recovered,
-            deaths,
-            lastUpdateDate: date,
-        }) +
+        getCountryMessage(name, confirmed, recovered, deaths, date) +
         `\n\n📈 Country change, since ⏱️${prevDate}\n` +
         getDiffMessage(
             { confirmed, recovered, deaths },

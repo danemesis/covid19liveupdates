@@ -12,10 +12,12 @@ import {
 } from '../services/keyboard';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { getRequestedCountry } from '../../../services/domain/countries';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { getErrorMessage } from '../../../utils/getErrorMessages';
+import { Country } from '../../../models/country.models';
+import { CountrySituationInfo } from '../../../models/covid19.models';
+import { getRequestedCountry } from '../../../services/domain/countries';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -38,11 +40,11 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
 export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
     message: TelegramBot.Message,
-    chatId: number,
-    parameterAfterCommand?: string
+    chatId: number
 ): Promise<TelegramBot.Message> => {
+    const countryFlag = message.text;
     if (
-        !parameterAfterCommand ||
+        !countryFlag ||
         // Because of
         // [https://github.com/danbilokha/covid19liveupdates/issues/61]
         // fix of https://github.com/danbilokha/covid19liveupdates/issues/58
@@ -50,7 +52,7 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         //      MessageRegistry.registerMessageHandler this._bot.onText(
         // Regexp works not as we expect it to work
         // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
-        !adaptCountryToSystemRepresentation(name(parameterAfterCommand))
+        !adaptCountryToSystemRepresentation(name(countryFlag))
     ) {
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
@@ -59,7 +61,7 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         bot,
         message,
         chatId,
-        adaptCountryToSystemRepresentation(name(parameterAfterCommand))
+        adaptCountryToSystemRepresentation(name(countryFlag))
     );
 };
 
@@ -69,7 +71,10 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     chatId: number,
     requestedCountry: string
 ): Promise<TelegramBot.Message> => {
-    const [err, result] = await catchAsyncError(
+    const [err, result]: [
+        Error,
+        [Country, Array<CountrySituationInfo>]
+    ] = await catchAsyncError<[Country, Array<CountrySituationInfo>]>(
         getRequestedCountry(requestedCountry)
     );
     if (err) {
@@ -86,13 +91,7 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     // two send messages due to https://stackoverflow.com/a/41841237/6803463
     await bot.sendMessage(
         chatId,
-        getCountryMessage({
-            name,
-            confirmed,
-            recovered,
-            deaths,
-            lastUpdateDate: date,
-        }),
+        getCountryMessage(name, confirmed, recovered, deaths, date),
         getFullMenuKeyboard(chatId)
     );
     return bot.sendMessage(

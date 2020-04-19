@@ -14,7 +14,7 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     message: TelegramBot.Message,
     chatId: number,
     requestedCountry?: string | undefined
-): Promise<unknown> => {
+): Promise<TelegramBot.Message> => {
     const [err, [foundCountry, foundSituation]] = await catchAsyncError(
         getRequestedCountry(requestedCountry)
     );

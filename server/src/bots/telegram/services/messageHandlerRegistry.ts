@@ -34,12 +34,16 @@ export class MessageHandlerRegistry {
         regexps: Array<string>,
         callback: CallBackQueryHandlerWithCommandArgument
     ): MessageHandlerRegistry {
+        const systemRegExps = regexps.map((regexp: string) =>
+            regexp.toLocaleLowerCase()
+        );
+
         this._singleParameterAfterCommands = [
             ...this._singleParameterAfterCommands,
-            ...regexps,
+            ...systemRegExps,
         ];
 
-        regexps.forEach(
+        systemRegExps.forEach(
             (regexp: string) =>
                 (this._messageHandlers[
                     regexp
@@ -61,7 +65,10 @@ export class MessageHandlerRegistry {
     ): Promise<TelegramBot.Message> {
         logger.log('info', message);
 
-        const runCheckupAgainstStr = ikCbData ? ikCbData : message.text;
+        const runCheckupAgainstStr = (ikCbData
+            ? ikCbData
+            : message.text
+        ).toLocaleLowerCase();
         const cbHandlers = this._messageHandlers;
 
         const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
@@ -120,12 +127,7 @@ export class MessageHandlerRegistry {
 
         if (isMessageCountryFlag(message.text)) {
             const countryName: string = getCountryNameByFlag(message.text);
-            return showCountryResponse(
-                this.bot,
-                message,
-                chatId,
-                countryName
-            ) as Promise<TelegramBot.Message>;
+            return showCountryResponse(this.bot, message, chatId, countryName);
         }
 
         const countries: Array<Country> = await getAvailableCountries();
@@ -134,12 +136,7 @@ export class MessageHandlerRegistry {
             countries
         );
         if (country) {
-            return showCountryResponse(
-                this.bot,
-                message,
-                chatId,
-                country.name
-            ) as Promise<TelegramBot.Message>;
+            return showCountryResponse(this.bot, message, chatId, country.name);
         }
 
         const answers: Array<Answer> = await fetchAnswer(message.text);
@@ -163,11 +160,11 @@ export const withSingleParameterAfterCommand = (
         message: TelegramBot.Message,
         chatId: number,
         ikCbData?: string
-    ): unknown => {
+    ): Promise<TelegramBot.Message> => {
         try {
             const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage.call(
                 context,
-                ikCbData ?? message.text
+                (ikCbData ?? message.text).toLocaleLowerCase()
             );
 
             return handlerFn.call(
@@ -183,6 +180,8 @@ export const withSingleParameterAfterCommand = (
                 type: LogglyTypes.CommandError,
                 message: err.message,
             });
+
+            return noResponse(this.bot, message, chatId);
         }
     };
 };

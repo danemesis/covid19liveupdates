@@ -119,7 +119,7 @@ function runTelegramBot(app: Express, appUrl: string) {
         const single = countries
             .map((c) => flag(c.name)?.trim() ?? undefined)
             .filter((v) => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
-            .join('//');
+            .join('><');
 
         messageHandlerRegistry.registerMessageHandler(
             [`[~${single}~]`],
