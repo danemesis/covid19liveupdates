@@ -23,7 +23,6 @@ import { Country } from '../../models/country.models';
 import { flag } from 'country-emoji';
 import { assistantStrategyResponse } from './botResponse/assistantResponse';
 import * as TelegramBot from 'node-telegram-bot-api';
-import Config from '../../environments/environment';
 import { logger } from '../../utils/logger';
 import { startResponse } from './botResponse/startResponse';
 import { showAvailableCountriesResponse } from './botResponse/availableResponse';
@@ -42,14 +41,18 @@ import { catchAsyncError } from '../../utils/catchError';
 import { LogglyTypes } from '../../models/loggly.models';
 import { getErrorMessage } from '../../utils/getErrorMessages';
 
-function runTelegramBot(app: Express, appUrl: string) {
+export function runTelegramBot(
+    app: Express,
+    appUrl: string,
+    telegramToken: string
+) {
     // Create a bot that uses 'polling' to fetch new updates
-    const bot = new TelegramBot(Config.TELEGRAM_TOKEN, { polling: true });
+    const bot = new TelegramBot(telegramToken, { polling: true });
     // This informs the Telegram servers of the new webhook
-    bot.setWebHook(`${appUrl}/bot${Config.TELEGRAM_TOKEN}`);
+    bot.setWebHook(`${appUrl}/bot${telegramToken}`);
 
     // We are receiving updates at the route below!
-    app.post(`/bot${Config.TELEGRAM_TOKEN}`, (req, res) => {
+    app.post(`/bot${telegramToken}`, (req, res) => {
         bot.processUpdate(req.body);
         res.sendStatus(200);
     });
@@ -161,5 +164,3 @@ function runTelegramBot(app: Express, appUrl: string) {
     bot.on('webhook_error', (err) => logger.log('error', err));
     bot.on('error', (err) => logger.log('error', err));
 }
-
-export { runTelegramBot };
