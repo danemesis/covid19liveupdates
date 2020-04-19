@@ -8,7 +8,7 @@ import {
 import { CustomSubscriptions, UserRegExps } from '../../../models/constants';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { catchAsyncError } from '../../../utils/catchError';
-import { getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
+import { getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
 import { getTelegramActiveUserSubscriptions } from '../services/storage';
 import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText';
 import { UserSubscription } from '../../../models/subscription.models';
@@ -41,7 +41,10 @@ export const showExistingSubscriptionsResponse = async (
         return bot.sendMessage(chatId, noSubscriptionsResponseMessage());
     }
 
-    return bot.sendMessage(chatId, showMySubscriptionMessage(activeUserSubscription));
+    return bot.sendMessage(
+        chatId,
+        showMySubscriptionMessage(activeUserSubscription)
+    );
 };
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
@@ -60,7 +63,11 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         subscribeOn(
             message.chat,
             removeCommandFromMessageIfExist(
-                getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, ''),
+                getUserMessageFromIKorText(
+                    message,
+                    CustomSubscriptions.SubscribeMeOn,
+                    ''
+                ),
                 UserRegExps.Subscribe
             )
         )
@@ -69,5 +76,5 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         return bot.sendMessage(chatId, subscribeError(err.message));
     }
 
-    return bot.sendMessage(chatId, subscriptionResultMessage(result), getFullMenuKeyboard(chatId));
+    return bot.sendMessage(chatId, subscriptionResultMessage(result));
 };

@@ -6,7 +6,7 @@ import {
 import { getCountriesSituation } from '../../../services/domain/covid19';
 import {
     getTableHeader,
-    getTableRowMessageForCountry,
+    getTableCountryRowMessage,
 } from '../../../messages/feature/countryMessages';
 import { Country } from '../../../models/country.models';
 import {
@@ -74,7 +74,7 @@ export const countriesByContinentResponse = (continent) => async (
                 continentTotalRecovered += recovered;
                 continentTotalDeath += deaths;
                 portionMessage.push(
-                    getTableRowMessageForCountry({
+                    getTableCountryRowMessage({
                         name,
                         confirmed,
                         recovered,

@@ -21,7 +21,9 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { getInfoMessage } from '../../../utils/getErrorMessages';
 
 export class MessageHandlerRegistry {
-    _messageHandlers: { [regexp: string]: CallBackQueryHandlerWithCommandArgument } = {};
+    _messageHandlers: {
+        [regexp: string]: CallBackQueryHandlerWithCommandArgument;
+    } = {};
     _singleParameterAfterCommands: Array<string> = [];
 
     constructor(private readonly bot: TelegramBot) {
@@ -32,11 +34,16 @@ export class MessageHandlerRegistry {
         regexps: Array<string>,
         callback: CallBackQueryHandlerWithCommandArgument
     ): MessageHandlerRegistry {
-        this._singleParameterAfterCommands = [...this._singleParameterAfterCommands, ...regexps];
+        this._singleParameterAfterCommands = [
+            ...this._singleParameterAfterCommands,
+            ...regexps,
+        ];
 
         regexps.forEach(
             (regexp: string) =>
-                (this._messageHandlers[regexp] = withSingleParameterAfterCommand(this, callback))
+                (this._messageHandlers[
+                    regexp
+                ] = withSingleParameterAfterCommand(this, callback))
         );
         return this;
     }
@@ -59,7 +66,9 @@ export class MessageHandlerRegistry {
 
         const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
             (cbHandlerRegExpKey: string) =>
-                !!runCheckupAgainstStr.match(new RegExp(cbHandlerRegExpKey, 'g'))
+                !!runCheckupAgainstStr.match(
+                    new RegExp(cbHandlerRegExpKey, 'g')
+                )
         );
 
         if (suitableKeys.length === 0) {
@@ -89,25 +98,34 @@ export class MessageHandlerRegistry {
 
     private registerCallBackQuery() {
         this.bot.on('callback_query', ({ id, data, message, from }) => {
-            this.bot.answerCallbackQuery(id, { text: `${data} in progress...` }).then(() => {
-                return this.runCommandHandler(
-                    {
-                        ...message,
-                        from, // As in cases of answerCallbackQuery original from in message will be bot sender,
-                        // But we do want it still to be user. Do we? :D
-                    },
-                    data
-                );
-            });
+            this.bot
+                .answerCallbackQuery(id, { text: `${data} in progress...` })
+                .then(() => {
+                    return this.runCommandHandler(
+                        {
+                            ...message,
+                            from, // As in cases of answerCallbackQuery original from in message will be bot sender,
+                            // But we do want it still to be user. Do we? :D
+                        },
+                        data
+                    );
+                });
         });
     }
 
-    private async tryDeduceUserCommand(message: TelegramBot.Message): Promise<TelegramBot.Message> {
+    private async tryDeduceUserCommand(
+        message: TelegramBot.Message
+    ): Promise<TelegramBot.Message> {
         const chatId = getChatId(message);
 
         if (isMessageCountryFlag(message.text)) {
             const countryName: string = getCountryNameByFlag(message.text);
-            return showCountryResponse(this.bot, countryName, chatId);
+            return showCountryResponse(
+                this.bot,
+                message,
+                chatId,
+                countryName
+            ) as Promise<TelegramBot.Message>;
         }
 
         const countries: Array<Country> = await getAvailableCountries();
@@ -116,7 +134,12 @@ export class MessageHandlerRegistry {
             countries
         );
         if (country) {
-            return showCountryResponse(this.bot, country.name, chatId);
+            return showCountryResponse(
+                this.bot,
+                message,
+                chatId,
+                country.name
+            ) as Promise<TelegramBot.Message>;
         }
 
         const answers: Array<Answer> = await fetchAnswer(message.text);
@@ -147,7 +170,13 @@ export const withSingleParameterAfterCommand = (
                 ikCbData ?? message.text
             );
 
-            return handlerFn.call(context, bot, message, chatId, userEnteredArgumentAfterCommand);
+            return handlerFn.call(
+                context,
+                bot,
+                message,
+                chatId,
+                userEnteredArgumentAfterCommand
+            );
         } catch (err) {
             logger.log('error', {
                 ...message,
@@ -172,7 +201,9 @@ function getParameterAfterCommandFromMessage(
           userFullInput;
 
     const execResult = new RegExp(
-        `(?<command>${this._singleParameterAfterCommands.join('|\\')})\\s(?<firstargument>.*)`
+        `(?<command>${this._singleParameterAfterCommands.join(
+            '|\\'
+        )})\\s(?<firstargument>.*)`
     ).exec(makeMagicOverUserFullInput);
     if (!execResult) {
         logger.log('info', getInfoMessage('Entered unsupported command'));
@@ -181,7 +212,10 @@ function getParameterAfterCommandFromMessage(
 
     /* tslint:disable:no-string-literal */
     if (execResult.groups['command'] && !execResult.groups['firstargument']) {
-        logger.log('info', getInfoMessage(`No parameter for ${execResult.groups['command']}`));
+        logger.log(
+            'info',
+            getInfoMessage(`No parameter for ${execResult.groups['command']}`)
+        );
         return undefined;
     }
 

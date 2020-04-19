@@ -1,7 +1,7 @@
 import { UserSubscription } from '../../../models/subscription.models';
 import {
     getUnsubscribeResponseMessage,
-    unSubscribeError,
+    unSubscribeErrorMessage,
     unsubscribeResultMessage,
 } from '../../../messages/feature/unsubscribeMessages';
 import {
@@ -54,7 +54,7 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         unsubscribeMeFrom(message.chat, parameterAfterCommand)
     );
     if (err) {
-        return bot.sendMessage(chatId, unSubscribeError(err.message));
+        return bot.sendMessage(chatId, unSubscribeErrorMessage(err.message));
     }
 
     return bot.sendMessage(

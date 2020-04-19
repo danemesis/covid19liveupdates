@@ -1,40 +1,27 @@
 import { getCovidTrends } from '../../../services/api/api-chart';
 import { addDays, Now } from '../../../utils/dateUtils';
 import { CountrySituationInfo } from '../../../models/covid19.models';
-import { Country } from '../../../models/country.models';
-import { getCountriesSituation } from '../../../services/domain/covid19';
 import { Transform } from '../../../services/domain/chart';
+import { catchAsyncError } from '../../../utils/catchError';
+import { getRequestedCountry } from '../../../services/domain/countries';
+import { logger } from '../../../utils/logger';
+import { getErrorMessage } from '../../../utils/getErrorMessages';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import * as TelegramBot from 'node-telegram-bot-api';
 
-export const trendsByCountryResponse = async (
-    bot,
-    message,
-    chatId,
-    requestedCountry
+export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number,
+    requestedCountry?: string | undefined
 ): Promise<unknown> => {
-    const allCountries: Array<[
-        Country,
-        Array<CountrySituationInfo>
-    ]> = await getCountriesSituation();
-    const foundCountrySituations: [
-        Country,
-        Array<CountrySituationInfo>
-    ] = allCountries.find(
-        ([receivedCountry, situations]) =>
-            receivedCountry.name === requestedCountry
+    const [err, [foundCountry, foundSituation]] = await catchAsyncError(
+        getRequestedCountry(requestedCountry)
     );
-    if (
-        !foundCountrySituations ||
-        !foundCountrySituations?.length ||
-        !foundCountrySituations[0] ||
-        !foundCountrySituations[1].length
-    ) {
-        return bot.sendMessage(
-            chatId,
-            `Sorry, but I cannot find anything for ${requestedCountry}. I will save your request and will work on it`
-        );
+    if (err) {
+        logger.log('error', getErrorMessage(err));
+        return bot.sendMessage(chatId, err.message);
     }
-
-    const [foundCountry, foundSituation] = foundCountrySituations;
 
     const lastWeekSituation = foundSituation.filter(
         (c: CountrySituationInfo) => {
