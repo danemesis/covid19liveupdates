@@ -11,7 +11,9 @@ import * as TelegramBot from 'node-telegram-bot-api';
 
 export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
     const rk = new ReplyKeyboard();
-    const latestSelectedCountries: Array<string> = Cache.get(`${chatId}_commands_country`);
+    const latestSelectedCountries: Array<string> = Cache.get(
+        `${chatId}_commands_country`
+    );
 
     if (latestSelectedCountries.length > 0) {
         rk.addRow.apply(rk, latestSelectedCountries);
@@ -30,7 +32,7 @@ export const getAfterCountryResponseInlineKeyboard = (
     const ik = new InlineKeyboard();
     ik.addRow({
         text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
-        callback_data: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
+        callback_data: `${UserRegExps.Subscribe} ${country}`,
     }).addRow({
         text: 'Show weekly chart',
         callback_data: `${UserRegExps.Trends} ${country}`,
@@ -67,7 +69,9 @@ export const getUnsubscribeMessageInlineKeyboard = (
         while (!!values[i] && rowItem < UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER) {
             rows.push({
                 text: values[i],
-                callback_data: `${CustomSubscriptions.UnsubscribeMeFrom} ${values[i++]}`,
+                callback_data: `${CustomSubscriptions.UnsubscribeMeFrom} ${
+                    values[i++]
+                }`,
             });
             rowItem += 1;
         }

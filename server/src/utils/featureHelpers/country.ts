@@ -34,7 +34,7 @@ const countriesExceptionMap: Map<UpperCaseString, string> = new Map<
 export const getCountryNameFormat = (
     country: UpperCaseString
 ): UserPresentationalCountryNameString =>
-    countriesExceptionMap.has(country)
+    countriesExceptionMap.has(country.toLocaleUpperCase())
         ? countriesExceptionMap.get(country)
         : country
               .slice(0, 1)
