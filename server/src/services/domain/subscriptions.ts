@@ -4,7 +4,10 @@ import {
     getTelegramUserSubscriptions,
     setTelegramSubscription,
 } from '../../bots/telegram/services/storage';
-import { Subscription, SubscriptionType } from '../../models/subscription.models';
+import {
+    Subscription,
+    SubscriptionType,
+} from '../../models/subscription.models';
 import { catchAsyncError } from '../../utils/catchError';
 import { ALREADY_SUBSCRIBED_MESSAGE } from '../../messages/feature/subscribeMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
@@ -28,7 +31,8 @@ export const subscribeOn = async (
         Array<CountrySituationInfo>
     ] = availableCountries.find(
         ([country, _]: [Country, Array<CountrySituationInfo>]) =>
-            country.name.toLocaleLowerCase() === subscribeMeOn.toLocaleLowerCase()
+            country.name.toLocaleLowerCase() ===
+            subscribeMeOn.toLocaleLowerCase()
     );
 
     if (!subscribeMeOnCountry) {
@@ -37,11 +41,14 @@ export const subscribeOn = async (
 
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ?? [];
+        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
+        [];
 
     const checkIfAlreadySubscribed = existingSubscriptions
         .filter((subscription: Subscription) => subscription.active)
-        .find((subscription: Subscription) => subscription.value === subscribeMeOn);
+        .find(
+            (subscription: Subscription) => subscription.value === subscribeMeOn
+        );
     if (!!checkIfAlreadySubscribed) {
         // TODO: it's not actually error, re-write it be not an error
         throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);
@@ -55,7 +62,8 @@ export const subscribeOn = async (
                 active: true,
                 type: SubscriptionType.Country,
                 value: subscribeMeOnCountry.name,
-                lastReceivedData: countrySituations[countrySituations.length - 1],
+                lastReceivedData:
+                    countrySituations[countrySituations.length - 1],
                 lastUpdate: Date.now(),
             },
         ],
@@ -70,11 +78,12 @@ export const unsubscribeMeFrom = async (
 ): Promise<string> => {
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ?? [];
+        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
+        [];
     let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions.map(
         (subscription: Subscription) => {
-            if (subscription.value === unsubscribeMeFrom) {
+            if (subscription.value.toLocaleLowerCase() === unsubscribeMeFrom) {
                 foundSubscription = subscription;
                 subscription.active = false;
             }
@@ -103,7 +112,15 @@ export const unsubscribeMeFrom = async (
 
 export const isCountrySituationHasChangedSinceLastData = (
     { confirmed, deaths, recovered }: CountrySituationInfo,
-    { confirmed: prevConfirmed, deaths: prevDeaths, recovered: prevRecovered }: CountrySituationInfo
+    {
+        confirmed: prevConfirmed,
+        deaths: prevDeaths,
+        recovered: prevRecovered,
+    }: CountrySituationInfo
 ): boolean => {
-    return confirmed !== prevConfirmed || deaths !== prevDeaths || recovered !== prevRecovered;
+    return (
+        confirmed !== prevConfirmed ||
+        deaths !== prevDeaths ||
+        recovered !== prevRecovered
+    );
 };

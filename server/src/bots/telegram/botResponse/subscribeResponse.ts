@@ -5,21 +5,16 @@ import {
     subscriptionManagerResponseMessage,
     subscriptionResultMessage,
 } from '../../../messages/feature/subscribeMessages';
-import {
-    isCommandOnly,
-    isMatchingDashboardItem,
-    isMessageIsCommand,
-    isMessageStartsWithCommand,
-} from '../../../utils/incomingMessages';
-import { CustomSubscriptions, UserMessages, UserRegExps } from '../../../models/constants';
+import { CustomSubscriptions, UserRegExps } from '../../../models/constants';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { catchAsyncError } from '../../../utils/catchError';
-import { getFullMenuKeyboard, getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
+import { getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
 import { getTelegramActiveUserSubscriptions } from '../services/storage';
 import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText';
 import { UserSubscription } from '../../../models/subscription.models';
 import { removeCommandFromMessageIfExist } from '../../../utils/removeCommandFromMessageIfExist';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
 
 // TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse = async (
@@ -46,22 +41,21 @@ export const showExistingSubscriptionsResponse = async (
         return bot.sendMessage(chatId, noSubscriptionsResponseMessage());
     }
 
-    return bot.sendMessage(chatId, showMySubscriptionMessage(activeUserSubscription));
+    return bot.sendMessage(
+        chatId,
+        showMySubscriptionMessage(activeUserSubscription)
+    );
 };
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
 // otherwise @param ikCbData will be null
-export const subscribingStrategyResponse = async (
-    bot,
-    message,
-    chatId,
-    ikCbData?: string
+export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number,
+    commandParameter?: string
 ): Promise<TelegramBot.Message> => {
-    if (
-        (isMessageStartsWithCommand(message.text) && isCommandOnly(message.text)) ||
-        isMessageIsCommand(message.text, UserRegExps.Subscribe) ||
-        isMatchingDashboardItem(message.text, UserMessages.SubscriptionManager)
-    ) {
+    if (!commandParameter) {
         return showExistingSubscriptionsResponse(bot, message, chatId);
     }
 
@@ -69,7 +63,11 @@ export const subscribingStrategyResponse = async (
         subscribeOn(
             message.chat,
             removeCommandFromMessageIfExist(
-                getUserMessageFromIKorText(message, CustomSubscriptions.SubscribeMeOn, ''),
+                getUserMessageFromIKorText(
+                    message,
+                    CustomSubscriptions.SubscribeMeOn,
+                    ''
+                ),
                 UserRegExps.Subscribe
             )
         )
@@ -78,5 +76,5 @@ export const subscribingStrategyResponse = async (
         return bot.sendMessage(chatId, subscribeError(err.message));
     }
 
-    return bot.sendMessage(chatId, subscriptionResultMessage(result), getFullMenuKeyboard(chatId));
+    return bot.sendMessage(chatId, subscriptionResultMessage(result));
 };

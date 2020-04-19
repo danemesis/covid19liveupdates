@@ -9,8 +9,8 @@ export const CONSOLE_LOG_EASE_DELIMITER: string = '==============> ';
 export const CONSOLE_LOG_DELIMITER: string = '\n\n==============> ';
 
 export enum CustomSubscriptions {
-    SubscribeMeOn = `Subscribe on`,
-    UnsubscribeMeFrom = `Unsubscribe me from`
+    SubscribeMeOn = `Subscribe me on`,
+    UnsubscribeMeFrom = `Unsubscribe me from`,
 }
 
 export enum UserRegExps {
@@ -23,18 +23,18 @@ export enum UserRegExps {
     Advice = '/advice',
     Subscribe = '/subscribe',
     Unsubscribe = '/unsubscribe',
-    Help = '/help'
+    Help = '/help',
 }
 
 export enum UserMessages {
     Assistant = 'Assistant 👦',
     CountriesData = 'Countries data 🌍',
     AvailableCountries = 'Countries we track',
-    GetAdvicesHowToBehave = 'Advice how not to 😷',
+    GetAdviceHowToBehave = 'Advice how not to 😷',
     SubscriptionManager = 'Subscriptions 💌',
     Existing = 'Existing',
     Unsubscribe = 'Unsubscribe',
-    Help = 'ℹ What can you do?'
+    Help = 'ℹ What can you do?',
 }
 
 export enum Continents {
@@ -43,12 +43,11 @@ export enum Continents {
     Africa = 'Africa',
     Americas = 'Americas',
     Oceania = 'Oceania',
-    Other = 'Other'
+    Other = 'Other',
 }
 
 export enum Status {
     Confirmed = 'confirmed',
     Deaths = 'deaths',
-    Recovered = 'recovered'
+    Recovered = 'recovered',
 }
-
