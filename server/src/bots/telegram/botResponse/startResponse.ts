@@ -22,7 +22,7 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
             startedOn: Date.now()
         };
         try {
-            await addUser(user);
+            addUser(user);
             logger.log('info', `New user ${user.chatId} was successfully added`)
         }
         catch (error) {
