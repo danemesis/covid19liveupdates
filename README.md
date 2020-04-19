@@ -13,12 +13,12 @@ around the world and in your local area.
 
 ## Main features we want to have
 - [ ] Assistant, who knows answers on a lot of questions (we want to apply ML technics here as well), 
-- [ ] predict further development of the diseases and notify the public about them,
-- [ ] give advice about how you should behave in oder to stay healthy, 
+- [ ] <s>predict further development of the diseases and notify the public about them</s>,
+- [x] give advice about how you should behave in oder to stay healthy, 
 - [ ] if you got sick, we want to suggest tracking your health for advice & suggestions,
-- [ ] data visualization,
-- [ ] live notifications (updates), 
-- [ ] general improvements, 
+- [x] data visualization,
+- [x] live notifications (updates), 
+- [x] general improvements, 
 - [ ] internationalization, 
 - [ ] fixes & improvement of some UI\UX issues, 
 - [ ] country breakdown,
