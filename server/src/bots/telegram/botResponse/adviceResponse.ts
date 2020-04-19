@@ -3,15 +3,16 @@ import {
     encouragingMessage,
     getCovid19ExplanationVideo,
     socialDistancing,
-    suggestedBehaviors
+    suggestedBehaviors,
 } from '../../../messages/feature/adviceMessages';
-import {CallBackQueryHandler} from '../models';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import * as TelegramBot from 'node-telegram-bot-api';
 
-export const showAdvicesHowToBehaveResponse: CallBackQueryHandler = async (
+export const showAdvicesHowToBehaveResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot,
     message,
     chatId
-): Promise<void> => {
+): Promise<TelegramBot.Message> => {
     return bot.sendMessage(
         chatId,
         `ℹ Suggested Behaviors for ${getCovid19ExplanationVideo()}
@@ -19,6 +20,6 @@ export const showAdvicesHowToBehaveResponse: CallBackQueryHandler = async (
         ${socialDistancing()} \nℹ Alternative Greetings
         ${alternativeGreetings()} \n${encouragingMessage()}
         `,
-        {parse_mode: 'HTML'}
+        { parse_mode: 'HTML' }
     );
 };

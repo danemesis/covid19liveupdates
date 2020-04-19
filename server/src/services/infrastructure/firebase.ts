@@ -1,14 +1,14 @@
 import * as firebase from 'firebase/app';
 
 export const initFirebase = ({
-                                 FIREBASE_API_KEY,
-                                 FIREBASE_AUTHDOMAIN,
-                                 FIREBASE_DATABASE_URL,
-                                 FIREBASE_PROJECT_ID,
-                                 FIREBASE_STORAGE_BUCKET,
-                                 FIREBASE_MESSAGING_SENDER_ID,
-                                 FIREBASE_APP_ID
-                             }): [Error, boolean] => {
+    FIREBASE_API_KEY,
+    FIREBASE_AUTHDOMAIN,
+    FIREBASE_DATABASE_URL,
+    FIREBASE_PROJECT_ID,
+    FIREBASE_STORAGE_BUCKET,
+    FIREBASE_MESSAGING_SENDER_ID,
+    FIREBASE_APP_ID,
+}): [Error, boolean] => {
     try {
         firebase.initializeApp({
             apiKey: FIREBASE_API_KEY,

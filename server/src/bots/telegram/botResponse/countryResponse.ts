@@ -1,47 +1,50 @@
-import {ApiCovid19Situation, CountrySituationInfo} from '../../../models/covid19.models';
-import {adaptCountryToSystemRepresentation, getCountriesSituation} from '../../../services/domain/covid19';
-import {Country} from '../../../models/country.models';
+import { adaptCountryToSystemRepresentation } from '../../../services/domain/covid19';
 import {
-    getMessageForCountry,
-    getMessageForUserInputWithoutCountryName
+    getCountryIKActionMessage,
+    getCountryMessage,
+    getUserInputWithoutCountryNameMessage,
 } from '../../../messages/feature/countryMessages';
-import {Cache} from '../../../utils/cache';
-import {flag, name} from 'country-emoji';
-import {getAfterCountryResponseInlineKeyboard} from '../services/keyboard';
-import {textAfterUserCommand} from '../../../utils/textAfterCommand';
-import {isMessageIsCommand} from '../../../utils/incomingMessages';
-import {UserRegExps} from '../../../models/constants';
-import {CallBackQueryHandler} from '../models';
+import { Cache } from '../../../utils/cache';
+import { flag, name } from 'country-emoji';
+import {
+    getAfterCountryResponseInlineKeyboard,
+    getFullMenuKeyboard,
+} from '../services/keyboard';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import * as TelegramBot from 'node-telegram-bot-api';
+import { catchAsyncError } from '../../../utils/catchError';
+import { logger } from '../../../utils/logger';
+import { getErrorMessage } from '../../../utils/getErrorMessages';
+import { Country } from '../../../models/country.models';
+import { CountrySituationInfo } from '../../../models/covid19.models';
+import { getRequestedCountry } from '../../../services/domain/countries';
 
-export const showCountryByNameStrategyResponse: CallBackQueryHandler = async (
-    bot,
-    message,
-    chatId
-): Promise<void> =>
-    isMessageIsCommand(message.text, UserRegExps.CountryData)
-        ? bot.sendMessage(chatId, getMessageForUserInputWithoutCountryName())
-        : showCountryResponse(bot,
-        adaptCountryToSystemRepresentation(textAfterUserCommand(message.text)),
-        chatId,);
+export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number,
+    commandParameter?: string
+): Promise<TelegramBot.Message> => {
+    if (!commandParameter) {
+        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
+    }
 
-export const showCountryByFlag: CallBackQueryHandler = async (
-    bot,
-    message,
-    chatId
-): Promise<void> =>
-    showCountryResponse(
+    return showCountryResponse(
         bot,
-        adaptCountryToSystemRepresentation(name(message.text)),
+        message,
         chatId,
+        adaptCountryToSystemRepresentation(commandParameter)
     );
+};
 
-// TODO: Split and move messages to /messages/feature and /domain directories
-export const showCountryResponse = async (
-    bot,
-    requestedCountry,
-    chatId
-): Promise<void> => {
-    if (!requestedCountry) {
+export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number
+): Promise<TelegramBot.Message> => {
+    const countryFlag = message.text;
+    if (
+        !countryFlag ||
         // Because of
         // [https://github.com/danbilokha/covid19liveupdates/issues/61]
         // fix of https://github.com/danbilokha/covid19liveupdates/issues/58
@@ -49,46 +52,51 @@ export const showCountryResponse = async (
         //      MessageRegistry.registerMessageHandler this._bot.onText(
         // Regexp works not as we expect it to work
         // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
-        return;
+        !adaptCountryToSystemRepresentation(name(countryFlag))
+    ) {
+        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
 
-    const allCountriesSituations: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
-    const foundCountrySituations: [Country, Array<CountrySituationInfo>] = allCountriesSituations
-        .find(([receivedCountry, situations]) => receivedCountry.name === requestedCountry);
-    if (!foundCountrySituations || !foundCountrySituations?.length
-        || !foundCountrySituations[0]
-        || !foundCountrySituations[1].length) {
-        bot.sendMessage(
-            chatId,
-            `Sorry, but I cannot find anything for ${requestedCountry}. I will save your request and will work on it`
-        );
-        return;
-    }
-
-    const [foundCountry, foundSituation] = foundCountrySituations;
-
-    Cache.set(`${chatId}_commands_country`, flag(foundCountry.name));
-
-    // TODO: Optimize!
-    let totalRecovered = 0;
-    let totalConfirmed = 0;
-    let totalDeaths = 0;
-
-    [foundSituation[foundSituation.length - 1]].forEach(({confirmed, deaths, recovered}: ApiCovid19Situation) => {
-        totalRecovered += recovered;
-        totalConfirmed += confirmed;
-        totalDeaths += deaths;
-    });
-
-    bot.sendMessage(
+    return showCountryResponse(
+        bot,
+        message,
         chatId,
-        getMessageForCountry({
-            name: foundCountry.name,
-            confirmed: totalConfirmed,
-            recovered: totalRecovered,
-            deaths: totalDeaths,
-            lastUpdateDate: foundSituation[foundSituation.length - 1].date
-        }),
-        getAfterCountryResponseInlineKeyboard(foundCountry.name)
+        adaptCountryToSystemRepresentation(name(countryFlag))
+    );
+};
+
+export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number,
+    requestedCountry: string
+): Promise<TelegramBot.Message> => {
+    const [err, result]: [
+        Error,
+        [Country, Array<CountrySituationInfo>]
+    ] = await catchAsyncError<[Country, Array<CountrySituationInfo>]>(
+        getRequestedCountry(requestedCountry)
+    );
+    if (err) {
+        logger.log('error', getErrorMessage(err));
+        return bot.sendMessage(chatId, err.message);
+    }
+
+    const [{ name }, foundSituation] = result;
+    Cache.set(`${chatId}_commands_country`, flag(name));
+
+    const { recovered, confirmed, deaths, date } = foundSituation[
+        foundSituation.length - 1
+    ];
+    // two send messages due to https://stackoverflow.com/a/41841237/6803463
+    await bot.sendMessage(
+        chatId,
+        getCountryMessage(name, confirmed, recovered, deaths, date),
+        getFullMenuKeyboard(chatId)
+    );
+    return bot.sendMessage(
+        chatId,
+        getCountryIKActionMessage(name),
+        getAfterCountryResponseInlineKeyboard(name)
     );
 };

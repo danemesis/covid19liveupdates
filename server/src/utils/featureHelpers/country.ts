@@ -1,6 +1,13 @@
-import {UpperCaseString, UserPresentationalCountryNameString} from '../../models/tsTypes.models';
+import {
+    UpperCaseString,
+    UserPresentationalCountryNameString,
+} from '../../models/tsTypes.models';
 
-const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseString, string>([
+const countriesExceptionMap: Map<UpperCaseString, string> = new Map<
+    UpperCaseString,
+    string
+>([
+    ['UNITED STATES', 'United States'],
     ['US', 'United States'],
     ['USA', 'United States'],
     ['RUSSIAN FEDERATION', 'Russia'],
@@ -24,7 +31,12 @@ const countriesExceptionMap: Map<UpperCaseString, string> = new Map<UpperCaseStr
     ['HOLY SEE', 'Holy See (Vatican City)'],
 ]);
 
-export const getCountryNameFormat = (country: UpperCaseString): UserPresentationalCountryNameString =>
-    countriesExceptionMap.has(country)
+export const getCountryNameFormat = (
+    country: UpperCaseString
+): UserPresentationalCountryNameString =>
+    countriesExceptionMap.has(country.toLocaleUpperCase())
         ? countriesExceptionMap.get(country)
-        : country.slice(0, 1).toLocaleUpperCase().concat(country.slice(1).toLocaleLowerCase());
+        : country
+              .slice(0, 1)
+              .toLocaleUpperCase()
+              .concat(country.slice(1).toLocaleLowerCase());

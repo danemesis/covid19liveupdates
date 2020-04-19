@@ -58,11 +58,16 @@ on Windows 10, x64 machine
 - Open <a href='https://t.me/botfather'>BotFather</a>,
 - Create your development version of the bot (for your local testing purpose) via `/newbot` command
 - Receive from <a href='https://t.me/botfather'>BotFather</a> Key & Copy it,
-- Create `.env` in `/server/src/bots/telegram` file and add received **key** there (<a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/bots/telegram'>more about it, example of the file</a>),
+- Create `.env` in `/server/src/bots/telegram` file and add received **key** there (<a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/environments'>more about it, example of the file</a>),
 - Add to the project,
 - run `npm i`
-- run `npm run start:watch`
+- run `npm run start:watch`, `npm run start:inspect` for debugging 
+(<a href='https://medium.com/the-node-js-collection/debugging-node-js-with-google-chrome-4965b5f910f4'>Useful link</a>)
 
+<b>Hints</b>
+- If you\'re running locally, you can run `ngrok http 3000` copy `https url` 
+paste to `APP_URL` <a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/environments'>
+env variable</a> and reloading will be faster and cheaper for CPU
 
 ##### If any questions and/or issues, 
 - contact any collaborator,
@@ -71,6 +76,6 @@ on Windows 10, x64 machine
 
 ### Restrictions and Limitations
 For running the application we need to have secure connection (as some all known messengers
-do not support running via http) thus we are using **ngrok** library for that currently. It
-creates public domain with secured connection with we are using for redirecting all messages
+do not support running via http) thus we are using <a href='https://github.com/bubenshchykov/ngrok'>**ngrok**</a> library 
+for that, currently. It creates public domain with secured connection with we are using for redirecting all messages
 to our local machines.

@@ -1,116 +1,82 @@
-import {ContinentCountriesSituation, CountrySituation, CountrySituationInfo} from '../../../models/covid19.models';
-import {getChatId} from '../utils/chat';
-import {getCountriesSituation} from '../../../services/domain/covid19';
-import {getTableHeader, getTableRowMessageForCountry} from '../../../messages/feature/countryMessages';
-import {Country} from '../../../models/country.models';
-import {getCountriesSumupMessage, getCountriesTableHTML} from '../../../messages/feature/countriesMessages';
-import {getContinentsInlineKeyboard} from '../services/keyboard';
-import {CallBackQueryHandler} from '../models';
+import {
+    CountrySituationInfo,
+    WorldOverallInformation,
+} from '../../../models/covid19.models';
+import {
+    getCountriesTableHTML,
+    getCountriesWorldMessage,
+    getTableCountryRowMessage,
+    getTableHeader,
+} from '../../../messages/feature/countriesMessages';
+import { getContinentsInlineKeyboard } from '../services/keyboard';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    getContinentOverallInformation,
+    getWorldOverallInformation,
+} from '../../../services/domain/countries';
 
-// TODO: Move this logic to domain and leave here only Telegram bot specific message response
-// Sending response itself
-export const countriesByContinent = (continent) => async (bot, message, chatId) => {
-    const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
-    const continentCountries: ContinentCountriesSituation = {};
-
-    countriesSituation
-        .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
-            const {confirmed, recovered, deaths} = situations[situations.length - 1];
-
-            const countrySituationResult: CountrySituation = {
-                lastUpdateDate: situations[situations.length - 1].date,
-                country,
-                confirmed,
-                recovered,
-                deaths
-            };
-            const prevCountriesResult: Array<CountrySituation> = continentCountries[country.continent]
-                ? continentCountries[country.continent]
-                : [];
-            continentCountries[country.continent] = [
-                ...prevCountriesResult,
-                countrySituationResult
-            ];
-        });
+export const countriesByContinentResponse = (continent) => async (
+    bot,
+    message,
+    chatId
+) => {
+    const {
+        confirmed,
+        recovered,
+        deaths,
+        countriesSituation,
+    } = await getContinentOverallInformation(continent);
 
     const portionMessage = [getTableHeader()];
-    let continentTotalConfirmed: number = 0;
-    let continentTotalRecovered: number = 0;
-    let continentTotalDeath: number = 0;
-
     portionMessage.push();
-    continentCountries[continent]
-        .sort((country1, country2) => country2.confirmed - country1.confirmed)
-        .forEach(({
-                      country: {name},
-                      lastUpdateDate,
-                      confirmed,
-                      recovered,
-                      deaths
-                  }: CountrySituation) => {
-                continentTotalConfirmed += confirmed;
-                continentTotalRecovered += recovered;
-                continentTotalDeath += deaths;
-            portionMessage.push(
-                getTableRowMessageForCountry({
-                    name,
-                    confirmed,
-                    recovered,
-                    deaths,
-                    lastUpdateDate
-                })
-            );
-        });
 
-    await bot.sendMessage(
+    countriesSituation
+        .sort((country1, country2) => country2.active - country1.active)
+        .forEach(({ name, active, recovered, deaths }) =>
+            portionMessage.push(
+                getTableCountryRowMessage(name, active, recovered, deaths)
+            )
+        );
+
+    return bot.sendMessage(
         chatId,
-        getCountriesTableHTML({continent, continentTotalConfirmed, continentTotalRecovered, continentTotalDeath, portionMessage}),
-        {parse_mode: 'HTML'}
+        getCountriesTableHTML(
+            continent,
+            confirmed,
+            recovered,
+            deaths,
+            countriesSituation,
+            portionMessage
+        ),
+        { parse_mode: 'HTML' }
     );
 };
 
-// TODO: Move this logic to domain and leave here only Telegram bot specific message response
-// Sending response itself
-export const countriesResponse: CallBackQueryHandler = async (bot, message, chatId) => {
-    const countriesSituation: Array<[Country, Array<CountrySituationInfo>]> = await getCountriesSituation();
-    const continentCountries: ContinentCountriesSituation = {};
-    let worldTotalConfirmed = 0;
-    let worldTotalRecovered = 0;
-    let worldTotalDeaths = 0;
-
-    countriesSituation
-        .forEach(([country, situations]: [Country, Array<CountrySituationInfo>]) => {
-            const {confirmed, recovered, deaths} = situations[situations.length - 1];
-
-            worldTotalConfirmed += confirmed;
-            worldTotalRecovered += recovered;
-            worldTotalDeaths += deaths;
-
-            const countrySituationResult: CountrySituation = {
-                lastUpdateDate: situations[situations.length - 1].date,
-                country,
-                confirmed,
-                recovered,
-                deaths
-            };
-            const prevCountriesResult = continentCountries[country.continent]
-                ? continentCountries[country.continent]
-                : [];
-            continentCountries[country.continent] = [
-                ...prevCountriesResult,
-                countrySituationResult
-            ];
-        });
+export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot,
+    message,
+    chatId
+) => {
+    const {
+        confirmed,
+        recovered,
+        deaths,
+        continentCountriesSituations,
+    }: WorldOverallInformation = await getWorldOverallInformation();
 
     // Send overall world info,
     return bot.sendMessage(
         chatId,
-        getCountriesSumupMessage(
-            worldTotalConfirmed,
-            worldTotalRecovered,
-            worldTotalDeaths,
-            countriesSituation.length,
-            Object.keys(continentCountries).length
+        getCountriesWorldMessage(
+            confirmed,
+            recovered,
+            deaths,
+            Object.values(continentCountriesSituations).reduce(
+                (acc: number, val: Array<CountrySituationInfo>): number =>
+                    acc + val.length,
+                0
+            ) as number,
+            Object.keys(continentCountriesSituations).length
         ),
         getContinentsInlineKeyboard()
     );

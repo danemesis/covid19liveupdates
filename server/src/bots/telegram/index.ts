@@ -1,123 +1,166 @@
-import {countriesByContinent, countriesResponse} from './botResponse/countriesResponse';
-import {showCountryByFlag, showCountryByNameStrategyResponse} from './botResponse/countryResponse';
-import {Continents, CustomSubscriptions, UserMessages, UserRegExps} from '../../models/constants';
-import {showAdvicesHowToBehaveResponse} from './botResponse/adviceResponse';
-import {showHelpInfoResponse} from './botResponse/helpResponse';
-import {Express} from 'express';
-import {cachedCovid19CountriesData, getAvailableCountries,} from '../../services/domain/covid19';
-import {Country} from '../../models/country.models';
-import {flag} from 'country-emoji';
-import {assistantStrategyResponse} from './botResponse/assistantResponse';
+import {
+    countriesByContinentResponse,
+    countriesResponse,
+} from './botResponse/countriesResponse';
+import {
+    showCountryByFlag,
+    showCountryByNameStrategyResponse,
+} from './botResponse/countryResponse';
+import {
+    Continents,
+    CustomSubscriptions,
+    UserMessages,
+    UserRegExps,
+} from '../../models/constants';
+import { showAdvicesHowToBehaveResponse } from './botResponse/adviceResponse';
+import { helpInfoResponse } from './botResponse/helpResponse';
+import { Express } from 'express';
+import {
+    cachedCovid19CountriesData,
+    getAvailableCountries,
+} from '../../services/domain/covid19';
+import { Country } from '../../models/country.models';
+import { flag } from 'country-emoji';
+import { assistantStrategyResponse } from './botResponse/assistantResponse';
 import * as TelegramBot from 'node-telegram-bot-api';
-import Config from '../../environments/environment';
-import {logger} from '../../utils/logger';
-import {startResponse} from './botResponse/startResponse';
-import {showAvailableCountriesResponse} from './botResponse/availableResponse';
+import { logger } from '../../utils/logger';
+import { startResponse } from './botResponse/startResponse';
+import { showAvailableCountriesResponse } from './botResponse/availableResponse';
 import {
     showExistingSubscriptionsResponse,
     subscribingStrategyResponse,
-    subscriptionManagerResponse
+    subscriptionManagerResponse,
 } from './botResponse/subscribeResponse';
-import {SubscriptionType} from '../../models/subscription.models';
-import {registry, withCommandArgument} from './services/messageRegistry';
-import {subscriptionNotifierHandler} from './services/subscriptionNotifierManager';
-import {unsubscribeStrategyResponse} from './botResponse/unsubscribeResponse';
-import {showTrendsByCountry} from './botResponse/trendResponse';
-import {CountrySituationInfo} from '../../models/covid19.models';
-import {catchAsyncError} from '../../utils/catchError';
-import {LogglyTypes} from '../../models/loggly.models';
-import {getErrorMessage} from '../../utils/getLoggerMessages';
+import { SubscriptionType } from '../../models/subscription.models';
+import { MessageHandlerRegistry } from './services/messageHandlerRegistry';
+import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
+import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
+import { trendsByCountryResponse } from './botResponse/trendResponse';
+import { CountrySituationInfo } from '../../models/covid19.models';
+import { catchAsyncError } from '../../utils/catchError';
+import { LogglyTypes } from '../../models/loggly.models';
+import { getErrorMessage } from '../../utils/getErrorMessages';
 
-function runTelegramBot(app: Express, ngRokUrl: string) {
+export function runTelegramBot(
+    app: Express,
+    appUrl: string,
+    telegramToken: string
+) {
     // Create a bot that uses 'polling' to fetch new updates
-    const bot = new TelegramBot(Config.TELEGRAM_TOKEN, {polling: true});
-
+    const bot = new TelegramBot(telegramToken, { polling: true });
     // This informs the Telegram servers of the new webhook
-    bot.setWebHook(`${ngRokUrl}/bot${Config.TELEGRAM_TOKEN}`);
+    bot.setWebHook(`${appUrl}/bot${telegramToken}`);
 
     // We are receiving updates at the route below!
-    app.post(`/bot${Config.TELEGRAM_TOKEN}`, (req, res) => {
+    app.post(`/bot${telegramToken}`, (req, res) => {
         bot.processUpdate(req.body);
         res.sendStatus(200);
     });
 
-    registry.setBot(bot); // TODO: DO IT COOLER
-    registry.addSingleParameterCommands([
-        UserRegExps.CountryData,
-        UserRegExps.Trends
-    ]);
+    const messageHandlerRegistry = new MessageHandlerRegistry(bot);
+    messageHandlerRegistry
+        .registerMessageHandler([UserRegExps.Start], startResponse)
+        // Message handler for feature  Countries / Country
+        .registerMessageHandler(
+            [UserRegExps.CountriesData, UserMessages.CountriesData],
+            countriesResponse
+        )
+        .registerMessageHandler(
+            [UserRegExps.AvailableCountries, UserMessages.AvailableCountries],
+            showAvailableCountriesResponse
+        )
+        .registerMessageHandler(
+            [UserRegExps.CountryData],
+            showCountryByNameStrategyResponse
+        )
+        // Message handler for feature  Advices
+        .registerMessageHandler(
+            [UserRegExps.Advice, UserMessages.GetAdviceHowToBehave],
+            showAdvicesHowToBehaveResponse
+        )
+        // Message handler for feature  Help
+        .registerMessageHandler(
+            [UserRegExps.Help, UserMessages.Help],
+            helpInfoResponse
+        )
+        // Message handler for feature  Assistant
+        .registerMessageHandler(
+            [UserRegExps.Assistant, UserMessages.Assistant],
+            assistantStrategyResponse
+        )
+        // Message handler for feature  Subscriptions
+        .registerMessageHandler(
+            [UserMessages.SubscriptionManager],
+            subscriptionManagerResponse
+        )
+        .registerMessageHandler(
+            [UserMessages.Existing],
+            showExistingSubscriptionsResponse
+        )
+        .registerMessageHandler(
+            [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
+            subscribingStrategyResponse
+        )
+        .registerMessageHandler(
+            [
+                CustomSubscriptions.UnsubscribeMeFrom,
+                UserRegExps.Unsubscribe,
+                UserMessages.Unsubscribe,
+            ],
+            unsubscribeStrategyResponse
+        )
+        .registerMessageHandler([UserRegExps.Trends], trendsByCountryResponse);
 
-    registry
-        .registerMessageHandler(UserRegExps.Start, startResponse)
-        // Feature: Countries / Country
-        .registerMessageHandler(UserMessages.CountriesData, countriesResponse)
-        .registerMessageHandler(UserRegExps.CountriesData, countriesResponse)
-        .registerMessageHandler(UserMessages.AvailableCountries, showAvailableCountriesResponse)
-        .registerMessageHandler(UserRegExps.AvailableCountries, showAvailableCountriesResponse)
-        .registerMessageHandler(UserRegExps.CountryData, showCountryByNameStrategyResponse)
-        // Feature: Advices
-        .registerMessageHandler(UserMessages.GetAdvicesHowToBehave, showAdvicesHowToBehaveResponse)
-        .registerMessageHandler(UserRegExps.Advice, showAdvicesHowToBehaveResponse)
-        // Feature: Help
-        .registerMessageHandler(UserMessages.Help, showHelpInfoResponse)
-        .registerMessageHandler(UserRegExps.Help, showHelpInfoResponse)
-        // Feature: Assistant
-        .registerMessageHandler(UserMessages.Assistant, assistantStrategyResponse)
-        .registerMessageHandler(UserRegExps.Assistant, assistantStrategyResponse)
-        // Feature: Subscriptions
-        .registerMessageHandler(UserMessages.SubscriptionManager, subscriptionManagerResponse)
-        .registerMessageHandler(UserMessages.Existing, showExistingSubscriptionsResponse)
-        .registerMessageHandler(UserRegExps.Subscribe, subscribingStrategyResponse)
-        .registerMessageHandler(UserRegExps.Unsubscribe, unsubscribeStrategyResponse)
-        .registerMessageHandler(UserRegExps.Trends, withCommandArgument(showTrendsByCountry));
-    registry.registerCallBackQueryHandler(CustomSubscriptions.SubscribeMeOn, subscribingStrategyResponse);
-    registry.registerCallBackQueryHandler(CustomSubscriptions.UnsubscribeMeFrom, unsubscribeStrategyResponse);
-    registry.registerCallBackQueryHandler(UserMessages.Existing, showExistingSubscriptionsResponse);
-    registry.registerCallBackQueryHandler(UserMessages.Unsubscribe, unsubscribeStrategyResponse);
-    registry.registerCallBackQueryHandler(UserMessages.Help, showHelpInfoResponse);
-    registry.registerCallBackQueryHandler(UserRegExps.Trends, withCommandArgument(showTrendsByCountry));
-
-
-    // Feature: Countries / Country
+    // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {
-        registry.registerCallBackQueryHandler(continent, countriesByContinent(continent));
+        messageHandlerRegistry.registerMessageHandler(
+            [continent],
+            countriesByContinentResponse(continent)
+        );
     }
-    // Feature: Countries / Country
-    getAvailableCountries()
-        .then((countries: Array<Country>) => {
-            const single = countries
-                .map(c => flag(c.name)?.trim() ?? undefined)
-                .filter(v => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
-                .join('//');
+    getAvailableCountries().then((countries: Array<Country>) => {
+        const single = countries
+            .map((c) => flag(c.name)?.trim() ?? undefined)
+            .filter((v) => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
+            .join('><');
 
-            registry.registerMessageHandler(`[~${single}~]`, showCountryByFlag);
-        });
+        messageHandlerRegistry.registerMessageHandler(
+            [`[~${single}~]`],
+            showCountryByFlag
+        );
+    });
 
-    // Feature: Subscriptions
+    // Sending subscriptions
     cachedCovid19CountriesData.subscribe(
-        async (countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]) => {
-            const [err, result] = await catchAsyncError(subscriptionNotifierHandler(countriesData));
+        async (
+            countriesData: [
+                number,
+                Array<[Country, Array<CountrySituationInfo>]>
+            ]
+        ) => {
+            const [err, result] = await catchAsyncError(
+                subscriptionNotifierHandler(
+                    messageHandlerRegistry,
+                    countriesData
+                )
+            );
             if (err) {
-                logger.log(
-                    'error',
-                    {
-                        type: LogglyTypes.SubscriptionNotifierHandlerError,
-                        message: `${getErrorMessage(err)}. subscriptionNotifierHandler failed`
-                    }
-                );
+                logger.log('error', {
+                    type: LogglyTypes.SubscriptionNotifierHandlerError,
+                    message: `${getErrorMessage(
+                        err
+                    )}. subscriptionNotifierHandler failed`,
+                });
             }
         },
         [SubscriptionType.Country]
     );
 
-    bot.on('message', (message, ...args) => {
-        logger.log('info', message);
-        registry.runCommandHandler(message);
+    bot.on('message', (message) => {
+        messageHandlerRegistry.runCommandHandler(message);
     });
 
     bot.on('polling_error', (err) => logger.log('error', err));
     bot.on('webhook_error', (err) => logger.log('error', err));
     bot.on('error', (err) => logger.log('error', err));
 }
-
-export {runTelegramBot};

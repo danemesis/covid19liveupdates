@@ -1,14 +1,18 @@
-import {getFullMenuKeyboard} from '../services/keyboard';
-import {greetUser} from '../../../messages/userMessage';
-import {showHelpInfoResponse} from './helpResponse';
-import {CallBackQueryHandler} from '../models';
+import { getFullMenuKeyboard } from '../services/keyboard';
+import { greetUser } from '../../../messages/userMessage';
+import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import * as TelegramBot from 'node-telegram-bot-api';
+import { helpInfoResponse } from './helpResponse';
 
-export const startResponse: CallBackQueryHandler = async (bot, message, chatId) => {
+export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
+    bot: TelegramBot,
+    message: TelegramBot.Message,
+    chatId: number
+): Promise<TelegramBot.Message> => {
     await bot.sendMessage(
         chatId,
         `${greetUser(message.from)}`,
         getFullMenuKeyboard(message)
     );
-
-    await showHelpInfoResponse(bot, message, chatId);
+    return helpInfoResponse(bot, message, chatId);
 };
