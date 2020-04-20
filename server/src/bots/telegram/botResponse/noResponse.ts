@@ -1,7 +1,7 @@
 import { noResponseForUserMessage } from '../../../messages/userMessage';
 import { logger } from '../../../utils/logger';
 import { getHelpProposalInlineKeyboard } from '../services/keyboard';
-import { LogglyTypes } from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
 
 export const noResponse = async (
@@ -11,9 +11,9 @@ export const noResponse = async (
 ): Promise<TelegramBot.Message> => {
     // TODO: log with another severity type
     logger.error(
-        'error',
+        `We have no response for user ${chatId} for ${message.text} ... plak.. plak..`,
         message,
-        LogglyTypes.NoSuitableResponseToUser,
+        LogCategory.NoSuitableResponseToUser,
         chatId
     );
 

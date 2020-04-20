@@ -14,7 +14,7 @@ import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
-import { LogglyTypes } from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 
 export const showAssistantFeatures: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -29,7 +29,7 @@ export const showAssistantFeatures: CallBackQueryHandlerWithCommandArgument = as
         logger.error(
             'Error occured when trying to acces fetchKnowledgeMetainformation',
             err,
-            LogglyTypes.Assistant
+            LogCategory.Assistant
         );
     }
     const messageText =

@@ -1,8 +1,7 @@
 import * as winston from 'winston';
 import { Loggly } from 'winston-loggly-bulk';
 import environment from '../environments/environment';
-import {LogLevel} from '../models/constants';
-import {LogglyTypes} from '../models/loggly.models'
+import { LogLevel, LogCategory } from '../models/constants';
 
 if (environment.LOGGLY_TOKEN) {
     winston.add(
@@ -16,16 +15,16 @@ if (environment.LOGGLY_TOKEN) {
 }
 
 export const logger = {
-    log(severity: string, message: any, type?: LogglyTypes, chatId?: number) {
-        if(typeof message === 'string'){
+    log(severity: string, message: any, type?: LogCategory, chatId?: number) {
+        if (typeof message === 'string') {
             message = {
-                message
-            }
+                message,
+            };
         }
-        if(chatId !== undefined){
+        if (chatId !== undefined) {
             message.chatId = chatId;
         }
-        if(type !== undefined){
+        if (type !== undefined) {
             message.type = type;
         }
         winston.log(severity, message);
@@ -34,17 +33,17 @@ export const logger = {
             console.log(severity, message);
         }
     },
-    error(message: any, error: Error, type?: LogglyTypes, chatId?: number){
-        if(typeof message === 'string'){
+    error(message: any, error: Error, type?: LogCategory, chatId?: number) {
+        if (typeof message === 'string') {
             message = {
-                message
-            }
+                message,
+            };
         }
         message.error = {
             message: error.message,
             stack: error.stack,
             name: error.name,
-        }
+        };
         this.log(LogLevel.Error, message, type, chatId);
-    }
+    },
 };

@@ -17,7 +17,7 @@ import { logger } from '../../../utils/logger';
 import { Country } from '../../../models/country.models';
 import { CountrySituationInfo } from '../../../models/covid19.models';
 import { getRequestedCountry } from '../../../services/domain/countries';
-import {LogglyTypes} from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -78,11 +78,13 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
         getRequestedCountry(requestedCountry)
     );
     if (err) {
-        logger.error(`Error ocured while getting response for Country ${requestedCountry}`, 
-            err, 
-            LogglyTypes.Countries, 
-            chatId);
-            
+        logger.error(
+            `Error ocured while getting response for Country ${requestedCountry}`,
+            err,
+            LogCategory.Countries,
+            chatId
+        );
+
         return bot.sendMessage(chatId, err.message);
     }
 

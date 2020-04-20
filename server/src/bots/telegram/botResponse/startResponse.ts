@@ -4,7 +4,7 @@ import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getUser, addUser } from '../../../services/domain/user';
 import { logger } from '../../../utils/logger';
-import { LogglyTypes } from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
 
 export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
@@ -23,7 +23,7 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
         logger.error(
             `Error while trying to get user ${chatId} from db`,
             err,
-            LogglyTypes.Command,
+            LogCategory.Command,
             chatId
         );
     }
@@ -42,14 +42,14 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
             logger.error(
                 `An error ocured while trying to add new user ${chatId}`,
                 err,
-                LogglyTypes.Command,
+                LogCategory.Command,
                 chatId
             );
         } else {
             logger.log(
                 'info',
                 `New user ${newUser.chatId} was successfully added`,
-                LogglyTypes.Command,
+                LogCategory.Command,
                 chatId
             );
         }

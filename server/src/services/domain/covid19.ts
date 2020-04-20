@@ -4,7 +4,7 @@ import {
     ApiCovid19Situation,
     CountrySituationInfo,
 } from '../../models/covid19.models';
-import { COVID19_FETCH_SALT, TIMES } from '../../models/constants';
+import { COVID19_FETCH_SALT, TIMES, LogCategory } from '../../models/constants';
 import { Country } from '../../models/country.models';
 import { fetchCovid19Data } from '../api/api-covid19';
 import { CountryLookup } from '../../models/country-code-lookup.models';
@@ -12,7 +12,6 @@ import { getCountryNameFormat } from '../../utils/featureHelpers/country';
 import { getCountryByName, getDefaultCountry } from './countryLookup';
 import { SubscriptionType } from '../../models/subscription.models';
 import { logger } from '../../utils/logger';
-import { LogglyTypes } from '../../models/loggly.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 
 // TODO: Improve Cached management
@@ -152,7 +151,7 @@ export function tryToUpdateCovid19Cache(): Promise<TelegramBot.Message> {
             logger.error(
                 '[ERROR] While fetching Hopkins uni data',
                 e,
-                LogglyTypes.Covid19DataUpdate
+                LogCategory.Covid19DataUpdate
             )
         );
 }
