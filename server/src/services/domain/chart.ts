@@ -3,6 +3,7 @@ import { CountrySituationInfo } from '../../models/covid19.models';
 import { Status } from '../../models/constants';
 export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
     const days = situations.map((x) => x.date);
+    // return config as ChartModelExtended;
     return {
         type: 'line',
         data: {
@@ -12,22 +13,22 @@ export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
                     label: Status.Confirmed,
                     data: situations.map((x) => x.confirmed),
                     fill: false,
-                    borderColor: 'blue',
-                    backgroundColor: '#f3a16c',
+                    borderColor: 'rgb(230, 165, 96)',
+                    backgroundColor: 'rgb(230, 165, 96)',
                 },
                 {
                     label: Status.Deaths,
                     data: situations.map((x) => x.deaths),
                     fill: false,
-                    borderColor: '#de425b',
-                    backgroundColor: '#de425b',
+                    borderColor: 'rgb(222, 66, 91)',
+                    backgroundColor: 'rgb(222, 66, 91)',
                 },
                 {
                     label: Status.Recovered,
                     data: situations.map((x) => x.recovered),
                     fill: false,
-                    borderColor: '#488f31',
-                    backgroundColor: '#488f31',
+                    borderColor: 'rgb(62, 148, 107)',
+                    backgroundColor: 'rgb(62, 148, 107)',
                 },
             ],
         },
@@ -46,8 +47,9 @@ export const enrichWithTitle = (
             title: {
                 display: true,
                 text: title,
-                fontColor: 'hotpink',
-                fontSize: 32,
+                fontColor: 'dark',
+                fontFamily: 'Helvetica',
+                fontSize: 28,
             },
         },
     };
