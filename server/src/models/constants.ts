@@ -76,6 +76,8 @@ export enum LogCategory {
     SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
     SubscriptionNotifier = 'SubscriptionNotifier',
     Assistant = 'Assistant',
+    Scheduler = 'Scheduler',
+
     // service types
     TelegramError = 'TelegramError',
     WebhookError = 'WebhookError',

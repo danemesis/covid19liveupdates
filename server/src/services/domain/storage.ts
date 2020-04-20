@@ -129,7 +129,17 @@ export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
         .set(message);
 };
 
-export const getUser = (messengerPrefix: string) => async <T>(
+export const getAllUsers = (messengerPrefix: string) => async (): Promise<
+    Array<User>
+> => {
+    const snapshot = await firebase
+        .database()
+        .ref(`${messengerPrefix}/users`)
+        .once('value');
+    return snapshot.val() ?? {};
+};
+
+export const getUser = (messengerPrefix: string) => async (
     chatId: number
 ): Promise<User> => {
     const snapshot = await firebase
@@ -139,9 +149,9 @@ export const getUser = (messengerPrefix: string) => async <T>(
     return snapshot.val() ?? {};
 };
 
-export const addUser = (messengerPrefix: string) => async <T>(
+export const addUser = (messengerPrefix: string) => async (
     user: User
-): Promise<T> => {
+): Promise<void> => {
     return firebase
         .database()
         .ref(`${messengerPrefix}/users/${user.chatId}`)
