@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 import { Loggly } from 'winston-loggly-bulk';
 import environment from '../environments/environment';
-import { LogLevel, LogCategory } from '../models/constants';
+import { LogCategory, LogLevel } from '../models/constants';
 
 if (environment.LOGGLY_TOKEN) {
     winston.add(

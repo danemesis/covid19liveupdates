@@ -10,9 +10,11 @@ export const noResponse = async (
     chatId: number
 ): Promise<TelegramBot.Message> => {
     // TODO: log with another severity type
-    logger.log(
+    logger.error(
         'error',
-        `We have no response for user ${chatId} for ${message.text} ... plak.. plak..`,
+        new Error(
+            `We have no response for a user ${chatId} for ${message.text}.`
+        ),
         LogCategory.NoSuitableResponseToUser,
         chatId
     );

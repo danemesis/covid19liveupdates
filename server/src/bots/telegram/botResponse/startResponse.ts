@@ -2,13 +2,10 @@ import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import {
-    getTelegramUser,
-    addTelegramUser,
-} from '../../telegram/services/storage';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
+import { addTelegramUser, getTelegramUser } from '../services/storage';
 
 export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -49,13 +46,14 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
                 chatId
             );
         } else {
-            logger.log(
+            logger.error(
                 'info',
-                `New user ${newUser.chatId} was successfully added`,
+                new Error(`New user ${newUser.chatId} was successfully added`),
                 LogCategory.Command,
                 chatId
             );
         }
-        return messageSentPromise;
     }
+
+    return messageSentPromise;
 };

@@ -1,10 +1,10 @@
 import { CallBackQueryHandlerWithCommandArgument } from '../../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { logger } from '../../../../utils/logger';
-import { LogglyTypes } from '../../../../models/loggly.models';
 import { noResponse } from '../../botResponse/noResponse';
 import { MessageHandlerRegistry } from './messageHandlerRegistry';
 import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
+import { LogCategory } from '../../../../models/constants';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -35,11 +35,12 @@ export const withSingleParameterAfterCommand = (
                 userEnteredArgumentAfterCommand
             );
         } catch (err) {
-            logger.log('error', {
-                ...message,
-                type: LogglyTypes.CommandError,
-                message: err.message,
-            });
+            logger.error(
+                `Error happend inside withSingleParameterAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
+                err,
+                LogCategory.Command,
+                chatId
+            );
 
             return noResponse(bot, message, chatId);
         }

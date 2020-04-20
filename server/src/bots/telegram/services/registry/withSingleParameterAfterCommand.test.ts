@@ -2,9 +2,10 @@ import * as getParameterAfterCommandFromMessage from './getParameterAfterCommand
 import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
 import * as noResponse from '../../botResponse/noResponse';
 import { logger } from '../../../../utils/logger';
-import { LogglyTypes } from '../../../../models/loggly.models';
+import { LogCategory } from '../../../../models/constants';
 
 describe('withSingleParameterAfterCommand', () => {
+    const errorMock: any = new Error('error');
     const contextMock: any = {
         singleParameterAfterCommands: 'singleParameterAfterCommands',
     };
@@ -26,14 +27,13 @@ describe('withSingleParameterAfterCommand', () => {
             'getParameterAfterCommandFromMessage'
         ).and.callFake((singleParameterAfterCommands, userInput) => {
             if (userInput === 'error') {
-                throw new Error('error');
+                throw errorMock;
             }
             return 'result';
         });
 
         noResponseMock = spyOn(noResponse, 'noResponse');
-
-        loggerMock = spyOn(logger, 'log');
+        loggerMock = spyOn(logger, 'error');
     });
 
     afterAll(() => {
@@ -98,7 +98,7 @@ describe('withSingleParameterAfterCommand', () => {
         );
     });
 
-    it('should send no response', () => {
+    it('should send noResponse', () => {
         withSingleParameterAfterCommand(contextMock, handleFnMock)(
             telegramBotMock,
             messageMock,
@@ -115,18 +115,21 @@ describe('withSingleParameterAfterCommand', () => {
     });
 
     it('should log error', () => {
+        const ikCbDataErrorCauseMock = 'error';
+
         withSingleParameterAfterCommand(contextMock, handleFnMock)(
             telegramBotMock,
             messageMock,
             chatIdMock,
-            'error'
+            ikCbDataErrorCauseMock
         );
 
         expect(handleFnMock).not.toBeCalled();
-        expect(loggerMock).toHaveBeenCalledWith('error', {
-            ...messageMock,
-            type: LogglyTypes.CommandError,
-            message: 'error',
-        });
+        expect(loggerMock).toHaveBeenCalledWith(
+            `Error happend inside withSingleParameterAfterCommand() for ${chatIdMock} with message: ${messageMock.text} and ikCbData: ${ikCbDataErrorCauseMock}`,
+            errorMock,
+            LogCategory.Command,
+            chatIdMock
+        );
     });
 });

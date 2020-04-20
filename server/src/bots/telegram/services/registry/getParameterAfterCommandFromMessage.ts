@@ -1,6 +1,3 @@
-import { logger } from '../../../../utils/logger';
-import { getInfoMessage } from '../../../../utils/getErrorMessages';
-
 /**
  * Check out how it works here
  * https://codepen.io/belokha/pen/xxwOdWg?editors=0012
@@ -23,16 +20,11 @@ export function getParameterAfterCommandFromMessage(
         )})\\s(?<firstargument>.*)`
     ).exec(makeMagicOverUserFullInput);
     if (!execResult) {
-        logger.log('warn', getInfoMessage('Entered unsupported command'));
         return undefined;
     }
 
     /* tslint:disable:no-string-literal */
     if (execResult.groups['command'] && !execResult.groups['firstargument']) {
-        logger.log(
-            'info',
-            getInfoMessage(`No parameter for ${execResult.groups['command']}`)
-        );
         return undefined;
     }
 

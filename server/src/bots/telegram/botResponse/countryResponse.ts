@@ -19,7 +19,6 @@ import {
     getCountryNameFormat,
     getRequestedCountry,
 } from '../../../services/domain/countries';
-import { getErrorMessage } from '../../../utils/getErrorMessages';
 import { LogCategory } from '../../../models/constants';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (

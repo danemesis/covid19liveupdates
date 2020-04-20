@@ -160,12 +160,12 @@ export function runTelegramBot(
     });
 
     bot.on('polling_error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.PollingError)
+        logger.error(LogLevel.Error, err, LogCategory.PollingError)
     );
     bot.on('webhook_error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.WebhookError)
+        logger.error(LogLevel.Error, err, LogCategory.WebhookError)
     );
     bot.on('error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.TelegramError)
+        logger.error(LogLevel.Error, err, LogCategory.TelegramError)
     );
 }
