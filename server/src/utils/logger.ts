@@ -1,6 +1,7 @@
 import * as winston from 'winston';
 import { Loggly } from 'winston-loggly-bulk';
 import environment from '../environments/environment';
+import { LogLevel, LogCategory } from '../models/constants';
 
 if (environment.LOGGLY_TOKEN) {
     winston.add(
@@ -14,11 +15,35 @@ if (environment.LOGGLY_TOKEN) {
 }
 
 export const logger = {
-    log(severity: string, message: any) {
+    log(severity: string, message: any, type?: LogCategory, chatId?: number) {
+        if (typeof message === 'string') {
+            message = {
+                message,
+            };
+        }
+        if (chatId !== undefined) {
+            message.chatId = chatId;
+        }
+        if (type !== undefined) {
+            message.type = type;
+        }
         winston.log(severity, message);
         if (!environment.IsProduction()) {
             // tslint:disable-next-line:no-console
             console.log(severity, message);
         }
+    },
+    error(message: any, error: Error, type?: LogCategory, chatId?: number) {
+        if (typeof message === 'string') {
+            message = {
+                message,
+            };
+        }
+        message.error = {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+        };
+        this.log(LogLevel.Error, message, type, chatId);
     },
 };

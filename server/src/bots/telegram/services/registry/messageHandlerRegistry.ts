@@ -13,7 +13,7 @@ import { Answer } from '../../../../models/knowledgebase/answer.models';
 import { fetchAnswer } from '../../../../services/api/api-knowledgebase';
 import { assistantResponse } from '../../botResponse/assistantResponse';
 import { noResponse } from '../../botResponse/noResponse';
-import { LogglyTypes } from '../../../../models/loggly.models';
+import { LogCategory } from '../../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
 import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
@@ -82,12 +82,14 @@ export class MessageHandlerRegistry {
         }
 
         if (suitableKeys.length > 1) {
-            logger.log('info', {
-                type: LogglyTypes.MoreThenOneAvailableResponseError,
-                message: `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
+            logger.log(
+                'info',
+                `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
                     ';\n'
                 )}`,
-            });
+                LogCategory.MoreThenOneAvailableResponse,
+                getChatId(message)
+            );
         }
 
         // This statement will invoke wrapper (withSingleParameterAfterCommand)

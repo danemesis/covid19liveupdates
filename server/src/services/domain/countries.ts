@@ -44,7 +44,6 @@ export const getRequestedCountry = async (
         Country,
         Array<CountrySituationInfo>
     ]> = await getCountriesSituation();
-
     const foundCountrySituations: [
         Country,
         Array<CountrySituationInfo>

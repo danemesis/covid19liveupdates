@@ -10,10 +10,9 @@ import {
 import { getTelegramSubscriptions, setTelegramSubscription } from './storage';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
-import { getErrorMessage } from '../../../utils/getErrorMessages';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
 import { showCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
-import { LogglyTypes } from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
 
 export const subscriptionNotifierHandler = async (
@@ -41,12 +40,11 @@ export const subscriptionNotifierHandler = async (
             )
         );
         if (err) {
-            logger.log('error', {
-                type: LogglyTypes.SubscriptionNotifierGeneralError,
-                message: `${getErrorMessage(
-                    err
-                )}. General subscriptionNotifierHandler, sending user ${chatId} notification  failed`,
-            });
+            logger.error(
+                `General subscriptionNotifierHandler, sending user ${chatId} notification  failed`,
+                err,
+                LogCategory.SubscriptionNotifierGeneral
+            );
         }
     }
 };
@@ -80,12 +78,11 @@ const getAndSendUserNotificationSubscriptions = async (
             )
         );
         if (!!sendingNotificationErr) {
-            return logger.log('error', {
-                type: LogglyTypes.SubscriptionNotifierError,
-                message: `${getErrorMessage(
-                    sendingNotificationErr
-                )}. User ${chatId} notifications has not been send`,
-            });
+            return logger.error(
+                `User ${chatId} notifications has not been send`,
+                sendingNotificationErr,
+                LogCategory.SubscriptionNotifier
+            );
         }
 
         const mergeAllUserSubscriptions: Array<Subscription> = (userSubscription as UserSubscription).subscriptionsOn.map(
@@ -116,12 +113,11 @@ const getAndSendUserNotificationSubscriptions = async (
             })
         );
         if (!!updatingUserSubscriptionErr) {
-            return logger.log('error', {
-                type: LogglyTypes.SubscriptionNotifierError,
-                message: `${getErrorMessage(
-                    updatingUserSubscriptionErr
-                )}. User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
-            });
+            return logger.error(
+                `User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
+                updatingUserSubscriptionErr,
+                LogCategory.SubscriptionNotifier
+            );
         }
     }
 };

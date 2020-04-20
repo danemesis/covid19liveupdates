@@ -3,14 +3,13 @@ import {
     ApiCovid19Situation,
     CountrySituationInfo,
 } from '../../models/covid19.models';
-import { COVID19_FETCH_SALT, TIMES } from '../../models/constants';
+import { COVID19_FETCH_SALT, TIMES, LogCategory } from '../../models/constants';
 import { Country } from '../../models/country.models';
 import { fetchCovid19Data } from '../api/api-covid19';
 import { CountryLookup } from '../../models/country-code-lookup.models';
 import { getCountryByName, getDefaultCountry } from './countryLookup';
 import { SubscriptionType } from '../../models/subscription.models';
 import { logger } from '../../utils/logger';
-import { LogglyTypes } from '../../models/loggly.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from './countries';
 
@@ -141,10 +140,11 @@ export function tryToUpdateCovid19Cache(): Promise<TelegramBot.Message> {
     return getCovid19Data()
         .then((v) => undefined)
         .catch((e) =>
-            logger.log('error', {
-                type: LogglyTypes.Covid19DataUpdateError,
-                message: `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`,
-            })
+            logger.error(
+                '[ERROR] While fetching Hopkins uni data',
+                e,
+                LogCategory.Covid19DataUpdate
+            )
         );
 }
 

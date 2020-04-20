@@ -20,6 +20,7 @@ import {
     getRequestedCountry,
 } from '../../../services/domain/countries';
 import { getErrorMessage } from '../../../utils/getErrorMessages';
+import { LogCategory } from '../../../models/constants';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -80,7 +81,13 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
         getRequestedCountry(requestedCountry)
     );
     if (err) {
-        logger.log('error', getErrorMessage(err));
+        logger.error(
+            `Error ocured while getting response for Country ${requestedCountry}`,
+            err,
+            LogCategory.Countries,
+            chatId
+        );
+
         return bot.sendMessage(chatId, err.message);
     }
 
