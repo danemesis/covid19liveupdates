@@ -22,13 +22,16 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
             lastName: message.chat.last_name || '',
             startedOn: Date.now()
         };
-        try {
-            addUser(user);
-            logger.log('info', `New user ${user.chatId} was successfully added`, LogglyTypes.Command, chatId)
-        }
-        catch (error) {
-            logger.error(`An error ocured while trying to add new user ${chatId}`, error, LogglyTypes.Command, chatId)
-        }
+        addUser(user)
+        .then(x => 
+            logger.log('info', `New user ${user.chatId} was successfully added`
+            , LogglyTypes.Command
+            , chatId))
+        .catch((error) => 
+            logger.error(`An error ocured while trying to add new user ${chatId}`
+            , error
+            , LogglyTypes.Command
+            , chatId));
     }
 
     await bot.sendMessage(
