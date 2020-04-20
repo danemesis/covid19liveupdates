@@ -11,7 +11,7 @@ import {
     CustomSubscriptions,
     UserMessages,
     UserRegExps,
-    LogLevel
+    LogLevel,
 } from '../../models/constants';
 import { showAdvicesHowToBehaveResponse } from './botResponse/adviceResponse';
 import { helpInfoResponse } from './botResponse/helpResponse';
@@ -145,7 +145,11 @@ export function runTelegramBot(
                 )
             );
             if (err) {
-                logger.error("subscriptionNotifierHandler failed", err, LogglyTypes.SubscriptionNotifierHandler);
+                logger.error(
+                    'subscriptionNotifierHandler failed',
+                    err,
+                    LogglyTypes.SubscriptionNotifierHandler
+                );
             }
         },
         [SubscriptionType.Country]
@@ -155,7 +159,13 @@ export function runTelegramBot(
         messageHandlerRegistry.runCommandHandler(message);
     });
 
-    bot.on('polling_error', (err) => logger.log('error', err, LogglyTypes.PollingError));
-    bot.on('webhook_error', (err) => logger.log('error', err, LogglyTypes.WebhookError));
-    bot.on('error', (err) => logger.log('error', err, LogglyTypes.TelegramError));
+    bot.on('polling_error', (err) =>
+        logger.log('error', err, LogglyTypes.PollingError)
+    );
+    bot.on('webhook_error', (err) =>
+        logger.log('error', err, LogglyTypes.WebhookError)
+    );
+    bot.on('error', (err) =>
+        logger.log('error', err, LogglyTypes.TelegramError)
+    );
 }

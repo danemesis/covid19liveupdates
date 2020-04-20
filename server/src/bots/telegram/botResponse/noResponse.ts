@@ -9,8 +9,13 @@ export const noResponse = async (
     message: TelegramBot.Message,
     chatId: number
 ): Promise<TelegramBot.Message> => {
-    //TODO: log with another severity type
-    logger.error('error', message, LogglyTypes.NoSuitableResponseToUser, chatId);
+    // TODO: log with another severity type
+    logger.error(
+        'error',
+        message,
+        LogglyTypes.NoSuitableResponseToUser,
+        chatId
+    );
 
     return bot.sendMessage(
         chatId,
