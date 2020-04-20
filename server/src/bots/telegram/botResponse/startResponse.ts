@@ -5,6 +5,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { helpInfoResponse } from './helpResponse';
 import { getUser, addUser } from '../../../services/domain/user'
 import { logger } from '../../../utils/logger';
+import { LogglyTypes } from '../../../models/loggly.models';
 
 export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -23,13 +24,10 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
         };
         try {
             addUser(user);
-            logger.log('info', `New user ${user.chatId} was successfully added`)
+            logger.log('info', `New user ${user.chatId} was successfully added`, LogglyTypes.Command, chatId)
         }
         catch (error) {
-            logger.log('error', {
-                error,
-                message: `An error ocured while trying to add new user ${user.chatId}`
-            });
+            logger.error(`An error ocured while trying to add new user ${chatId}`, error, LogglyTypes.Command, chatId)
         }
     }
 

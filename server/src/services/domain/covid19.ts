@@ -128,10 +128,9 @@ export function tryToUpdateCovid19Cache(): Promise<TelegramBot.Message> {
     return getCovid19Data()
         .then((v) => undefined)
         .catch((e) =>
-            logger.log('error', {
-                type: LogglyTypes.Covid19DataUpdateError,
-                message: `[ERROR] While fetching Hopkins uni data. ${e?.message}, ${e?.stack}`,
-            })
+            logger.error("[ERROR] While fetching Hopkins uni data"
+                ,e
+                ,LogglyTypes.Covid19DataUpdate)
         );
 }
 

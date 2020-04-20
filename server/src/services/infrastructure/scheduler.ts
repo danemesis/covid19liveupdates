@@ -8,7 +8,7 @@ export const checkCovid19Updates = () => {
     schedule.scheduleJob('30 * * * *', () => {
         tryToUpdateCovid19Cache().then(() =>
             logger.log('info', {
-                type: LogglyTypes.Covid19DataUpdateInfo,
+                type: LogglyTypes.Covid19DataUpdate,
                 message: 'Covid19 cache updated',
             })
         );

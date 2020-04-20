@@ -1,13 +1,18 @@
 export enum LogglyTypes {
-    CommandError = '[Error]Command',
-    Covid19DataUpdateError = '[Error]Covid19DataUpdate',
-    MoreThenOneAvailableResponseError = '[Error]MoreThenOneAvailableResponse',
-    NoSuitableResponseToUserError = '[Error]NoSuitableResponseToUser',
-    SubscriptionNotifierHandlerError = '[Error]SubscriptionNotifierHandler',
-    SubscriptionNotifierGeneralError = '[Error]SubscriptionNotifierGeneralError',
-    SubscriptionNotifierError = '[Error]SubscriptionNotifier',
-    Covid19DataUpdateInfo = '[Info]Covid19DataUpdate',
-    RemoveCommandFromMessageIfExistInfo = '[Info]removeCommandFromMessageIfExist',
+    Command = 'Command',
+    Covid19DataUpdate = 'Covid19DataUpdate',
+    Countries = 'Countries',
+    MoreThenOneAvailableResponse = 'MoreThenOneAvailableResponse',
+    NoSuitableResponseToUser = 'NoSuitableResponseToUser',
+    SubscriptionNotifierHandler = 'SubscriptionNotifierHandler',
+    SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
+    SubscriptionNotifier = 'SubscriptionNotifier',
+
+
+    //service types
+    TelegramError = 'TelegramError',
+    WebhookError = 'WebhookError',
+    PollingError = 'PollingError'
 }
 
 export interface LogglyModels extends Object {

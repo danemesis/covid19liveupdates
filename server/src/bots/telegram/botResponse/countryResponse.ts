@@ -14,10 +14,10 @@ import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
-import { getErrorMessage } from '../../../utils/getErrorMessages';
 import { Country } from '../../../models/country.models';
 import { CountrySituationInfo } from '../../../models/covid19.models';
 import { getRequestedCountry } from '../../../services/domain/countries';
+import {LogglyTypes} from '../../../models/loggly.models';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -78,7 +78,11 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
         getRequestedCountry(requestedCountry)
     );
     if (err) {
-        logger.log('error', getErrorMessage(err));
+        logger.error(`Error ocured while getting response for Country ${requestedCountry}`, 
+            err, 
+            LogglyTypes.Countries, 
+            chatId);
+            
         return bot.sendMessage(chatId, err.message);
     }
 
