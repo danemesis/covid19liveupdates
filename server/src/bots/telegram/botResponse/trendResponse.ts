@@ -1,7 +1,11 @@
 import { getCovidTrends } from '../../../services/api/api-chart';
 import { addDays, Now } from '../../../utils/dateUtils';
 import { CountrySituationInfo } from '../../../models/covid19.models';
-import { Transform, enrichWithTitle } from '../../../services/domain/chart';
+import {
+    Transform,
+    enrichWithTitle,
+    enrichWithType,
+} from '../../../services/domain/chart';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getRequestedCountry } from '../../../services/domain/countries';
 import { logger } from '../../../utils/logger';
@@ -57,15 +61,15 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
             ? 'Whole period'
             : capitalize(requestedFrequency);
 
-    return bot.sendPhoto(
-        chatId,
-        getCovidTrends(
-            enrichWithTitle(
-                Transform(periodSituation),
-                `${frequencyName} trends for ${capitalize(requestedCountry)}`
-            )
-        )
+    let model = enrichWithTitle(
+        Transform(periodSituation),
+        `${frequencyName} trends for ${capitalize(requestedCountry)}`
     );
+    if (requestedFrequency === Frequency.Weekly) {
+        model = enrichWithType(model, 'bar');
+    }
+
+    return bot.sendPhoto(chatId, getCovidTrends(model));
 };
 
 const capitalize = (input: string): string =>

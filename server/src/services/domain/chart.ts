@@ -49,3 +49,10 @@ export const enrichWithTitle = (
         },
     };
 };
+
+export const enrichWithType = (model: ChartModel, type: string): ChartModel => {
+    return {
+        ...model,
+        type,
+    };
+};

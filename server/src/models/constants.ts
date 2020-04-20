@@ -55,7 +55,7 @@ export enum Frequency {
 }
 
 export enum Status {
-    Confirmed = 'confirmed',
+    Confirmed = 'active',
     Deaths = 'deaths',
     Recovered = 'recovered',
 }
