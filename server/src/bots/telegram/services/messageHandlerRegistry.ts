@@ -204,7 +204,6 @@ function getParameterAfterCommandFromMessage(
         )})\\s(?<firstargument>.*)`
     ).exec(makeMagicOverUserFullInput);
 
-    //TODO: So far there is no reason to log on any of those if... 
     if (!execResult) {
         return undefined;
     }

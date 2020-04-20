@@ -42,12 +42,11 @@ export const getRequestedCountry = async (
         Country,
         Array<CountrySituationInfo>
     ]> = await getCountriesSituation();
-
     const foundCountrySituations: [
         Country,
         Array<CountrySituationInfo>
     ] = allCountriesSituations.find(
-        ([receivedCountry, situations]) => receivedCountry.name === countryName
+        ([receivedCountry, situations]) => receivedCountry.name.toLowerCase() === countryName.toLowerCase()
     );
 
     if (
