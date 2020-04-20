@@ -8,6 +8,8 @@ import {
     listenSubscriptionsChanges,
     setQueryToAnalyse,
     setSubscription,
+    getUser,
+    addUser
 } from '../../../services/domain/storage';
 import * as firebase from 'firebase';
 
@@ -16,6 +18,8 @@ export const getTelegramSubscriptions: Function = getSubscriptions(TELEGRAM_PREF
 export const getTelegramActiveSubscriptions: Function = getActiveSubscriptions(TELEGRAM_PREFIX);
 export const getTelegramUserSubscriptions: Function = getUserSubscription(TELEGRAM_PREFIX);
 export const getTelegramActiveUserSubscriptions: Function = getActiveUserSubscription(TELEGRAM_PREFIX);
+export const getTelegramUser: Function = getUser(TELEGRAM_PREFIX);
+export const addTelegramUser: Function = addUser(TELEGRAM_PREFIX);
 export const setTelegramSubscription: Function = setSubscription(TELEGRAM_PREFIX);
 export const setTelegramQueryToAnalyse: Function = setQueryToAnalyse(TELEGRAM_PREFIX);
 

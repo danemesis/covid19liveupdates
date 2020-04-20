@@ -16,9 +16,8 @@ import { Answer } from '../../../models/knowledgebase/answer.models';
 import { fetchAnswer } from '../../../services/api/api-knowledgebase';
 import { assistantResponse } from '../botResponse/assistantResponse';
 import { noResponse } from '../botResponse/noResponse';
-import { LogglyTypes } from '../../../models/loggly.models';
+import { LogCategory } from '../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { getInfoMessage } from '../../../utils/getErrorMessages';
 
 export class MessageHandlerRegistry {
     _messageHandlers: {
@@ -83,12 +82,14 @@ export class MessageHandlerRegistry {
         }
 
         if (suitableKeys.length > 1) {
-            logger.log('info', {
-                type: LogglyTypes.MoreThenOneAvailableResponseError,
-                message: `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
+            logger.log(
+                'info',
+                `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
                     ';\n'
                 )}`,
-            });
+                LogCategory.MoreThenOneAvailableResponse,
+                getChatId(message)
+            );
         }
 
         // This statement will invoke wrapper (withSingleParameterAfterCommand)
@@ -177,11 +178,12 @@ export const withSingleParameterAfterCommand = (
                 userEnteredArgumentAfterCommand
             );
         } catch (err) {
-            logger.log('error', {
-                ...message,
-                type: LogglyTypes.CommandError,
-                message: err.message,
-            });
+            logger.error(
+                `Error happend inside withSingleParameterAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
+                err,
+                LogCategory.Command,
+                chatId
+            );
 
             return noResponse(this.bot, message, chatId);
         }
@@ -208,17 +210,13 @@ function getParameterAfterCommandFromMessage(
             '|\\'
         )})\\s(?<firstargument>.*)`
     ).exec(makeMagicOverUserFullInput);
+
     if (!execResult) {
-        logger.log('warn', getInfoMessage('Entered unsupported command'));
         return undefined;
     }
 
     /* tslint:disable:no-string-literal */
     if (execResult.groups['command'] && !execResult.groups['firstargument']) {
-        logger.log(
-            'info',
-            getInfoMessage(`No parameter for ${execResult.groups['command']}`)
-        );
         return undefined;
     }
 

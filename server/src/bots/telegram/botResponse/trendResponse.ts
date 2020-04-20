@@ -5,7 +5,6 @@ import { Transform } from '../../../services/domain/chart';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getRequestedCountry } from '../../../services/domain/countries';
 import { logger } from '../../../utils/logger';
-import { getErrorMessage } from '../../../utils/getErrorMessages';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 
@@ -19,10 +18,12 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
         getRequestedCountry(requestedCountry)
     );
     if (err) {
-        logger.log('error', getErrorMessage(err));
+        logger.error(
+            `Error ocured while trying to get requested country ${requestedCountry}`,
+            err);
+
         return bot.sendMessage(chatId, err.message);
     }
-
     const lastWeekSituation = foundSituation.filter(
         (c: CountrySituationInfo) => {
             const date = new Date(c.date);

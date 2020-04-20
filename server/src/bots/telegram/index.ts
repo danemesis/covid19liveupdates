@@ -11,6 +11,8 @@ import {
     CustomSubscriptions,
     UserMessages,
     UserRegExps,
+    LogCategory,
+    LogLevel,
 } from '../../models/constants';
 import { showAdvicesHowToBehaveResponse } from './botResponse/adviceResponse';
 import { helpInfoResponse } from './botResponse/helpResponse';
@@ -38,8 +40,6 @@ import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { catchAsyncError } from '../../utils/catchError';
-import { LogglyTypes } from '../../models/loggly.models';
-import { getErrorMessage } from '../../utils/getErrorMessages';
 
 export function runTelegramBot(
     app: Express,
@@ -145,12 +145,11 @@ export function runTelegramBot(
                 )
             );
             if (err) {
-                logger.log('error', {
-                    type: LogglyTypes.SubscriptionNotifierHandlerError,
-                    message: `${getErrorMessage(
-                        err
-                    )}. subscriptionNotifierHandler failed`,
-                });
+                logger.error(
+                    'subscriptionNotifierHandler failed',
+                    err,
+                    LogCategory.SubscriptionNotifierHandler
+                );
             }
         },
         [SubscriptionType.Country]
@@ -160,7 +159,13 @@ export function runTelegramBot(
         messageHandlerRegistry.runCommandHandler(message);
     });
 
-    bot.on('polling_error', (err) => logger.log('error', err));
-    bot.on('webhook_error', (err) => logger.log('error', err));
-    bot.on('error', (err) => logger.log('error', err));
+    bot.on('polling_error', (err) =>
+        logger.log(LogLevel.Error, err, LogCategory.PollingError)
+    );
+    bot.on('webhook_error', (err) =>
+        logger.log(LogLevel.Error, err, LogCategory.WebhookError)
+    );
+    bot.on('error', (err) =>
+        logger.log(LogLevel.Error, err, LogCategory.TelegramError)
+    );
 }

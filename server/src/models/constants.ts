@@ -51,3 +51,32 @@ export enum Status {
     Deaths = 'deaths',
     Recovered = 'recovered',
 }
+
+export enum LogLevel {
+    //   Emerg = 'emerg',
+    //   Alert = 'alert',
+    //   Crit = 'crit',
+    Error = 'error',
+    Warning = 'warn',
+    //   Notice = 'notice',
+    Info = 'info',
+    Debug = 'debug', // ????????
+    //   Trace = 'trace'
+}
+
+export enum LogCategory {
+    Command = 'Command',
+    Covid19DataUpdate = 'Covid19DataUpdate',
+    Countries = 'Countries',
+    MoreThenOneAvailableResponse = 'MoreThenOneAvailableResponse',
+    NoSuitableResponseToUser = 'NoSuitableResponseToUser',
+    SubscriptionNotifierHandler = 'SubscriptionNotifierHandler',
+    SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
+    SubscriptionNotifier = 'SubscriptionNotifier',
+    Assistant = 'Assistant',
+
+    // service types
+    TelegramError = 'TelegramError',
+    WebhookError = 'WebhookError',
+    PollingError = 'PollingError',
+}
