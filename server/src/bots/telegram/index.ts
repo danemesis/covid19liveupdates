@@ -34,7 +34,7 @@ import {
     subscriptionManagerResponse,
 } from './botResponse/subscribeResponse';
 import { SubscriptionType } from '../../models/subscription.models';
-import { MessageHandlerRegistry } from './services/registry/messageHandlerRegistry';
+import { MessageHandlerRegistry, withTwoArgumentsAfterCommand } from './services/registry/messageHandlerRegistry';
 import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
@@ -109,7 +109,10 @@ export function runTelegramBot(
             ],
             unsubscribeStrategyResponse
         )
-        .registerMessageHandler([UserRegExps.Trends], trendsByCountryResponse);
+        .registerMessageHandler(
+            [UserRegExps.Trends],
+            withTwoArgumentsAfterCommand(trendsByCountryResponse)
+        );
 
     // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {

@@ -48,6 +48,12 @@ export enum Continents {
     Other = 'Other',
 }
 
+export enum Frequency {
+    Weekly = 'weekly',
+    Monthly = 'monthly',
+    WholePeriod = 'wholeperiod',
+}
+
 export enum Status {
     Confirmed = 'confirmed',
     Deaths = 'deaths',

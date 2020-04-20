@@ -7,12 +7,14 @@ import { getRequestedCountry } from '../../../services/domain/countries';
 import { logger } from '../../../utils/logger';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { Frequency } from './../../../models/constants';
 
 export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number,
-    requestedCountry?: string | undefined
+    requestedCountry?: string | undefined,
+    requestedFrequency?: Frequency | undefined
 ): Promise<TelegramBot.Message> => {
     const [err, [foundCountry, foundSituation]] = await catchAsyncError(
         getRequestedCountry(requestedCountry)
@@ -25,12 +27,29 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
 
         return bot.sendMessage(chatId, err.message);
     }
-    const lastWeekSituation = foundSituation.filter(
-        (c: CountrySituationInfo) => {
-            const date = new Date(c.date);
-            return date < Now && date > addDays(Now, -7);
-        }
-    );
 
-    return bot.sendPhoto(chatId, getCovidTrends(Transform(lastWeekSituation)));
+    let startDate: Date;
+    let hasFilter = true;
+    switch (requestedFrequency) {
+        case undefined:
+        case Frequency.Weekly:
+            startDate = addDays(Now, -7);
+            break;
+        case Frequency.Monthly:
+            startDate = addDays(Now, -30);
+            break;
+        case Frequency.WholePeriod:
+            hasFilter = false;
+            break;
+    }
+
+    let periodSituation = foundSituation;
+    if (hasFilter) {
+        periodSituation = periodSituation.filter((c: CountrySituationInfo) => {
+            const date = new Date(c.date);
+            return date < Now && date > startDate;
+        });
+    }
+
+    return bot.sendPhoto(chatId, getCovidTrends(Transform(periodSituation)));
 };
