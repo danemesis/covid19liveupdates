@@ -11,6 +11,7 @@ import {
     getAllUsers,
     getUser,
     addUser,
+    getNotificationMessage,
 } from '../../../services/domain/storage';
 import * as firebase from 'firebase';
 
@@ -32,6 +33,9 @@ export const getTelegramActiveUserSubscriptions: Function = getActiveUserSubscri
 export const getTelegramUser = getUser(TELEGRAM_PREFIX);
 export const getTelegramAllUsers = getAllUsers(TELEGRAM_PREFIX);
 export const addTelegramUser = addUser(TELEGRAM_PREFIX);
+export const getTelegramNotificationMessage = getNotificationMessage(
+    TELEGRAM_PREFIX
+);
 export const setTelegramSubscription: Function = setSubscription(
     TELEGRAM_PREFIX
 );

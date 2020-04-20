@@ -157,3 +157,13 @@ export const addUser = (messengerPrefix: string) => async (
         .ref(`${messengerPrefix}/users/${user.chatId}`)
         .set(user);
 };
+
+export const getNotificationMessage = (
+    messengerPrefix: string
+) => async (): Promise<string> => {
+    const snapshot = await firebase
+        .database()
+        .ref(`${messengerPrefix}/notificationMessage`)
+        .once('value');
+    return snapshot.val() ?? {};
+};

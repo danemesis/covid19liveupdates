@@ -2,9 +2,14 @@ import * as schedule from 'node-schedule';
 import { tryToUpdateCovid19Cache } from '../domain/covid19';
 import { logger } from '../../utils/logger';
 import { LogCategory } from '../../models/constants';
-import { getTelegramAllUsers } from '../../bots/telegram/services/storage';
+import {
+    getTelegramAllUsers,
+    getTelegramNotificationMessage,
+} from '../../bots/telegram/services/storage';
 import { catchAsyncError } from '../../utils/catchError';
 import TelegramBot = require('node-telegram-bot-api');
+import environments from '../../environments/environment';
+import { User } from '../../models/user.model';
 
 export const checkCovid19Updates = () => {
     // Check covid19 info every hour (at hh:30 mins, e.g. 1:30, 2:30 ...)
@@ -18,21 +23,57 @@ export const checkCovid19Updates = () => {
     });
 };
 
-export const sendReleaseNotificationToUsers = async (bot: TelegramBot) => {
-    // At 08:00 PM, only on Monday
-    schedule.scheduleJob('0 0 20 * * 1', async () => {
-        const [err, users] = await catchAsyncError(getTelegramAllUsers());
-        if (err) {
-            logger.error(
-                'sendReleaseNotificationToUsers failed when accessing users Db',
-                err,
-                LogCategory.Scheduler
+export const sendReleaseNotificationToUsers = async (
+    bot: TelegramBot
+): Promise<void> => {
+    // At 08:00 PM, every day
+    schedule.scheduleJob(
+        environments.features.ScheduledNotification.cronExpr || '0 0 20 * * *',
+        async () => {
+            if (!environments.features.ScheduledNotification.enabled) {
+                logger.log(
+                    'info',
+                    'SchedulerNotification was launched, but currently disabled',
+                    LogCategory.Scheduler
+                );
+                return;
+            }
+            const [err, users] = await catchAsyncError(getTelegramAllUsers());
+            if (err) {
+                logger.error(
+                    'sendReleaseNotificationToUsers failed when accessing users Db',
+                    err,
+                    LogCategory.Scheduler
+                );
+                return;
+            }
+            const [err1, message] = await catchAsyncError(
+                getTelegramNotificationMessage()
             );
-            return;
-        }
+            if (err) {
+                logger.error(
+                    'sendReleaseNotificationToUsers failed when accessing getTelegramNotificationMessage()',
+                    err,
+                    LogCategory.Scheduler
+                );
+                return;
+            }
+            if (!message) {
+                logger.error(
+                    'getTelegramNotificationMessage() returns empty message',
+                    err,
+                    LogCategory.Scheduler
+                );
+            }
 
-        for (const usr of users) {
-            bot.sendMessage(usr.chatId, 'Hello DUDE, What\'s UP? ');
+            for (const usr of users) {
+                message.replace('#UserName#', getUserName(usr));
+                bot.sendMessage(usr.chatId, message);
+            }
         }
-    });
+    );
 };
+
+function getUserName(user: User): string {
+    return user.firstName ?? user.lastName ?? user.userName ?? 'friend';
+}
