@@ -3,7 +3,7 @@ export type DataSet = {
     data: Array<number>;
     fill: boolean;
     backgroundColor?: string;
-    borderColor: string;
+    borderColor?: string;
 };
 
 type ChartData = {

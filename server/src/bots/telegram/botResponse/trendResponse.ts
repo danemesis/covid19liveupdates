@@ -66,7 +66,7 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
         `${frequencyName} trends for ${capitalize(requestedCountry)}`
     );
     if (requestedFrequency === Frequency.Weekly) {
-        model = enrichWithType(model, 'bar');
+        model = enrichWithType(model, 'barStacked');
     }
 
     return bot.sendPhoto(chatId, getCovidTrends(model));

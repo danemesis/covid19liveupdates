@@ -13,18 +13,21 @@ export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
                     data: situations.map((x) => x.confirmed),
                     fill: false,
                     borderColor: 'blue',
+                    backgroundColor: '#f3a16c',
                 },
                 {
                     label: Status.Deaths,
                     data: situations.map((x) => x.deaths),
                     fill: false,
-                    borderColor: 'red',
+                    borderColor: '#de425b',
+                    backgroundColor: '#de425b',
                 },
                 {
                     label: Status.Recovered,
                     data: situations.map((x) => x.recovered),
                     fill: false,
-                    borderColor: 'green',
+                    borderColor: '#488f31',
+                    backgroundColor: '#488f31',
                 },
             ],
         },
@@ -51,6 +54,27 @@ export const enrichWithTitle = (
 };
 
 export const enrichWithType = (model: ChartModel, type: string): ChartModel => {
+    if (type === 'barStacked') {
+        return {
+            ...model,
+            type: 'bar',
+            options: {
+                ...model.options,
+                scales: {
+                    xAxes: [
+                        {
+                            stacked: true,
+                        },
+                    ],
+                    yAxes: [
+                        {
+                            stacked: true,
+                        },
+                    ],
+                },
+            },
+        };
+    }
     return {
         ...model,
         type,
