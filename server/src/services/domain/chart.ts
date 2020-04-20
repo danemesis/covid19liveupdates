@@ -1,7 +1,6 @@
-import { Status } from '../../models/constants';
 import { ChartModel } from '../../models/chart.models';
 import { CountrySituationInfo } from '../../models/covid19.models';
-
+import { Status } from '../../models/constants';
 export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
     const days = situations.map((x) => x.date);
     return {
@@ -28,6 +27,25 @@ export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
                     borderColor: 'green',
                 },
             ],
+        },
+        options: {},
+    };
+};
+
+export const enrichWithTitle = (
+    model: ChartModel,
+    title: string
+): ChartModel => {
+    return {
+        ...model,
+        options: {
+            ...model.options,
+            title: {
+                display: true,
+                text: title,
+                fontColor: 'hotpink',
+                fontSize: 32,
+            },
         },
     };
 };

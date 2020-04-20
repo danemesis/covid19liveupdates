@@ -1,7 +1,7 @@
 import { getCovidTrends } from '../../../services/api/api-chart';
 import { addDays, Now } from '../../../utils/dateUtils';
 import { CountrySituationInfo } from '../../../models/covid19.models';
-import { Transform } from '../../../services/domain/chart';
+import { Transform, enrichWithTitle } from '../../../services/domain/chart';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getRequestedCountry } from '../../../services/domain/countries';
 import { logger } from '../../../utils/logger';
@@ -16,6 +16,8 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     requestedCountry?: string | undefined,
     requestedFrequency?: Frequency | undefined
 ): Promise<TelegramBot.Message> => {
+    requestedFrequency = requestedFrequency || Frequency.Weekly;
+
     const [err, [foundCountry, foundSituation]] = await catchAsyncError(
         getRequestedCountry(requestedCountry)
     );
@@ -31,7 +33,6 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     let startDate: Date;
     let hasFilter = true;
     switch (requestedFrequency) {
-        case undefined:
         case Frequency.Weekly:
             startDate = addDays(Now, -7);
             break;
@@ -51,5 +52,21 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
         });
     }
 
-    return bot.sendPhoto(chatId, getCovidTrends(Transform(periodSituation)));
+    const frequencyName =
+        requestedFrequency === Frequency.WholePeriod
+            ? 'Whole period'
+            : capitalize(requestedFrequency);
+
+    return bot.sendPhoto(
+        chatId,
+        getCovidTrends(
+            enrichWithTitle(
+                Transform(periodSituation),
+                `${frequencyName} trends for ${capitalize(requestedCountry)}`
+            )
+        )
+    );
 };
+
+const capitalize = (input: string): string =>
+    input.charAt(0).toUpperCase() + input.substring(1).toLowerCase();
