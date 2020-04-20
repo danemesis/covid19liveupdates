@@ -1,4 +1,3 @@
-import { adaptCountryToSystemRepresentation } from '../../../services/domain/covid19';
 import {
     getCountryIKActionMessage,
     getCountryMessage,
@@ -14,10 +13,13 @@ import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
-import { getErrorMessage } from '../../../utils/getErrorMessages';
 import { Country } from '../../../models/country.models';
 import { CountrySituationInfo } from '../../../models/covid19.models';
-import { getRequestedCountry } from '../../../services/domain/countries';
+import {
+    getCountryNameFormat,
+    getRequestedCountry,
+} from '../../../services/domain/countries';
+import { getErrorMessage } from '../../../utils/getErrorMessages';
 
 export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -33,7 +35,7 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
         bot,
         message,
         chatId,
-        adaptCountryToSystemRepresentation(commandParameter)
+        getCountryNameFormat(commandParameter)
     );
 };
 
@@ -52,7 +54,7 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         //      MessageRegistry.registerMessageHandler this._bot.onText(
         // Regexp works not as we expect it to work
         // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
-        !adaptCountryToSystemRepresentation(name(countryFlag))
+        !getCountryNameFormat(name(countryFlag))
     ) {
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
@@ -61,7 +63,7 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         bot,
         message,
         chatId,
-        adaptCountryToSystemRepresentation(name(countryFlag))
+        getCountryNameFormat(name(countryFlag))
     );
 };
 

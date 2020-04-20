@@ -12,6 +12,8 @@ import { catchAsyncError } from '../../utils/catchError';
 import { ALREADY_SUBSCRIBED_MESSAGE } from '../../messages/feature/subscribeMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { isTextEqual } from '../../utils/isEqual';
+import { getCountryNameFormat } from './countries';
 
 /*
     @params
@@ -21,21 +23,21 @@ export const subscribeOn = async (
     chat: TelegramBot.Chat,
     subscribeMeOn: string
 ): Promise<string> => {
+    const subscribeMeOnTheCountry: string = getCountryNameFormat(subscribeMeOn);
     const availableCountries: Array<[
         Country,
         Array<CountrySituationInfo>
     ]> = await getCountriesSituation();
 
-    const [subscribeMeOnCountry, countrySituations]: [
+    const [country, countrySituations]: [
         Country,
         Array<CountrySituationInfo>
     ] = availableCountries.find(
         ([country, _]: [Country, Array<CountrySituationInfo>]) =>
-            country.name.toLocaleLowerCase() ===
-            subscribeMeOn.toLocaleLowerCase()
+            isTextEqual(country.name, subscribeMeOnTheCountry)
     );
 
-    if (!subscribeMeOnCountry) {
+    if (!country) {
         throw Error('Is not supported, yet');
     }
 
@@ -46,8 +48,8 @@ export const subscribeOn = async (
 
     const checkIfAlreadySubscribed = existingSubscriptions
         .filter((subscription: Subscription) => subscription.active)
-        .find(
-            (subscription: Subscription) => subscription.value === subscribeMeOn
+        .find((subscription: Subscription) =>
+            isTextEqual(subscription.value, subscribeMeOnTheCountry)
         );
     if (!!checkIfAlreadySubscribed) {
         // TODO: it's not actually error, re-write it be not an error
@@ -61,7 +63,7 @@ export const subscribeOn = async (
             {
                 active: true,
                 type: SubscriptionType.Country,
-                value: subscribeMeOnCountry.name,
+                value: country.name,
                 lastReceivedData:
                     countrySituations[countrySituations.length - 1],
                 lastUpdate: Date.now(),
@@ -69,13 +71,16 @@ export const subscribeOn = async (
         ],
     });
 
-    return subscribeMeOnCountry.name;
+    return country.name;
 };
 
 export const unsubscribeMeFrom = async (
     chat: TelegramBot.Chat,
     unsubscribeMeFrom: string
 ): Promise<string> => {
+    const unsubscribeMeFromTheCountry: string = getCountryNameFormat(
+        unsubscribeMeFrom
+    );
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
         ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
@@ -83,7 +88,7 @@ export const unsubscribeMeFrom = async (
     let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions.map(
         (subscription: Subscription) => {
-            if (subscription.value.toLocaleLowerCase() === unsubscribeMeFrom) {
+            if (isTextEqual(subscription.value, unsubscribeMeFromTheCountry)) {
                 foundSubscription = subscription;
                 subscription.active = false;
             }
@@ -107,7 +112,7 @@ export const unsubscribeMeFrom = async (
         );
     }
 
-    return unsubscribeMeFrom;
+    return unsubscribeMeFromTheCountry;
 };
 
 export const isCountrySituationHasChangedSinceLastData = (

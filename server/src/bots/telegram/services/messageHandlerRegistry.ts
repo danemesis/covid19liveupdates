@@ -8,10 +8,7 @@ import {
 } from '../../../utils/featureHelpers/isMessageCountry';
 import { showCountryResponse } from '../botResponse/countryResponse';
 import { Country } from '../../../models/country.models';
-import {
-    adaptCountryToSystemRepresentation,
-    getAvailableCountries,
-} from '../../../services/domain/covid19';
+import { getAvailableCountries } from '../../../services/domain/covid19';
 import { Answer } from '../../../models/knowledgebase/answer.models';
 import { fetchAnswer } from '../../../services/api/api-knowledgebase';
 import { assistantResponse } from '../botResponse/assistantResponse';
@@ -19,6 +16,7 @@ import { noResponse } from '../botResponse/noResponse';
 import { LogglyTypes } from '../../../models/loggly.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getInfoMessage } from '../../../utils/getErrorMessages';
+import { getCountryNameFormat } from '../../../services/domain/countries';
 
 export class MessageHandlerRegistry {
     _messageHandlers: {
@@ -132,7 +130,7 @@ export class MessageHandlerRegistry {
 
         const countries: Array<Country> = await getAvailableCountries();
         const country: Country | undefined = getCountryByMessage(
-            adaptCountryToSystemRepresentation(message.text),
+            getCountryNameFormat(message.text),
             countries
         );
         if (country) {
