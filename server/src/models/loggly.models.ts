@@ -7,15 +7,10 @@ export enum LogglyTypes {
     SubscriptionNotifierHandler = 'SubscriptionNotifierHandler',
     SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
     SubscriptionNotifier = 'SubscriptionNotifier',
+    Assistant = 'Assistant',
 
-
-    //service types
+    // service types
     TelegramError = 'TelegramError',
     WebhookError = 'WebhookError',
-    PollingError = 'PollingError'
-}
-
-export interface LogglyModels extends Object {
-    type: LogglyTypes;
-    message?: string;
+    PollingError = 'PollingError',
 }
