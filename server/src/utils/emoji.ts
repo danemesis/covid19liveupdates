@@ -11,8 +11,9 @@ const numberEmojiMap = new Map([
     ['9', '9️⃣'],
 ]);
 
-export const getNumberEmoji = (numberValue: number): string => numberValue
-    .toString()
-    .match(/.{1}/g)
-    .map(v => numberEmojiMap.get(v))
-    .join('');
+export const getNumberEmoji = (numberValue: number): string =>
+    numberValue
+        .toString()
+        .match(/.{1}/g)
+        .map((v) => numberEmojiMap.get(v))
+        .join('');

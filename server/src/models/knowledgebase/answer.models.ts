@@ -1,4 +1,4 @@
-import {Modify} from '../tsTypes.models';
+import { Modify } from '../tsTypes.models';
 
 export interface ApiAnswer {
     category: string;
@@ -9,10 +9,16 @@ export interface ApiAnswer {
     additional_links: string;
 }
 
-export type Answer = Omit<Modify<ApiAnswer, {
-    question: string;
-    countries: Array<string>;
-    links: Array<string>;
-    additionalAnswers: Array<string>;
-    additionalLinks: Array<string>;
-}>, 'additional_answers' | 'additional_links'>
+export type Answer = Omit<
+    Modify<
+        ApiAnswer,
+        {
+            question: string;
+            countries: Array<string>;
+            links: Array<string>;
+            additionalAnswers: Array<string>;
+            additionalLinks: Array<string>;
+        }
+    >,
+    'additional_answers' | 'additional_links'
+>;

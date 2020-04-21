@@ -1,16 +1,16 @@
 export type DataSet = {
-    label: string,
-    data: Array<number>,
-    fill: boolean,
-    borderColor: string
-}
+    label: string;
+    data: Array<number>;
+    fill: boolean;
+    borderColor: string;
+};
 
 type ChartData = {
-    labels: Array<string>
-    datasets: Array<DataSet>
-}
+    labels: Array<string>;
+    datasets: Array<DataSet>;
+};
 
 export type ChartModel = {
-    type: string,
-    data: ChartData
-}
+    type: string;
+    data: ChartData;
+};

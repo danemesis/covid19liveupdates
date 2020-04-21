@@ -3,7 +3,9 @@ import * as TelegramBot from 'node-telegram-bot-api';
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
 // otherwise @param ikCbData will be null
-export function getUserMessageFromIKorText(message: TelegramBot.Message): string;
+export function getUserMessageFromIKorText(
+    message: TelegramBot.Message
+): string;
 export function getUserMessageFromIKorText(
     ikCbData: string,
     replace: string,

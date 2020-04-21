@@ -18,7 +18,10 @@ export const getDefaultCountry = (name): CountryLookup => ({
 export const getCountryByName = (name: string): CountryLookup => {
     /* tslint:disable:prefer-for-of */
     for (let i = 0; i < COUNTRIES_LOOKUP_LIST.length; i++) {
-        if (COUNTRIES_LOOKUP_LIST[i].country.toLocaleLowerCase() === name.toLocaleLowerCase()) {
+        if (
+            COUNTRIES_LOOKUP_LIST[i].country.toLocaleLowerCase() ===
+            name.toLocaleLowerCase()
+        ) {
             return COUNTRIES_LOOKUP_LIST[i];
         }
     }
