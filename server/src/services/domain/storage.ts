@@ -8,142 +8,109 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { User } from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
-export const getFllStorage = async <T>(): Promise<T> => {
-    const snapshot: DataSnapshot = await firebase
-        .database()
-        .ref()
-        .once('value');
-    return snapshot.val() ?? {};
-};
-
-export const getMessengerStorage = <T>(
-    messengerPrefix: string
-): Function => async <T>(): Promise<T> => {
-    const snapshot: DataSnapshot = await firebase
-        .database()
-        .ref(messengerPrefix)
-        .once('value');
-    return snapshot.val() ?? {};
-};
-
-export const listenSubscriptionsChanges = (
-    messengerPrefix: string
-): Function => (
-    cb: (a: firebase.database.DataSnapshot, b?: string | null) => unknown
-): ((
-    a: firebase.database.DataSnapshot | null,
-    b?: string | null
-) => unknown) => {
-    return firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions`)
-        .on('value', cb);
-};
-
-export const getSubscriptions = (messengerPrefix: string) => async <
-    T
->(): Promise<SubscriptionStorage> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions`)
-        .once('value');
-    return snapshot.val() ?? {};
-};
-
-export const getActiveSubscriptions = (messengerPrefix: string) => async <
-    T
->(): Promise<SubscriptionStorage> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions`)
-        .once('value');
-    const subscriptionStorage:
-        | SubscriptionStorage
-        | undefined = snapshot.val() as SubscriptionStorage;
-    if (!subscriptionStorage) {
-        return {};
+export class Storage {
+    private _messengerPrefix: string;
+    constructor(messengerPrefix: string) {
+        this._messengerPrefix = messengerPrefix;
     }
 
-    const activeSubscriptions: SubscriptionStorage = {};
-    // TODO: Make filtering on Firebase level userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
-    for (const [chatId, userSubscription] of Object.entries(
-        subscriptionStorage
-    )) {
-        activeSubscriptions[chatId] = {
+    async getRef<T>(reference?: string): Promise<T> {
+        const snapshot = await firebase
+            .database()
+            .ref(`${this._messengerPrefix}${reference ? '/' + reference : ''}`)
+            .once('value');
+        return (snapshot.val() ?? {}) as T;
+    }
+
+    async setRef<T>(reference: string, obj: T): Promise<any> {
+        return firebase
+            .database()
+            .ref(`${this._messengerPrefix}/${reference}`)
+            .set(obj);
+    }
+
+    async getFullStorage<T>(): Promise<T> {
+        const snapshot: DataSnapshot = await firebase
+            .database()
+            .ref()
+            .once('value');
+        return snapshot.val() ?? {};
+    }
+
+    async getMessengerStorage<T>(): Promise<T> {
+        return this.getRef();
+    }
+
+    async getSubscriptions(): Promise<SubscriptionStorage> {
+        return this.getRef<SubscriptionStorage>('subscriptions');
+    }
+
+    async getUserSubscriptions(chatId: number): Promise<UserSubscription> {
+        return this.getRef<UserSubscription>(`subscriptions/${chatId}`);
+    }
+
+    async setSubscription(subscription: UserSubscription): Promise<void> {
+        return this.setRef(
+            `subscriptions/${subscription.chat.id}`,
+            subscription
+        );
+    }
+
+    listenSubscriptionsChanges(
+        cb: (a: firebase.database.DataSnapshot, b?: string | null) => unknown
+    ): (
+        a: firebase.database.DataSnapshot | null,
+        b?: string | null
+    ) => unknown {
+        return firebase
+            .database()
+            .ref(`${this._messengerPrefix}/subscriptions`)
+            .on('value', cb);
+    }
+
+    async getActiveSubscriptions<T>(): Promise<SubscriptionStorage> {
+        const subscriptionStorage = await this.getRef<SubscriptionStorage>(
+            'subscriptions'
+        );
+        const activeSubscriptions: SubscriptionStorage = {};
+        // TODO: Make filtering on Firebase level userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
+        for (const [chatId, userSubscription] of Object.entries(
+            subscriptionStorage
+        )) {
+            activeSubscriptions[chatId] = {
+                ...userSubscription,
+                subscriptionsOn: userSubscription?.subscriptionsOn?.filter(
+                    (subscription: Subscription) => subscription.active
+                ),
+            };
+        }
+
+        return activeSubscriptions;
+    }
+
+    async getActiveUserSubscriptions(
+        chatId: number
+    ): Promise<UserSubscription> {
+        const userSubscription = await this.getRef<UserSubscription>(
+            `subscriptions/${chatId}`
+        );
+        return {
             ...userSubscription,
             subscriptionsOn: userSubscription?.subscriptionsOn?.filter(
-                (subscription: Subscription) => subscription.active
+                (sub: Subscription) => sub.active
             ),
         };
     }
 
-    return activeSubscriptions;
-};
+    async setQueryToAnalyse(message: TelegramBot.Message): Promise<void> {
+        return this.setRef(`analyse/${message.message_id}`, message);
+    }
 
-export const getUserSubscription = (messengerPrefix: string) => async <T>(
-    chatId: number
-): Promise<UserSubscription> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions/${chatId}`)
-        .once('value');
-    return snapshot.val() ?? {};
-};
+    async getUser(chatId: number): Promise<User> {
+        return this.getRef(`users/${chatId}`);
+    }
 
-export const getActiveUserSubscription = (messengerPrefix: string) => async <T>(
-    chatId: number
-): Promise<UserSubscription> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions/${chatId}`)
-        .once('value');
-    const userSubscription: UserSubscription = snapshot.val() as UserSubscription;
-    return {
-        ...userSubscription,
-        subscriptionsOn: userSubscription?.subscriptionsOn?.filter(
-            (sub: Subscription) => sub.active
-        ),
-    };
-};
-
-export const setSubscription = (messengerPrefix: string) => async <T>({
-    chat,
-    subscriptionsOn,
-}: UserSubscription): Promise<T> => {
-    return firebase
-        .database()
-        .ref(`${messengerPrefix}/subscriptions/${chat.id}`)
-        .set({
-            chat,
-            subscriptionsOn,
-        });
-};
-
-export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
-    message: TelegramBot.Message // I think it's OK to have this dependency here, we can have
-    // different messengers intersection here
-): Promise<T> => {
-    return firebase
-        .database()
-        .ref(`${messengerPrefix}/analyse/${message.message_id}`)
-        .set(message);
-};
-
-export const getUser = (messengerPrefix: string) => async <T>(
-    chatId: number
-): Promise<User> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/users/${chatId}`)
-        .once('value');
-    return snapshot.val() ?? {};
-};
-
-export const addUser = (messengerPrefix: string) => async <T>(
-    user: User
-): Promise<T> => {
-    return firebase
-        .database()
-        .ref(`${messengerPrefix}/users/${user.chatId}`)
-        .set(user);
-};
+    async addUser(user: User): Promise<void> {
+        return this.setRef(`users/${user.chatId}`, user);
+    }
+}

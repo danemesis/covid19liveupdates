@@ -1,13 +1,12 @@
 import { Country } from '../../../models/country.models';
 import { CountrySituationInfo } from '../../../models/covid19.models';
-import { SubscriptionStorage } from '../../../models/storage.models';
 import {
     Subscription,
     SubscriptionType,
     UserSubscription,
     UserSubscriptionNotification,
 } from '../../../models/subscription.models';
-import { getTelegramSubscriptions, setTelegramSubscription } from './storage';
+import Storage from './storage';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
@@ -19,7 +18,7 @@ export const subscriptionNotifierHandler = async (
     messageHandlerRegistry: MessageHandlerRegistry,
     countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]
 ): Promise<void> => {
-    const allUsersSubscriptions: SubscriptionStorage = await getTelegramSubscriptions();
+    const allUsersSubscriptions = await Storage.getSubscriptions();
     const [_, countriesInfo] = countriesData;
     const countriesInfoMap: Map<string, Array<CountrySituationInfo>> = new Map(
         countriesInfo.map(([country, countrySituations]) => [
@@ -107,7 +106,7 @@ const getAndSendUserNotificationSubscriptions = async (
             updatingUserSubscriptionErr,
             updatingUserSubscriptionResult,
         ] = await catchAsyncError(
-            setTelegramSubscription({
+            Storage.setSubscription({
                 chat: userSubscription.chat,
                 subscriptionsOn: mergeAllUserSubscriptions,
             })

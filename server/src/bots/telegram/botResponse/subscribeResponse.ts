@@ -9,7 +9,7 @@ import { CustomSubscriptions, UserRegExps } from '../../../models/constants';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
-import { getTelegramActiveUserSubscriptions } from '../services/storage';
+import Storage from '../services/storage';
 import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText';
 import { UserSubscription } from '../../../models/subscription.models';
 import { removeCommandFromMessageIfExist } from '../../../utils/removeCommandFromMessageIfExist';
@@ -34,7 +34,7 @@ export const showExistingSubscriptionsResponse = async (
     message,
     chatId
 ): Promise<TelegramBot.Message> => {
-    const activeUserSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(
+    const activeUserSubscription = await Storage.getActiveUserSubscriptions(
         chatId
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {
