@@ -20,7 +20,7 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     requestedCountry?: string | undefined,
     requestedFrequency?: Frequency | undefined
 ): Promise<TelegramBot.Message> => {
-    requestedFrequency = requestedFrequency || Frequency.Weekly;
+    const ferequency = requestedFrequency || Frequency.Weekly;
 
     const [err, [foundCountry, foundSituation]] = await catchAsyncError(
         getRequestedCountry(requestedCountry)
@@ -36,7 +36,7 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
 
     let startDate: Date;
     let hasFilter = true;
-    switch (requestedFrequency) {
+    switch (ferequency) {
         case Frequency.Weekly:
             startDate = addDays(Now, -7);
             break;
@@ -57,15 +57,15 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     }
 
     const frequencyName =
-        requestedFrequency === Frequency.WholePeriod
+        ferequency === Frequency.WholePeriod
             ? 'Whole period'
-            : capitalize(requestedFrequency);
+            : capitalize(ferequency);
 
     let model = enrichWithTitle(
         Transform(periodSituation),
         `${frequencyName} trends for ${capitalize(requestedCountry)}`
     );
-    if (requestedFrequency === Frequency.Weekly) {
+    if (ferequency === Frequency.Weekly) {
         model = enrichWithType(model, 'barStacked');
     }
 

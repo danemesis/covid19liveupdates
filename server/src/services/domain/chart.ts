@@ -3,7 +3,6 @@ import { CountrySituationInfo } from '../../models/covid19.models';
 import { Status } from '../../models/constants';
 export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
     const days = situations.map((x) => x.date);
-    // return config as ChartModelExtended;
     return {
         type: 'line',
         data: {
