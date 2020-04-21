@@ -1,4 +1,5 @@
-export const encouragingMessage = (): string => `<a href="https://www.youtube.com/watch?v=d914EnpU4Fo&feature=youtu.be">Wash 🧼 your hands</a> 👏 and stay healthy! Everything will be OK`;
+export const encouragingMessage = (): string =>
+    `<a href="https://www.youtube.com/watch?v=d914EnpU4Fo&feature=youtu.be">Wash 🧼 your hands</a> 👏 and stay healthy! Everything will be OK`;
 
 export const suggestedBehaviors = (): string => `
 🚫🤦 Don't touch your face

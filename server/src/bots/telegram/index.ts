@@ -34,7 +34,7 @@ import {
     subscriptionManagerResponse,
 } from './botResponse/subscribeResponse';
 import { SubscriptionType } from '../../models/subscription.models';
-import { MessageHandlerRegistry } from './services/messageHandlerRegistry';
+import { MessageHandlerRegistry } from './services/registry/messageHandlerRegistry';
 import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';

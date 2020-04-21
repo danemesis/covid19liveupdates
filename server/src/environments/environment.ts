@@ -3,16 +3,21 @@ import * as dotenv from 'dotenv';
 const environmentName = process.env.ENVIRONMENT_NAME ?? 'development';
 
 if (environmentName === 'development') {
-    dotenv.config({path: `${__dirname}/.env`});
+    dotenv.config({ path: `${__dirname}/.env` });
 } else {
-    dotenv.config({path: `${__dirname}/.env.prod`});
+    dotenv.config({ path: `${__dirname}/.env.prod` });
 }
 
-const tags = process.env.LOGGLY_TAGS && Array.isArray(process.env.LOGGLY_TAGS)
-    ? process.env.LOGGLY_TAGS
-    : ['covid19liveupd'];
+const tags =
+    process.env.LOGGLY_TAGS && Array.isArray(process.env.LOGGLY_TAGS)
+        ? process.env.LOGGLY_TAGS
+        : ['covid19liveupd'];
 
-tags.push('containerV' + process.env.CONTAINER_VERSION, 'pkgV' + process.env.npm_package_version, environmentName);
+tags.push(
+    'containerV' + process.env.CONTAINER_VERSION,
+    'pkgV' + process.env.npm_package_version,
+    environmentName
+);
 
 let envConfig = {
     ENV: environmentName,
@@ -31,7 +36,8 @@ let envConfig = {
     FIREBASE_DATABASE_URL: process.env.FIREBASE_DATABASE_URL ?? '',
     FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID ?? '',
     FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET ?? '',
-    FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID ?? '',
+    FIREBASE_MESSAGING_SENDER_ID:
+        process.env.FIREBASE_MESSAGING_SENDER_ID ?? '',
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID ?? '',
     CHARTSAPI_URL: 'https://quickchart.io/chart',
     IsProduction() {
@@ -42,13 +48,13 @@ let envConfig = {
     },
     IsNgRokMode() {
         return this.IsDevelopment();
-    }
+    },
 };
 
 if (!envConfig.IsProduction()) {
     envConfig = {
         ...envConfig,
-        LOGGLY_TAGS: tags
+        LOGGLY_TAGS: tags,
     };
 }
 

@@ -1,29 +1,28 @@
-import { logger } from '../../../utils/logger';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
-import { getChatId } from '../utils/chat';
+import { logger } from '../../../../utils/logger';
+import { CallBackQueryHandlerWithCommandArgument } from '../../models';
+import { getChatId } from '../../utils/chat';
 import {
     getCountryByMessage,
     getCountryNameByFlag,
     isMessageCountryFlag,
-} from '../../../utils/featureHelpers/isMessageCountry';
-import { showCountryResponse } from '../botResponse/countryResponse';
-import { Country } from '../../../models/country.models';
-import {
-    adaptCountryToSystemRepresentation,
-    getAvailableCountries,
-} from '../../../services/domain/covid19';
-import { Answer } from '../../../models/knowledgebase/answer.models';
-import { fetchAnswer } from '../../../services/api/api-knowledgebase';
-import { assistantResponse } from '../botResponse/assistantResponse';
-import { noResponse } from '../botResponse/noResponse';
-import { LogCategory } from '../../../models/constants';
+} from '../../../../utils/featureHelpers/isMessageCountry';
+import { showCountryResponse } from '../../botResponse/countryResponse';
+import { Country } from '../../../../models/country.models';
+import { getAvailableCountries } from '../../../../services/domain/covid19';
+import { Answer } from '../../../../models/knowledgebase/answer.models';
+import { fetchAnswer } from '../../../../services/api/api-knowledgebase';
+import { assistantResponse } from '../../botResponse/assistantResponse';
+import { noResponse } from '../../botResponse/noResponse';
+import { LogCategory } from '../../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { getCountryNameFormat } from '../../../../services/domain/countries';
+import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
 
 export class MessageHandlerRegistry {
-    _messageHandlers: {
+    private messageHandlers: {
         [regexp: string]: CallBackQueryHandlerWithCommandArgument;
     } = {};
-    _singleParameterAfterCommands: Array<string> = [];
+    public singleParameterAfterCommands: Array<string> = [];
 
     constructor(private readonly bot: TelegramBot) {
         this.registerCallBackQuery();
@@ -37,16 +36,17 @@ export class MessageHandlerRegistry {
             regexp.toLocaleLowerCase()
         );
 
-        this._singleParameterAfterCommands = [
-            ...this._singleParameterAfterCommands,
+        this.singleParameterAfterCommands = [
+            ...this.singleParameterAfterCommands,
             ...systemRegExps,
         ];
 
         systemRegExps.forEach(
             (regexp: string) =>
-                (this._messageHandlers[
-                    regexp
-                ] = withSingleParameterAfterCommand(this, callback))
+                (this.messageHandlers[regexp] = withSingleParameterAfterCommand(
+                    this,
+                    callback
+                ))
         );
         return this;
     }
@@ -68,7 +68,7 @@ export class MessageHandlerRegistry {
             ? ikCbData
             : message.text
         ).toLocaleLowerCase();
-        const cbHandlers = this._messageHandlers;
+        const cbHandlers = this.messageHandlers;
 
         const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
             (cbHandlerRegExpKey: string) =>
@@ -133,7 +133,7 @@ export class MessageHandlerRegistry {
 
         const countries: Array<Country> = await getAvailableCountries();
         const country: Country | undefined = getCountryByMessage(
-            adaptCountryToSystemRepresentation(message.text),
+            getCountryNameFormat(message.text),
             countries
         );
         if (country) {
@@ -147,79 +147,4 @@ export class MessageHandlerRegistry {
 
         return noResponse(this.bot, message, chatId);
     }
-}
-
-/**
- * This function is wrapper around the original User's query handler
- * It adds an additional parameter (if such exist) to original handler,
- * which will be an parameter following after command
- */
-export const withSingleParameterAfterCommand = (
-    context: MessageHandlerRegistry,
-    handlerFn: CallBackQueryHandlerWithCommandArgument
-): CallBackQueryHandlerWithCommandArgument => {
-    return (
-        bot: TelegramBot,
-        message: TelegramBot.Message,
-        chatId: number,
-        ikCbData?: string
-    ): Promise<TelegramBot.Message> => {
-        try {
-            const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage.call(
-                context,
-                (ikCbData ?? message.text).toLocaleLowerCase()
-            );
-
-            return handlerFn.call(
-                context,
-                bot,
-                message,
-                chatId,
-                userEnteredArgumentAfterCommand
-            );
-        } catch (err) {
-            logger.error(
-                `Error happend inside withSingleParameterAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
-                err,
-                LogCategory.Command,
-                chatId
-            );
-
-            return noResponse(this.bot, message, chatId);
-        }
-    };
-};
-
-/**
- * Check out how it works here
- * https://codepen.io/belokha/pen/xxwOdWg?editors=0012
- */
-function getParameterAfterCommandFromMessage(
-    userFullInput: string | undefined
-): string | undefined {
-    const makeMagicOverUserFullInput: string = this._singleParameterAfterCommands.find(
-        (parameter) => parameter === userFullInput
-    )
-        ? userFullInput + ' ' // Problem is that userInput is the same as RegExp it returns null, but when it has
-        : // at least one whitespace it is not null
-          // https://codepen.io/belokha/pen/xxwOdWg?editors=0012, Example 5.
-          userFullInput;
-
-    const execResult = new RegExp(
-        `(?<command>${this._singleParameterAfterCommands.join(
-            '|\\'
-        )})\\s(?<firstargument>.*)`
-    ).exec(makeMagicOverUserFullInput);
-
-    if (!execResult) {
-        return undefined;
-    }
-
-    /* tslint:disable:no-string-literal */
-    if (execResult.groups['command'] && !execResult.groups['firstargument']) {
-        return undefined;
-    }
-
-    return execResult.groups['firstargument'];
-    /* tslint:enable:no-string-literal */
 }

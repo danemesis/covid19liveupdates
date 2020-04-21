@@ -20,7 +20,8 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
     if (err) {
         logger.error(
             `Error ocured while trying to get requested country ${requestedCountry}`,
-            err);
+            err
+        );
 
         return bot.sendMessage(chatId, err.message);
     }

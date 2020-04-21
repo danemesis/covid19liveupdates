@@ -26,6 +26,8 @@ export enum UserRegExps {
     Help = '/help',
 }
 
+// TODO: Remove IK handling on those, add
+// usage of simple UserRegExps (add to them one if missing)
 export enum UserMessages {
     Assistant = 'Assistant 👦',
     CountriesData = 'Countries data 🌍',
@@ -74,7 +76,6 @@ export enum LogCategory {
     SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
     SubscriptionNotifier = 'SubscriptionNotifier',
     Assistant = 'Assistant',
-
     // service types
     TelegramError = 'TelegramError',
     WebhookError = 'WebhookError',

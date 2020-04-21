@@ -13,7 +13,7 @@ import { logger } from '../../../utils/logger';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
 import { showCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
 import { LogCategory } from '../../../models/constants';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
 
 export const subscriptionNotifierHandler = async (
     messageHandlerRegistry: MessageHandlerRegistry,

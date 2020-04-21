@@ -1,4 +1,3 @@
-import { UserPresentationalCountryNameString } from '../../models/tsTypes.models';
 import {
     ApiCountriesCovid19Situation,
     ApiCovid19Situation,
@@ -8,11 +7,11 @@ import { COVID19_FETCH_SALT, TIMES, LogCategory } from '../../models/constants';
 import { Country } from '../../models/country.models';
 import { fetchCovid19Data } from '../api/api-covid19';
 import { CountryLookup } from '../../models/country-code-lookup.models';
-import { getCountryNameFormat } from '../../utils/featureHelpers/country';
 import { getCountryByName, getDefaultCountry } from './countryLookup';
 import { SubscriptionType } from '../../models/subscription.models';
 import { logger } from '../../utils/logger';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { getCountryNameFormat } from './countries';
 
 // TODO: Improve Cached management
 class CachedCovid19CountriesData {
@@ -85,19 +84,12 @@ class CachedCovid19CountriesData {
 
 export const cachedCovid19CountriesData = new CachedCovid19CountriesData();
 
-export const adaptCountryToSystemRepresentation = (
-    country: string
-): UserPresentationalCountryNameString =>
-    getCountryNameFormat(country.trim().toLocaleUpperCase());
-
 function adaptApiCountriesResponse(
     apiCountriesSituation: ApiCountriesCovid19Situation
 ): Array<[Country, Array<CountrySituationInfo>]> {
     return Object.entries(apiCountriesSituation).map(
         ([apiCountry, apiSituations]: [string, Array<ApiCovid19Situation>]) => {
-            const adaptedCountry: UserPresentationalCountryNameString = adaptCountryToSystemRepresentation(
-                apiCountry
-            );
+            const adaptedCountry: string = getCountryNameFormat(apiCountry);
             const countryLookup: CountryLookup =
                 getCountryByName(adaptedCountry) ??
                 getDefaultCountry(adaptedCountry);

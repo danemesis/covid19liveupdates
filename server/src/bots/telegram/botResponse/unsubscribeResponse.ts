@@ -14,7 +14,6 @@ import { noSubscriptionsResponseMessage } from '../../../messages/feature/subscr
 import { getTelegramActiveUserSubscriptions } from '../services/storage';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
-import { adaptCountryToSystemRepresentation } from '../../../services/domain/covid19';
 
 export const buildUnsubscribeInlineResponse = async (
     bot: TelegramBot,
@@ -60,7 +59,7 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
 
     return bot.sendMessage(
         chatId,
-        unsubscribeResultMessage(adaptCountryToSystemRepresentation(result)),
+        unsubscribeResultMessage(result),
         getFullMenuKeyboard(chatId)
     );
 };
