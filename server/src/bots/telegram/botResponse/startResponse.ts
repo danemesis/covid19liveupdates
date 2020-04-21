@@ -40,15 +40,15 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
         const [err, result] = await catchAsyncError(addTelegramUser(newUser));
         if (err) {
             logger.error(
-                `An error ocured while trying to add new user ${chatId}`,
+                `An error occurred while trying to add new user ${chatId}`,
                 err,
                 LogCategory.Command,
                 chatId
             );
         } else {
-            logger.error(
+            logger.log(
                 'info',
-                new Error(`New user ${newUser.chatId} was successfully added`),
+                `New user ${newUser.chatId} was successfully added`,
                 LogCategory.Command,
                 chatId
             );
