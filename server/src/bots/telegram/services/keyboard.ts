@@ -4,6 +4,7 @@ import {
     CustomSubscriptions,
     UserMessages,
     UserRegExps,
+    Frequency,
 } from '../../../models/constants';
 import { InlineKeyboard, ReplyKeyboard } from 'node-telegram-keyboard-wrapper';
 import { UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER } from '../models';
@@ -33,10 +34,20 @@ export const getAfterCountryResponseInlineKeyboard = (
     ik.addRow({
         text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
         callback_data: `${UserRegExps.Subscribe} ${country}`,
-    }).addRow({
-        text: 'Show weekly chart',
-        callback_data: `${UserRegExps.Trends} ${country}`,
-    });
+    }).addRow(
+        {
+            text: 'Show weekly chart',
+            callback_data: `${UserRegExps.Trends} ${country}`,
+        },
+        {
+            text: 'Show monthly chart',
+            callback_data: `${UserRegExps.Trends} ${country} ${Frequency.Monthly}`,
+        },
+        {
+            text: 'Show whole period chart',
+            callback_data: `${UserRegExps.Trends} ${country} ${Frequency.WholePeriod}`,
+        }
+    );
 
     return ik.build();
 };
