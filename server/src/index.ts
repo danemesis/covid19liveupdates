@@ -12,6 +12,8 @@ import {
 import * as firebase from 'firebase';
 import { checkCovid19Updates } from './services/infrastructure/scheduler';
 import { catchAsyncError } from './utils/catchError';
+import * as i18n from 'i18n';
+import * as cookieParser from 'cookie-parser';
 
 export const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +22,20 @@ const environmentName = process.env.ENVIRONMENT_NAME;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', baseController.base);
+
+export const translateService = {};
+i18n.configure({
+    directory: __dirname + '/locales',
+    defaultLocale: 'en',
+    register: translateService,
+    api: {
+        __: 't',
+        __n: 'tn',
+    },
+});
+app.use(cookieParser());
+// translateService.setLocale('ua');
+app.use(i18n.init);
 
 const server = app.listen(PORT, async () => {
     const appUrl = environments.APP_URL;
