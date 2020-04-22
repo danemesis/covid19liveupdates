@@ -9,7 +9,7 @@ import {
 import { catchAsyncError } from '../../utils/catchError';
 import TelegramBot = require('node-telegram-bot-api');
 import environments from '../../environments/environment';
-import { User } from '../../models/user.model';
+import { getUserName } from '../../utils/user.utils';
 
 export const checkCovid19Updates = () => {
     // Check covid19 info every hour (at hh:30 mins, e.g. 1:30, 2:30 ...)
@@ -23,7 +23,7 @@ export const checkCovid19Updates = () => {
     });
 };
 
-export const sendReleaseNotificationToUsers = async (
+export const RunSendScheduledNotificationToUsersJob = async (
     bot: TelegramBot
 ): Promise<void> => {
     // At 08:00 PM, every day
@@ -73,7 +73,3 @@ export const sendReleaseNotificationToUsers = async (
         }
     );
 };
-
-function getUserName(user: User): string {
-    return user.firstName ?? user.lastName ?? user.userName ?? 'friend';
-}
