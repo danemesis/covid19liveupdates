@@ -40,6 +40,7 @@ import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { catchAsyncError } from '../../utils/catchError';
+import { RunSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
 
 export function runTelegramBot(
     app: Express,
@@ -168,4 +169,6 @@ export function runTelegramBot(
     bot.on('error', (err) =>
         logger.log(LogLevel.Error, err, LogCategory.TelegramError)
     );
+
+    RunSendScheduledNotificationToUsersJob(bot);
 }

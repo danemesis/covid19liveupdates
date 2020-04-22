@@ -5,7 +5,7 @@ import {
 } from '../../models/subscription.models';
 import { SubscriptionStorage } from '../../models/storage.models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { User } from '../../models/user.model';
+import User from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export const getFllStorage = async <T>(): Promise<T> => {
@@ -129,7 +129,17 @@ export const setQueryToAnalyse = (messengerPrefix: string) => async <T>(
         .set(message);
 };
 
-export const getUser = (messengerPrefix: string) => async <T>(
+export const getAllUsers = (messengerPrefix: string) => async (): Promise<
+    Array<User>
+> => {
+    const snapshot = await firebase
+        .database()
+        .ref(`${messengerPrefix}/users`)
+        .once('value');
+    return snapshot.val() ?? {};
+};
+
+export const getUser = (messengerPrefix: string) => async (
     chatId: number
 ): Promise<User> => {
     const snapshot = await firebase
@@ -139,11 +149,21 @@ export const getUser = (messengerPrefix: string) => async <T>(
     return snapshot.val() ?? {};
 };
 
-export const addUser = (messengerPrefix: string) => async <T>(
+export const addUser = (messengerPrefix: string) => async (
     user: User
-): Promise<T> => {
+): Promise<void> => {
     return firebase
         .database()
         .ref(`${messengerPrefix}/users/${user.chatId}`)
         .set(user);
+};
+
+export const getNotificationMessage = (
+    messengerPrefix: string
+) => async (): Promise<string> => {
+    const snapshot = await firebase
+        .database()
+        .ref(`${messengerPrefix}/notificationMessage`)
+        .once('value');
+    return snapshot.val() ?? {};
 };
