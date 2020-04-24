@@ -118,4 +118,12 @@ export class Storage {
     async getNotificationMessage(): Promise<string> {
         return this.getRef('notificationMessage');
     }
+
+    async getUserSettings(user: User): Promise<string> {
+        return this.getRef(`users/${user.chatId}/settings`);
+    }
+
+    async setUserLocale(user: User, locale: string): Promise<void> {
+        return this.setRef(`users/${user.chatId}/settings/locale`, locale);
+    }
 }
