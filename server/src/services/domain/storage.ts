@@ -5,19 +5,16 @@ import {
 } from '../../models/subscription.models';
 import { SubscriptionStorage } from '../../models/storage.models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import User from '../../models/user.model';
+import { User } from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export class Storage {
-    private _messengerPrefix: string;
-    constructor(messengerPrefix: string) {
-        this._messengerPrefix = messengerPrefix;
-    }
+    constructor(private messengerPrefix: string) {}
 
     async getRef<T>(reference?: string): Promise<T> {
         const snapshot = await firebase
             .database()
-            .ref(`${this._messengerPrefix}${reference ? '/' + reference : ''}`)
+            .ref(`${this.messengerPrefix}${reference ? '/' + reference : ''}`)
             .once('value');
         return (snapshot.val() ?? {}) as T;
     }
@@ -25,7 +22,7 @@ export class Storage {
     async setRef<T>(reference: string, obj: T): Promise<any> {
         return firebase
             .database()
-            .ref(`${this._messengerPrefix}/${reference}`)
+            .ref(`${this.messengerPrefix}/${reference}`)
             .set(obj);
     }
 
@@ -43,6 +40,26 @@ export class Storage {
 
     async getSubscriptions(): Promise<SubscriptionStorage> {
         return this.getRef<SubscriptionStorage>('subscriptions');
+    }
+
+    async getActiveSubscriptions<T>(): Promise<SubscriptionStorage> {
+        const subscriptionStorage = await this.getRef<SubscriptionStorage>(
+            'subscriptions'
+        );
+        const activeSubscriptions: SubscriptionStorage = {};
+        // TODO: Make filtering on Firebase level userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
+        for (const [chatId, userSubscription] of Object.entries(
+            subscriptionStorage
+        )) {
+            activeSubscriptions[chatId] = {
+                ...userSubscription,
+                subscriptionsOn: userSubscription?.subscriptionsOn?.filter(
+                    (subscription: Subscription) => subscription.active
+                ),
+            };
+        }
+
+        return activeSubscriptions;
     }
 
     async getUserSubscriptions(chatId: number): Promise<UserSubscription> {
@@ -64,28 +81,8 @@ export class Storage {
     ) => unknown {
         return firebase
             .database()
-            .ref(`${this._messengerPrefix}/subscriptions`)
+            .ref(`${this.messengerPrefix}/subscriptions`)
             .on('value', cb);
-    }
-
-    async getActiveSubscriptions<T>(): Promise<SubscriptionStorage> {
-        const subscriptionStorage = await this.getRef<SubscriptionStorage>(
-            'subscriptions'
-        );
-        const activeSubscriptions: SubscriptionStorage = {};
-        // TODO: Make filtering on Firebase level userSubscription?.subscriptionsOn?.filter((subscription: Subscription) => subscription.active)
-        for (const [chatId, userSubscription] of Object.entries(
-            subscriptionStorage
-        )) {
-            activeSubscriptions[chatId] = {
-                ...userSubscription,
-                subscriptionsOn: userSubscription?.subscriptionsOn?.filter(
-                    (subscription: Subscription) => subscription.active
-                ),
-            };
-        }
-
-        return activeSubscriptions;
     }
 
     async getActiveUserSubscriptions(
@@ -117,14 +114,8 @@ export class Storage {
     async addUser(user: User): Promise<void> {
         return this.setRef(`users/${user.chatId}`, user);
     }
-}
 
-export const getNotificationMessage = (
-    messengerPrefix: string
-) => async (): Promise<string> => {
-    const snapshot = await firebase
-        .database()
-        .ref(`${messengerPrefix}/notificationMessage`)
-        .once('value');
-    return snapshot.val() ?? {};
-};
+    async getNotificationMessage(): Promise<string> {
+        return this.getRef('notificationMessage');
+    }
+}

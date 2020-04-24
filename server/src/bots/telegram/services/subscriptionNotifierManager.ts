@@ -6,19 +6,19 @@ import {
     UserSubscription,
     UserSubscriptionNotification,
 } from '../../../models/subscription.models';
-import Storage from './storage';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
 import { showCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
 import { LogCategory } from '../../../models/constants';
 import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
+import { telegramStorage } from './storage';
 
 export const subscriptionNotifierHandler = async (
     messageHandlerRegistry: MessageHandlerRegistry,
     countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]
 ): Promise<void> => {
-    const allUsersSubscriptions = await Storage.getSubscriptions();
+    const allUsersSubscriptions = await telegramStorage.getSubscriptions();
     const [_, countriesInfo] = countriesData;
     const countriesInfoMap: Map<string, Array<CountrySituationInfo>> = new Map(
         countriesInfo.map(([country, countrySituations]) => [
@@ -106,7 +106,7 @@ const getAndSendUserNotificationSubscriptions = async (
             updatingUserSubscriptionErr,
             updatingUserSubscriptionResult,
         ] = await catchAsyncError(
-            Storage.setSubscription({
+            telegramStorage.setSubscription({
                 chat: userSubscription.chat,
                 subscriptionsOn: mergeAllUserSubscriptions,
             })
