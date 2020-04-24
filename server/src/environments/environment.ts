@@ -49,6 +49,12 @@ let envConfig = {
     IsNgRokMode() {
         return this.IsDevelopment();
     },
+    features: {
+        ScheduledNotification: {
+            enabled: process.env.EnableScheduledNotification || false,
+            cronExpr: process.env.ScheduledNotificationCronExpr,
+        },
+    },
 };
 
 if (!envConfig.IsProduction()) {

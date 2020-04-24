@@ -33,7 +33,7 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
             chatId,
             userName: message.chat.username || '',
             firstName: message.chat.first_name || '',
-            lastName: message.chat.last_name,
+            lastName: message.chat.last_name || '',
             startedOn: Date.now(),
         };
 

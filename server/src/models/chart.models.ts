@@ -2,7 +2,8 @@ export type DataSet = {
     label: string;
     data: Array<number>;
     fill: boolean;
-    borderColor: string;
+    backgroundColor?: string;
+    borderColor?: string;
 };
 
 type ChartData = {
@@ -13,4 +14,5 @@ type ChartData = {
 export type ChartModel = {
     type: string;
     data: ChartData;
+    options: any;
 };

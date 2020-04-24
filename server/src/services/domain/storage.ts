@@ -5,7 +5,7 @@ import {
 } from '../../models/subscription.models';
 import { SubscriptionStorage } from '../../models/storage.models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { User } from '../../models/user.model';
+import User from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
 export class Storage {
@@ -106,6 +106,10 @@ export class Storage {
         return this.setRef(`analyse/${message.message_id}`, message);
     }
 
+    async getAllUsers(): Promise<Array<User>> {
+        return this.getRef('users');
+    }
+
     async getUser(chatId: number): Promise<User> {
         return this.getRef(`users/${chatId}`);
     }
@@ -114,3 +118,13 @@ export class Storage {
         return this.setRef(`users/${user.chatId}`, user);
     }
 }
+
+export const getNotificationMessage = (
+    messengerPrefix: string
+) => async (): Promise<string> => {
+    const snapshot = await firebase
+        .database()
+        .ref(`${messengerPrefix}/notificationMessage`)
+        .once('value');
+    return snapshot.val() ?? {};
+};

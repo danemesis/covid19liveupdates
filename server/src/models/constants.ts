@@ -48,8 +48,14 @@ export enum Continents {
     Other = 'Other',
 }
 
+export enum Frequency {
+    Weekly = 'weekly',
+    Monthly = 'monthly',
+    WholePeriod = 'wholeperiod',
+}
+
 export enum Status {
-    Confirmed = 'confirmed',
+    Confirmed = 'active',
     Deaths = 'deaths',
     Recovered = 'recovered',
 }
@@ -76,6 +82,8 @@ export enum LogCategory {
     SubscriptionNotifierGeneral = 'SubscriptionNotifierGeneral',
     SubscriptionNotifier = 'SubscriptionNotifier',
     Assistant = 'Assistant',
+    Scheduler = 'Scheduler',
+
     // service types
     TelegramError = 'TelegramError',
     WebhookError = 'WebhookError',
