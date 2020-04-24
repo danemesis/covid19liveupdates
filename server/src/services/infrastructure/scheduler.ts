@@ -2,14 +2,11 @@ import * as schedule from 'node-schedule';
 import { tryToUpdateCovid19Cache } from '../domain/covid19';
 import { logger } from '../../utils/logger';
 import { LogCategory } from '../../models/constants';
-import {
-    getTelegramAllUsers,
-    getTelegramNotificationMessage,
-} from '../../bots/telegram/services/storage';
+import { telegramStorage } from '../../bots/telegram/services/storage';
 import { catchAsyncError } from '../../utils/catchError';
-import TelegramBot = require('node-telegram-bot-api');
 import environments from '../../environments/environment';
 import { getUserName } from '../../utils/user.utils';
+import TelegramBot = require('node-telegram-bot-api');
 
 export const checkCovid19Updates = () => {
     // Check covid19 info every hour (at hh:30 mins, e.g. 1:30, 2:30 ...)
@@ -38,7 +35,9 @@ export const runSendScheduledNotificationToUsersJob = async (
                 );
                 return;
             }
-            const [err, users] = await catchAsyncError(getTelegramAllUsers());
+            const [err, users] = await catchAsyncError(
+                telegramStorage.getAllUsers()
+            );
             if (err) {
                 logger.error(
                     'sendReleaseNotificationToUsers failed when accessing users Db',
@@ -48,7 +47,7 @@ export const runSendScheduledNotificationToUsersJob = async (
                 return;
             }
             const [err1, message] = await catchAsyncError(
-                getTelegramNotificationMessage()
+                telegramStorage.getNotificationMessage()
             );
             if (err) {
                 logger.error(

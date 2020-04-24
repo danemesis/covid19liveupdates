@@ -1,10 +1,6 @@
 import { getCountriesSituation } from './covid19';
 import { Country } from '../../models/country.models';
 import {
-    getTelegramUserSubscriptions,
-    setTelegramSubscription,
-} from '../../bots/telegram/services/storage';
-import {
     Subscription,
     SubscriptionType,
 } from '../../models/subscription.models';
@@ -14,6 +10,7 @@ import { CountrySituationInfo } from '../../models/covid19.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { isTextEqual } from '../../utils/isEqual';
 import { getCountryNameFormat } from './countries';
+import { telegramStorage } from '../../bots/telegram/services/storage';
 
 /*
     @params
@@ -43,8 +40,8 @@ export const subscribeOn = async (
 
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
-        [];
+        ((await telegramStorage.getUserSubscriptions(chat.id)) ?? {})
+            .subscriptionsOn ?? [];
 
     const checkIfAlreadySubscribed = existingSubscriptions
         .filter((subscription: Subscription) => subscription.active)
@@ -56,7 +53,7 @@ export const subscribeOn = async (
         throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);
     }
 
-    await setTelegramSubscription({
+    await telegramStorage.setSubscription({
         chat,
         subscriptionsOn: [
             ...existingSubscriptions,
@@ -83,8 +80,8 @@ export const unsubscribeMeFrom = async (
     );
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await getTelegramUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
-        [];
+        ((await telegramStorage.getUserSubscriptions(chat.id)) ?? {})
+            .subscriptionsOn ?? [];
     let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions.map(
         (subscription: Subscription) => {
@@ -100,7 +97,7 @@ export const unsubscribeMeFrom = async (
     }
 
     const [err, result] = await catchAsyncError(
-        setTelegramSubscription({
+        telegramStorage.setSubscription({
             chat,
             subscriptionsOn: updatedSubscriptions,
         })

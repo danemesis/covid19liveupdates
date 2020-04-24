@@ -1,4 +1,3 @@
-import { UserSubscription } from '../../../models/subscription.models';
 import {
     getUnsubscribeResponseMessage,
     unSubscribeErrorMessage,
@@ -11,16 +10,16 @@ import {
 import { catchAsyncError } from '../../../utils/catchError';
 import { unsubscribeMeFrom } from '../../../services/domain/subscriptions';
 import { noSubscriptionsResponseMessage } from '../../../messages/feature/subscribeMessages';
-import { getTelegramActiveUserSubscriptions } from '../services/storage';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import { telegramStorage } from '../services/storage';
 
 export const buildUnsubscribeInlineResponse = async (
     bot: TelegramBot,
     message: TelegramBot.Message,
     chatId: number
 ): Promise<TelegramBot.Message> => {
-    const userSubscription: UserSubscription = await getTelegramActiveUserSubscriptions(
+    const userSubscription = await telegramStorage.getActiveUserSubscriptions(
         chatId
     );
     if (!userSubscription?.subscriptionsOn?.length) {

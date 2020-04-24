@@ -2,10 +2,10 @@ import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { telegramStorage } from '../services/storage';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
-import { addTelegramUser, getTelegramUser } from '../services/storage';
 
 export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
     bot: TelegramBot,
@@ -18,7 +18,7 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
         getHelpProposalInlineKeyboard()
     );
 
-    const [err, user] = await catchAsyncError(getTelegramUser(chatId));
+    const [err, user] = await catchAsyncError(telegramStorage.getUser(chatId));
     if (err) {
         logger.error(
             `Error while trying to get user ${chatId} from db`,
@@ -37,7 +37,9 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
             startedOn: Date.now(),
         };
 
-        const [err, result] = await catchAsyncError(addTelegramUser(newUser));
+        const [err, result] = await catchAsyncError(
+            telegramStorage.addUser(newUser)
+        );
         if (err) {
             logger.error(
                 `An error occurred while trying to add new user ${chatId}`,
