@@ -4,4 +4,9 @@ export interface User {
     firstName: string;
     lastName: string;
     startedOn: number;
+    settings?: UserSettings;
+}
+
+export interface UserSettings {
+    locale: string;
 }

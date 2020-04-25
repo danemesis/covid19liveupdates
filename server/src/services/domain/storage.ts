@@ -11,7 +11,7 @@ import DataSnapshot = firebase.database.DataSnapshot;
 export class Storage {
     constructor(private messengerPrefix: string) {}
 
-    async getRef<T>(reference?: string): Promise<T> {
+    public async getRef<T>(reference?: string): Promise<T> {
         const snapshot = await firebase
             .database()
             .ref(`${this.messengerPrefix}${reference ? '/' + reference : ''}`)
@@ -19,14 +19,14 @@ export class Storage {
         return (snapshot.val() ?? {}) as T;
     }
 
-    async setRef<T>(reference: string, obj: T): Promise<any> {
+    public async setRef<T>(reference: string, obj: T): Promise<any> {
         return firebase
             .database()
             .ref(`${this.messengerPrefix}/${reference}`)
             .set(obj);
     }
 
-    async getFullStorage<T>(): Promise<T> {
+    public async getFullStorage<T>(): Promise<T> {
         const snapshot: DataSnapshot = await firebase
             .database()
             .ref()
@@ -34,15 +34,15 @@ export class Storage {
         return snapshot.val() ?? {};
     }
 
-    async getMessengerStorage<T>(): Promise<T> {
+    public async getMessengerStorage<T>(): Promise<T> {
         return this.getRef();
     }
 
-    async getSubscriptions(): Promise<SubscriptionStorage> {
+    public async getSubscriptions(): Promise<SubscriptionStorage> {
         return this.getRef<SubscriptionStorage>('subscriptions');
     }
 
-    async getActiveSubscriptions<T>(): Promise<SubscriptionStorage> {
+    public async getActiveSubscriptions<T>(): Promise<SubscriptionStorage> {
         const subscriptionStorage = await this.getRef<SubscriptionStorage>(
             'subscriptions'
         );
@@ -62,11 +62,15 @@ export class Storage {
         return activeSubscriptions;
     }
 
-    async getUserSubscriptions(chatId: number): Promise<UserSubscription> {
+    public async getUserSubscriptions(
+        chatId: number
+    ): Promise<UserSubscription> {
         return this.getRef<UserSubscription>(`subscriptions/${chatId}`);
     }
 
-    async setSubscription(subscription: UserSubscription): Promise<void> {
+    public async setSubscription(
+        subscription: UserSubscription
+    ): Promise<void> {
         return this.setRef(
             `subscriptions/${subscription.chat.id}`,
             subscription
@@ -85,7 +89,7 @@ export class Storage {
             .on('value', cb);
     }
 
-    async getActiveUserSubscriptions(
+    public async getActiveUserSubscriptions(
         chatId: number
     ): Promise<UserSubscription> {
         const userSubscription = await this.getRef<UserSubscription>(
@@ -99,31 +103,33 @@ export class Storage {
         };
     }
 
-    async setQueryToAnalyse(message: TelegramBot.Message): Promise<void> {
+    public async setQueryToAnalyse(
+        message: TelegramBot.Message
+    ): Promise<void> {
         return this.setRef(`analyse/${message.message_id}`, message);
     }
 
-    async getAllUsers(): Promise<Array<User>> {
-        return this.getRef('users');
-    }
-
-    async getUser(chatId: number): Promise<User> {
-        return this.getRef(`users/${chatId}`);
-    }
-
-    async addUser(user: User): Promise<void> {
-        return this.setRef(`users/${user.chatId}`, user);
-    }
-
-    async getNotificationMessage(): Promise<string> {
+    public async getNotificationMessage(): Promise<string> {
         return this.getRef('notificationMessage');
     }
 
-    async getUserSettings(user: User): Promise<string> {
-        return this.getRef(`users/${user.chatId}/settings`);
+    public async getAllUsers(): Promise<Array<User>> {
+        return this.getRef('users');
     }
 
-    async setUserLocale(user: User, locale: string): Promise<void> {
-        return this.setRef(`users/${user.chatId}/settings/locale`, locale);
+    public async getUser(chatId: number): Promise<User> {
+        return this.getRef(`users/${chatId}`);
+    }
+
+    public async addUser(user: User): Promise<void> {
+        return this.setRef(`users/${user.chatId}`, user);
+    }
+
+    public async updateUser(user: User): Promise<void> {
+        const prevUser: User = await this.getUser(user.chatId);
+        return this.addUser({
+            ...prevUser,
+            ...user,
+        });
     }
 }
