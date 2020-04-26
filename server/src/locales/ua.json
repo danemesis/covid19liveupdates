@@ -1,9 +1,24 @@
 {
   "Hello World": "Привіт світ!",
   "Hello": "Привіт",
+  "Hi, %s": "Привіт, %s",
   "Choose language": "Оберіть мову",
   "Language is not supported \uD83D\uDE14": "Мова не підтримується \uD83D\uDE14",
   ". Choose from the list": ". Оберіть з доступних",
   "Language has been successfully installed \uD83D\uDC4C": "Мова була успішно встановлена \uD83D\uDC4C",
-  "Sure": "Звісно"
+  "Sure": "Звісно",
+  "I can show you available data about COVID-19 \uD83E\uDDA0\uD83E\uDD12 in all countries where it's registered.": "Я показую дані про короновірус \uD83E\uDDA0\uD83E\uDD12 в усіх країнах, про які маю офіційні дані.",
+  "Not now": "Не зараз",
+  "Later": "Пізніше",
+  "Close": "Закрити",
+  "Next": "Далі",
+  "Previous": "Попередне",
+  "Assistant \uD83D\uDC66": "Асистент \uD83D\uDC66",
+  "Countries data \uD83C\uDF0D": "Дані в країнах \uD83C\uDF0D",
+  "Countries we track": "Наявні країни",
+  "Advice how not to \uD83D\uDE37": "Отримати поради як не \uD83D\uDE37",
+  "Subscriptions \uD83D\uDC8C": "Підписки \uD83D\uDC8C",
+  "Existing": "Існуючі",
+  "Unsubscribe": "Відписатись",
+  "ℹ What can you do?": "ℹ Що я вмію"
 }

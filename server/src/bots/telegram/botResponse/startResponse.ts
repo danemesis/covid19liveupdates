@@ -1,21 +1,25 @@
 import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
-import { CallBackQueryHandlerWithCommandArgument, CallBackQueryParameters } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { settingsLanguageResponse } from './settingsResponse';
 import { telegramUserService } from '../services/user';
 import { UserRegExps } from '../../../models/constants';
 
 export const startResponse: CallBackQueryHandlerWithCommandArgument = async ({
-                                                                                 bot,
-                                                                                 message,
-                                                                                 chatId,
-                                                                                 user,
-                                                                             }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    if (!user.settings?.locale) {
+    bot,
+    message,
+    chatId,
+    user,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const locale: string | null = user.settings?.locale;
+    if (!locale) {
         telegramUserService.setUserInterruptedCommand(user, UserRegExps.Start);
 
-        return await settingsLanguageResponse({
+        return settingsLanguageResponse({
             bot,
             message,
             chatId,
@@ -25,7 +29,7 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async ({
 
     return bot.sendMessage(
         chatId,
-        `${greetUser(message.from)}`,
-        getHelpProposalInlineKeyboard(),
+        greetUser(locale, user),
+        getHelpProposalInlineKeyboard(locale)
     );
 };

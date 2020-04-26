@@ -1,5 +1,3 @@
-import { DEFAULT_LOCALE } from './constants';
-
 export const DEFAULT_USER_SETTINGS: User = {
     chatId: undefined,
     userName: undefined,
@@ -7,7 +5,7 @@ export const DEFAULT_USER_SETTINGS: User = {
     lastName: undefined,
     startedOn: Date.now(),
     settings: {
-        locale: DEFAULT_LOCALE,
+        locale: null,
     },
     state: {
         interruptedCommand: null,

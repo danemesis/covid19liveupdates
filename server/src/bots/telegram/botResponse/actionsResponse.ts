@@ -1,37 +1,30 @@
-import { CallBackQueryHandlerWithCommandArgument, CallBackQueryParameters } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { getLocalizedMessage } from '../../../services/domain/localization.service';
-import { DEFAULT_LOCALE } from '../../../models/constants';
 import { getCloseActionMessage } from '../../../messages/feature/actionsMessages';
-import { telegramUserService } from '../services/user';
+import { runInterruptedCommandResponse } from './runInterruptedCommandReponse';
 
 export const closeActionResponse: CallBackQueryHandlerWithCommandArgument = async ({
-                                                                                       bot,
-                                                                                       user,
-                                                                                       message,
-                                                                                       messageHandlerRegistry,
-                                                                                       chatId,
-                                                                                   }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const closeActionMessage = await bot.sendMessage(
+    bot,
+    user,
+    message,
+    messageHandlerRegistry,
+    chatId,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const closeActionMessageResponse = await bot.sendMessage(
         chatId,
-        getLocalizedMessage(
-            user.settings?.locale ?? DEFAULT_LOCALE,
-            [getCloseActionMessage()],
-        ),
+        getCloseActionMessage(user.settings?.locale)
     );
 
-    const userInterruptedCommand: string = user.state.interruptedCommand;
-    if (userInterruptedCommand) {
-        telegramUserService.setUserInterruptedCommand(
+    if (user.state.interruptedCommand) {
+        return runInterruptedCommandResponse({
+            message,
+            messageHandlerRegistry,
             user,
-            null,
-        );
-
-        return messageHandlerRegistry.runCommandHandler({
-            ...message,
-            text: user.state.interruptedCommand,
         });
     }
 
-    return closeActionMessage;
+    return closeActionMessageResponse;
 };
