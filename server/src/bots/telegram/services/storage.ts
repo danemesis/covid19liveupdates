@@ -1,4 +1,4 @@
 import { TELEGRAM_PREFIX } from '../models';
-import { Storage } from '../../../services/domain/storage';
+import { StorageService } from '../../../services/domain/storage.service';
 
-export const telegramStorage = new Storage(TELEGRAM_PREFIX);
+export const telegramStorage = new StorageService(TELEGRAM_PREFIX);

@@ -9,17 +9,20 @@ import {
     getTableHeader,
 } from '../../../messages/feature/countriesMessages';
 import { getContinentsInlineKeyboard } from '../services/keyboard';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import {
     getContinentOverallInformation,
     getWorldOverallInformation,
 } from '../../../services/domain/countries';
 
-export const countriesByContinentResponse = (continent) => async (
+export const countriesByContinentResponse = (continent) => async ({
     bot,
     message,
-    chatId
-) => {
+    chatId,
+}: CallBackQueryParameters) => {
     const {
         confirmed,
         recovered,
@@ -52,11 +55,11 @@ export const countriesByContinentResponse = (continent) => async (
     );
 };
 
-export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async (
+export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
-    chatId
-) => {
+    chatId,
+}: CallBackQueryParameters) => {
     const {
         confirmed,
         recovered,

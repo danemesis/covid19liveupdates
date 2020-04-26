@@ -9,10 +9,10 @@ import {
 import {
     Continents,
     CustomSubscriptions,
-    UserMessages,
-    UserRegExps,
     LogCategory,
     LogLevel,
+    UserMessages,
+    UserRegExps,
 } from '../../models/constants';
 import { showAdvicesHowToBehaveResponse } from './botResponse/adviceResponse';
 import { helpInfoResponse } from './botResponse/helpResponse';
@@ -42,6 +42,8 @@ import { trendsByCountryResponse } from './botResponse/trendResponse';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { catchAsyncError } from '../../utils/catchError';
 import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
+import { telegramUserService } from './services/user';
+import { withSingleParameterAfterCommand } from './services/registry/withSingleParameterAfterCommand';
 
 export function runTelegramBot(
     app: Express,
@@ -65,15 +67,24 @@ export function runTelegramBot(
         // Message handler for feature  Countries / Country
         .registerMessageHandler(
             [UserRegExps.CountriesData, UserMessages.CountriesData],
-            countriesResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                countriesResponse
+            )
         )
         .registerMessageHandler(
             [UserRegExps.AvailableCountries, UserMessages.AvailableCountries],
-            showAvailableCountriesResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                showAvailableCountriesResponse
+            )
         )
         .registerMessageHandler(
             [UserRegExps.CountryData],
-            showCountryByNameStrategyResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                showCountryByNameStrategyResponse
+            )
         )
         // Message handler for feature  Advices
         .registerMessageHandler(
@@ -88,7 +99,10 @@ export function runTelegramBot(
         // Message handler for feature  Assistant
         .registerMessageHandler(
             [UserRegExps.Assistant, UserMessages.Assistant],
-            assistantStrategyResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                assistantStrategyResponse
+            )
         )
         // Message handler for feature  Subscriptions
         .registerMessageHandler(
@@ -101,7 +115,10 @@ export function runTelegramBot(
         )
         .registerMessageHandler(
             [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
-            subscribingStrategyResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                subscribingStrategyResponse
+            )
         )
         .registerMessageHandler(
             [
@@ -109,11 +126,17 @@ export function runTelegramBot(
                 UserRegExps.Unsubscribe,
                 UserMessages.Unsubscribe,
             ],
-            unsubscribeStrategyResponse
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                unsubscribeStrategyResponse
+            )
         )
         .registerMessageHandler(
             [UserRegExps.Trends],
-            withTwoArgumentsAfterCommand(trendsByCountryResponse)
+            withSingleParameterAfterCommand(
+                messageHandlerRegistry,
+                withTwoArgumentsAfterCommand(trendsByCountryResponse)
+            )
         );
 
     // Message handler for feature  Countries / Country
@@ -159,6 +182,7 @@ export function runTelegramBot(
         },
         [SubscriptionType.Country]
     );
+    telegramUserService.listenUsers();
 
     bot.on('message', (message) => {
         messageHandlerRegistry.runCommandHandler(message);

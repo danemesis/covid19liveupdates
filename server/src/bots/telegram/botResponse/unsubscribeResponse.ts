@@ -11,14 +11,18 @@ import { catchAsyncError } from '../../../utils/catchError';
 import { unsubscribeMeFrom } from '../../../services/domain/subscriptions';
 import { noSubscriptionsResponseMessage } from '../../../messages/feature/subscribeMessages';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import { telegramStorage } from '../services/storage';
 
-export const buildUnsubscribeInlineResponse = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-): Promise<TelegramBot.Message> => {
+export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    user,
+    chatId,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const userSubscription = await telegramStorage.getActiveUserSubscriptions(
         chatId
     );
@@ -37,16 +41,17 @@ export const buildUnsubscribeInlineResponse = async (
 
 // If it's called from InlineKeyboard, then @param ikCbData will be available
 // otherwise @param ikCbData will be null
-export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number,
-    commandParameter?: string
-): Promise<TelegramBot.Message> => {
+export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    user,
+    chatId,
+    commandParameter,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     // If it's called from InlineKeyboard, then @param ikCbData will be available
     // otherwise @param ikCbData will be null
     if (!commandParameter) {
-        return buildUnsubscribeInlineResponse(bot, message, chatId);
+        return buildUnsubscribeInlineResponse({ bot, message, chatId, user });
     }
 
     const [err, result] = await catchAsyncError<string>(

@@ -1,17 +1,22 @@
 import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { telegramStorage } from '../services/storage';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
+import { telegramUserService } from '../services/user';
 
-export const startResponse: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-): Promise<TelegramBot.Message> => {
+export const startResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    chatId,
+    user,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const messageSentPromise = bot.sendMessage(
         chatId,
         `${greetUser(message.from)}`,

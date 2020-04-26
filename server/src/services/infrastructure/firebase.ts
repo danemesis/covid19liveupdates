@@ -8,9 +8,9 @@ export const initFirebase = ({
     FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID,
-}): [Error, boolean] => {
+}): [Error, firebase.app.App | null] => {
     try {
-        firebase.initializeApp({
+        const firebaseApp: firebase.app.App = firebase.initializeApp({
             apiKey: FIREBASE_API_KEY,
             authDomain: FIREBASE_AUTHDOMAIN,
             databaseURL: FIREBASE_DATABASE_URL,
@@ -19,8 +19,8 @@ export const initFirebase = ({
             messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
             appId: FIREBASE_APP_ID,
         });
-        return [null, true];
+        return [null, firebaseApp];
     } catch (e) {
-        return [e, false];
+        return [e, null];
     }
 };

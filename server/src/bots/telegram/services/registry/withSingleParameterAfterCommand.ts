@@ -1,4 +1,7 @@
-import { CallBackQueryHandlerWithCommandArgument } from '../../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { logger } from '../../../../utils/logger';
 import { noResponse } from '../../botResponse/noResponse';
@@ -15,25 +18,26 @@ export const withSingleParameterAfterCommand = (
     context: MessageHandlerRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
 ): CallBackQueryHandlerWithCommandArgument => {
-    return (
-        bot: TelegramBot,
-        message: TelegramBot.Message,
-        chatId: number,
-        ikCbData?: string
-    ): Promise<TelegramBot.Message> => {
+    return ({
+        bot,
+        message,
+        chatId,
+        user,
+        commandParameter,
+    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
         try {
             const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
                 context.singleParameterAfterCommands,
-                (ikCbData ?? message.text).toLocaleLowerCase()
+                (commandParameter ?? message.text).toLocaleLowerCase()
             );
 
-            return handlerFn.call(
-                context,
+            return handlerFn.call(context, {
                 bot,
                 message,
                 chatId,
-                userEnteredArgumentAfterCommand
-            );
+                user,
+                commandParameter: userEnteredArgumentAfterCommand,
+            });
         } catch (err) {
             logger.error(
                 `Error happend inside withSingleParameterAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
@@ -42,7 +46,7 @@ export const withSingleParameterAfterCommand = (
                 chatId
             );
 
-            return noResponse(bot, message, chatId);
+            return noResponse({ bot, message, chatId, user });
         }
     };
 };

@@ -16,7 +16,8 @@ import { noResponse } from '../../botResponse/noResponse';
 import { LogCategory } from '../../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
-import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
+import { telegramUserService } from '../user';
+import { User } from '../../../../models/user.model';
 
 export class MessageHandlerRegistry {
     private messageHandlers: {
@@ -42,11 +43,7 @@ export class MessageHandlerRegistry {
         ];
 
         systemRegExps.forEach(
-            (regexp: string) =>
-                (this.messageHandlers[regexp] = withSingleParameterAfterCommand(
-                    this,
-                    callback
-                ))
+            (regexp: string) => (this.messageHandlers[regexp] = callback)
         );
         return this;
     }
@@ -63,6 +60,10 @@ export class MessageHandlerRegistry {
         ikCbData?: string
     ): Promise<TelegramBot.Message> {
         logger.log('info', message);
+        const chatId: number = getChatId(message);
+        const user: User | null =
+            (await telegramUserService.getUser(chatId)) ??
+            (await this.createAndAddUser(message, chatId));
 
         const runCheckupAgainstStr = (ikCbData
             ? ikCbData
@@ -78,7 +79,7 @@ export class MessageHandlerRegistry {
         );
 
         if (suitableKeys.length === 0) {
-            return this.tryDeduceUserCommand(message);
+            return this.tryDeduceUserCommand(message, chatId, user);
         }
 
         if (suitableKeys.length > 1) {
@@ -88,20 +89,59 @@ export class MessageHandlerRegistry {
                     ';\n'
                 )}`,
                 LogCategory.MoreThenOneAvailableResponse,
-                getChatId(message)
+                chatId
             );
         }
 
         // This statement will invoke wrapper (withSingleParameterAfterCommand)
         // around original handler which is defined by default in
         // this.registerMessageHandler
-        return cbHandlers[suitableKeys[0]].call(
-            this,
-            this.bot,
+        return cbHandlers[suitableKeys[0]].call(this, {
+            bot: this.bot,
             message,
-            getChatId(message),
-            ikCbData
+            chatId,
+            user,
+            commandParameter: ikCbData,
+        });
+    }
+
+    private async tryDeduceUserCommand(
+        message: TelegramBot.Message,
+        chatId: number,
+        user: User
+    ): Promise<TelegramBot.Message> {
+        if (isMessageCountryFlag(message.text)) {
+            const countryName: string = getCountryNameByFlag(message.text);
+            return showCountryResponse({
+                bot: this.bot,
+                message,
+                chatId,
+                user,
+                commandParameter: countryName,
+            });
+        }
+
+        const countries: Array<Country> = await getAvailableCountries();
+        const country: Country | undefined = getCountryByMessage(
+            getCountryNameFormat(message.text),
+            countries
         );
+        if (country) {
+            return showCountryResponse({
+                bot: this.bot,
+                message,
+                chatId,
+                commandParameter: country.name,
+                user,
+            });
+        }
+
+        const answers: Array<Answer> = await fetchAnswer(message.text);
+        if (answers?.length) {
+            return assistantResponse(this.bot, answers, chatId);
+        }
+
+        return noResponse({ bot: this.bot, message, chatId, user });
     }
 
     private registerCallBackQuery() {
@@ -121,30 +161,16 @@ export class MessageHandlerRegistry {
         });
     }
 
-    private async tryDeduceUserCommand(
-        message: TelegramBot.Message
-    ): Promise<TelegramBot.Message> {
-        const chatId = getChatId(message);
-
-        if (isMessageCountryFlag(message.text)) {
-            const countryName: string = getCountryNameByFlag(message.text);
-            return showCountryResponse(this.bot, message, chatId, countryName);
-        }
-
-        const countries: Array<Country> = await getAvailableCountries();
-        const country: Country | undefined = getCountryByMessage(
-            getCountryNameFormat(message.text),
-            countries
-        );
-        if (country) {
-            return showCountryResponse(this.bot, message, chatId, country.name);
-        }
-
-        const answers: Array<Answer> = await fetchAnswer(message.text);
-        if (answers?.length) {
-            return assistantResponse(this.bot, answers, chatId);
-        }
-
-        return noResponse(this.bot, message, chatId);
+    private async createAndAddUser(
+        message: TelegramBot.Message,
+        chatId: number
+    ): Promise<User> {
+        return telegramUserService.addUser({
+            chatId,
+            userName: message.chat.username || '',
+            firstName: message.chat.first_name || '',
+            lastName: message.chat.last_name || '',
+            startedOn: Date.now(),
+        });
     }
 }

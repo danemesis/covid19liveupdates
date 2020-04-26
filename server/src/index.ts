@@ -48,11 +48,11 @@ const server = app.listen(PORT, async () => {
         );
     }
 
-    const [e, isFirebaseInit] = initFirebase(environments);
-    if (!isFirebaseInit) {
+    const [err, fireBaseApp] = initFirebase(environments);
+    if (err) {
         // tslint:disable-next-line:no-console
         console.log(
-            `${CONSOLE_LOG_DELIMITER}Firebase did not start. Error ${e.name}, ${e.message}. Stack: ${e.stack}`
+            `${CONSOLE_LOG_DELIMITER}Firebase did not start. Error ${err.name}, ${err.message}. Stack: ${err.stack}`
         );
     }
 

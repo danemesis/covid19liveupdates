@@ -3,13 +3,43 @@ import {
     Subscription,
     UserSubscription,
 } from '../../models/subscription.models';
-import { SubscriptionStorage } from '../../models/storage.models';
+import { SubscriptionStorage, UserStorage } from '../../models/storage.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { User } from '../../models/user.model';
 import DataSnapshot = firebase.database.DataSnapshot;
 
-export class Storage {
+export class StorageService {
+    private storageSubscriptionsListeners: Array<
+        (a: SubscriptionStorage | null, b?: string | null) => unknown
+    > = [];
+    private storageUsersListeners: Array<
+        (a: UserStorage | null, b?: string | null) => unknown
+    > = [];
+
     constructor(private messengerPrefix: string) {}
+
+    public async subscribeOnSubscriptions(
+        cb: (a: SubscriptionStorage | null, b?: string | null) => unknown
+    ): Promise<void> {
+        this.storageSubscriptionsListeners = [
+            ...this.storageSubscriptionsListeners,
+            cb,
+        ];
+
+        if (this.storageSubscriptionsListeners.length === 1) {
+            this.listenSubscriptions();
+        }
+    }
+
+    public async subscribeOnUsers(
+        cb: (a: UserStorage | null, b?: string | null) => unknown
+    ): Promise<void> {
+        this.storageUsersListeners = [...this.storageUsersListeners, cb];
+
+        if (this.storageUsersListeners.length === 1) {
+            this.listenUsers();
+        }
+    }
 
     public async getRef<T>(reference?: string): Promise<T> {
         const snapshot = await firebase
@@ -77,18 +107,6 @@ export class Storage {
         );
     }
 
-    listenSubscriptionsChanges(
-        cb: (a: firebase.database.DataSnapshot, b?: string | null) => unknown
-    ): (
-        a: firebase.database.DataSnapshot | null,
-        b?: string | null
-    ) => unknown {
-        return firebase
-            .database()
-            .ref(`${this.messengerPrefix}/subscriptions`)
-            .on('value', cb);
-    }
-
     public async getActiveUserSubscriptions(
         chatId: number
     ): Promise<UserSubscription> {
@@ -125,11 +143,43 @@ export class Storage {
         return this.setRef(`users/${user.chatId}`, user);
     }
 
-    public async updateUser(user: User): Promise<void> {
+    public async updateUser(user: Partial<User>): Promise<void> {
         const prevUser: User = await this.getUser(user.chatId);
         return this.addUser({
             ...prevUser,
             ...user,
         });
+    }
+
+    private listenSubscriptions(): (
+        a: firebase.database.DataSnapshot | null,
+        b?: string | null
+    ) => unknown {
+        return firebase
+            .database()
+            .ref(`${this.messengerPrefix}/subscriptions`)
+            .on(
+                'value',
+                (a: firebase.database.DataSnapshot, b?: string | null) => {
+                    this.storageSubscriptionsListeners.forEach((cb) =>
+                        cb(a.val(), b)
+                    );
+                }
+            );
+    }
+
+    private listenUsers(): (
+        a: firebase.database.DataSnapshot | null,
+        b?: string | null
+    ) => unknown {
+        return firebase
+            .database()
+            .ref(`${this.messengerPrefix}/users`)
+            .on(
+                'value',
+                (a: firebase.database.DataSnapshot, b?: string | null) => {
+                    this.storageUsersListeners.forEach((cb) => cb(a.val(), b));
+                }
+            );
     }
 }
