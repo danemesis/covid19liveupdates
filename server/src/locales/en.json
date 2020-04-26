@@ -1,4 +1,9 @@
 {
   "Hello World": "Hello World",
-  "Hello": "Hello"
+  "Hello": "Hello",
+  "Choose language": "Choose language",
+  "Language is not supported \uD83D\uDE14": "Language is not supported \uD83D\uDE14",
+  ". Choose from the list": ". Choose from the list",
+  "Language has been successfully installed \uD83D\uDC4C": "Language has been successfully installed \uD83D\uDC4C",
+  "Sure": "Sure"
 }

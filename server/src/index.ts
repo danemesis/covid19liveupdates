@@ -5,10 +5,7 @@ import { runTelegramBot } from './bots/telegram';
 import { runNgrok, stopNgrok } from './runNgrok';
 import environments from './environments/environment';
 import { initFirebase } from './services/infrastructure/firebase';
-import {
-    CONSOLE_LOG_DELIMITER,
-    CONSOLE_LOG_EASE_DELIMITER,
-} from './models/constants';
+import { CONSOLE_LOG_DELIMITER, CONSOLE_LOG_EASE_DELIMITER, DEFAULT_LOCALE } from './models/constants';
 import * as firebase from 'firebase';
 import { checkCovid19Updates } from './services/infrastructure/scheduler';
 import { catchAsyncError } from './utils/catchError';
@@ -24,7 +21,7 @@ app.get('/', baseController.base);
 
 i18n.configure({
     directory: __dirname + '/locales',
-    defaultLocale: 'en',
+    defaultLocale: DEFAULT_LOCALE,
 });
 
 const server = app.listen(PORT, async () => {
@@ -33,18 +30,18 @@ const server = app.listen(PORT, async () => {
     console.log(
         'App is running at http://localhost:%d in %s mode',
         PORT,
-        environmentName
+        environmentName,
     );
 
     if (environments.IsNgRokMode()) {
         const [err, appUrl] = await catchAsyncError(
             environments.NGROK_URL
                 ? Promise.resolve(environments.NGROK_URL)
-                : runNgrok(PORT)
+                : runNgrok(PORT),
         );
         // tslint:disable-next-line:no-console
         console.log(
-            `${CONSOLE_LOG_EASE_DELIMITER} NGROK started on ngRokUrl: ${appUrl}`
+            `${CONSOLE_LOG_EASE_DELIMITER} NGROK started on ngRokUrl: ${appUrl}`,
         );
     }
 
@@ -52,7 +49,7 @@ const server = app.listen(PORT, async () => {
     if (err) {
         // tslint:disable-next-line:no-console
         console.log(
-            `${CONSOLE_LOG_DELIMITER}Firebase did not start. Error ${err.name}, ${err.message}. Stack: ${err.stack}`
+            `${CONSOLE_LOG_DELIMITER}Firebase did not start. Error ${err.name}, ${err.message}. Stack: ${err.stack}`,
         );
     }
 

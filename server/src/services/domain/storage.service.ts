@@ -143,14 +143,6 @@ export class StorageService {
         return this.setRef(`users/${user.chatId}`, user);
     }
 
-    public async updateUser(user: Partial<User>): Promise<void> {
-        const prevUser: User = await this.getUser(user.chatId);
-        return this.addUser({
-            ...prevUser,
-            ...user,
-        });
-    }
-
     private listenSubscriptions(): (
         a: firebase.database.DataSnapshot | null,
         b?: string | null

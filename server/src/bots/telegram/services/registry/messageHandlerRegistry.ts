@@ -17,7 +17,7 @@ import { LogCategory } from '../../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
 import { telegramUserService } from '../user';
-import { User } from '../../../../models/user.model';
+import { DEFAULT_USER_SETTINGS, User } from '../../../../models/user.model';
 
 export class MessageHandlerRegistry {
     private messageHandlers: {
@@ -31,10 +31,10 @@ export class MessageHandlerRegistry {
 
     public registerMessageHandler(
         regexps: Array<string>,
-        callback: CallBackQueryHandlerWithCommandArgument
+        callback: CallBackQueryHandlerWithCommandArgument,
     ): MessageHandlerRegistry {
         const systemRegExps = regexps.map((regexp: string) =>
-            regexp.toLocaleLowerCase()
+            regexp.toLocaleLowerCase(),
         );
 
         this.singleParameterAfterCommands = [
@@ -43,21 +43,21 @@ export class MessageHandlerRegistry {
         ];
 
         systemRegExps.forEach(
-            (regexp: string) => (this.messageHandlers[regexp] = callback)
+            (regexp: string) => (this.messageHandlers[regexp] = callback),
         );
         return this;
     }
 
     public sendUserNotification(
         chatId: number,
-        notification: string
+        notification: string,
     ): Promise<TelegramBot.Message> {
         return this.bot.sendMessage(chatId, notification);
     }
 
     public async runCommandHandler(
         message: TelegramBot.Message,
-        ikCbData?: string
+        ikCbData?: string,
     ): Promise<TelegramBot.Message> {
         logger.log('info', message);
         const chatId: number = getChatId(message);
@@ -66,16 +66,16 @@ export class MessageHandlerRegistry {
             (await this.createAndAddUser(message, chatId));
 
         const runCheckupAgainstStr = (ikCbData
-            ? ikCbData
-            : message.text
+                ? ikCbData
+                : message.text
         ).toLocaleLowerCase();
         const cbHandlers = this.messageHandlers;
 
         const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
             (cbHandlerRegExpKey: string) =>
                 !!runCheckupAgainstStr.match(
-                    new RegExp(cbHandlerRegExpKey, 'g')
-                )
+                    new RegExp(cbHandlerRegExpKey, 'g'),
+                ),
         );
 
         if (suitableKeys.length === 0) {
@@ -86,10 +86,10 @@ export class MessageHandlerRegistry {
             logger.log(
                 'info',
                 `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
-                    ';\n'
+                    ';\n',
                 )}`,
                 LogCategory.MoreThenOneAvailableResponse,
-                chatId
+                chatId,
             );
         }
 
@@ -101,6 +101,7 @@ export class MessageHandlerRegistry {
             message,
             chatId,
             user,
+            messageHandlerRegistry: this,
             commandParameter: ikCbData,
         });
     }
@@ -108,7 +109,7 @@ export class MessageHandlerRegistry {
     private async tryDeduceUserCommand(
         message: TelegramBot.Message,
         chatId: number,
-        user: User
+        user: User,
     ): Promise<TelegramBot.Message> {
         if (isMessageCountryFlag(message.text)) {
             const countryName: string = getCountryNameByFlag(message.text);
@@ -117,6 +118,7 @@ export class MessageHandlerRegistry {
                 message,
                 chatId,
                 user,
+                messageHandlerRegistry: this,
                 commandParameter: countryName,
             });
         }
@@ -124,13 +126,14 @@ export class MessageHandlerRegistry {
         const countries: Array<Country> = await getAvailableCountries();
         const country: Country | undefined = getCountryByMessage(
             getCountryNameFormat(message.text),
-            countries
+            countries,
         );
         if (country) {
             return showCountryResponse({
                 bot: this.bot,
                 message,
                 chatId,
+                messageHandlerRegistry: this,
                 commandParameter: country.name,
                 user,
             });
@@ -141,7 +144,13 @@ export class MessageHandlerRegistry {
             return assistantResponse(this.bot, answers, chatId);
         }
 
-        return noResponse({ bot: this.bot, message, chatId, user });
+        return noResponse({
+            bot: this.bot,
+            message,
+            chatId,
+            user,
+            messageHandlerRegistry: this,
+        });
     }
 
     private registerCallBackQuery() {
@@ -155,7 +164,7 @@ export class MessageHandlerRegistry {
                             from, // As in cases of answerCallbackQuery original from in message will be bot sender,
                             // But we do want it still to be user. Do we? :D
                         },
-                        data
+                        data,
                     );
                 });
         });
@@ -163,9 +172,10 @@ export class MessageHandlerRegistry {
 
     private async createAndAddUser(
         message: TelegramBot.Message,
-        chatId: number
+        chatId: number,
     ): Promise<User> {
         return telegramUserService.addUser({
+            ...DEFAULT_USER_SETTINGS,
             chatId,
             userName: message.chat.username || '',
             firstName: message.chat.first_name || '',

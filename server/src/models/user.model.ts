@@ -1,12 +1,33 @@
+import { DEFAULT_LOCALE } from './constants';
+
+export const DEFAULT_USER_SETTINGS: User = {
+    chatId: undefined,
+    userName: undefined,
+    firstName: undefined,
+    lastName: undefined,
+    startedOn: Date.now(),
+    settings: {
+        locale: DEFAULT_LOCALE,
+    },
+    state: {
+        interruptedCommand: null,
+    },
+};
+
 export interface User {
     chatId: number;
     userName: string;
     firstName: string;
     lastName: string;
     startedOn: number;
-    settings?: UserSettings;
+    settings: UserSettings;
+    state: UserState;
 }
 
 export interface UserSettings {
     locale: string;
+}
+
+export interface UserState {
+    interruptedCommand: string | null;
 }

@@ -1,4 +1,9 @@
 {
   "Hello World": "Привіт світ!",
-  "Hello": "Привіт"
+  "Hello": "Привіт",
+  "Choose language": "Оберіть мову",
+  "Language is not supported \uD83D\uDE14": "Мова не підтримується \uD83D\uDE14",
+  ". Choose from the list": ". Оберіть з доступних",
+  "Language has been successfully installed \uD83D\uDC4C": "Мова була успішно встановлена \uD83D\uDC4C",
+  "Sure": "Звісно"
 }

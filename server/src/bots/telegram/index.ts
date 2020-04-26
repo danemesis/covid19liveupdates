@@ -1,26 +1,19 @@
-import {
-    countriesByContinentResponse,
-    countriesResponse,
-} from './botResponse/countriesResponse';
-import {
-    showCountryByFlag,
-    showCountryByNameStrategyResponse,
-} from './botResponse/countryResponse';
+import { countriesByContinentResponse, countriesResponse } from './botResponse/countriesResponse';
+import { showCountryByFlag, showCountryByNameStrategyResponse } from './botResponse/countryResponse';
 import {
     Continents,
     CustomSubscriptions,
     LogCategory,
     LogLevel,
+    UserActionsRegExps,
     UserMessages,
     UserRegExps,
+    UserSettingsRegExps,
 } from '../../models/constants';
 import { showAdvicesHowToBehaveResponse } from './botResponse/adviceResponse';
 import { helpInfoResponse } from './botResponse/helpResponse';
 import { Express } from 'express';
-import {
-    cachedCovid19CountriesData,
-    getAvailableCountries,
-} from '../../services/domain/covid19';
+import { cachedCovid19CountriesData, getAvailableCountries } from '../../services/domain/covid19';
 import { Country } from '../../models/country.models';
 import { flag } from 'country-emoji';
 import { assistantStrategyResponse } from './botResponse/assistantResponse';
@@ -44,11 +37,13 @@ import { catchAsyncError } from '../../utils/catchError';
 import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
 import { telegramUserService } from './services/user';
 import { withSingleParameterAfterCommand } from './services/registry/withSingleParameterAfterCommand';
+import { settingsLanguageResponse } from './botResponse/settingsResponse';
+import { closeActionResponse } from './botResponse/actionsResponse';
 
 export function runTelegramBot(
     app: Express,
     appUrl: string,
-    telegramToken: string
+    telegramToken: string,
 ) {
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(telegramToken, { polling: true });
@@ -68,57 +63,52 @@ export function runTelegramBot(
         .registerMessageHandler(
             [UserRegExps.CountriesData, UserMessages.CountriesData],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                countriesResponse
-            )
+                countriesResponse,
+            ),
         )
         .registerMessageHandler(
             [UserRegExps.AvailableCountries, UserMessages.AvailableCountries],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                showAvailableCountriesResponse
-            )
+                showAvailableCountriesResponse,
+            ),
         )
         .registerMessageHandler(
             [UserRegExps.CountryData],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                showCountryByNameStrategyResponse
-            )
+                showCountryByNameStrategyResponse,
+            ),
         )
         // Message handler for feature  Advices
         .registerMessageHandler(
             [UserRegExps.Advice, UserMessages.GetAdviceHowToBehave],
-            showAdvicesHowToBehaveResponse
+            showAdvicesHowToBehaveResponse,
         )
         // Message handler for feature  Help
         .registerMessageHandler(
             [UserRegExps.Help, UserMessages.Help],
-            helpInfoResponse
+            helpInfoResponse,
         )
         // Message handler for feature  Assistant
         .registerMessageHandler(
             [UserRegExps.Assistant, UserMessages.Assistant],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                assistantStrategyResponse
-            )
+                assistantStrategyResponse,
+            ),
         )
         // Message handler for feature  Subscriptions
         .registerMessageHandler(
             [UserMessages.SubscriptionManager],
-            subscriptionManagerResponse
+            subscriptionManagerResponse,
         )
         .registerMessageHandler(
             [UserMessages.Existing],
-            showExistingSubscriptionsResponse
+            showExistingSubscriptionsResponse,
         )
         .registerMessageHandler(
             [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                subscribingStrategyResponse
-            )
+                subscribingStrategyResponse,
+            ),
         )
         .registerMessageHandler(
             [
@@ -127,23 +117,33 @@ export function runTelegramBot(
                 UserMessages.Unsubscribe,
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                unsubscribeStrategyResponse
-            )
+                unsubscribeStrategyResponse,
+            ),
         )
         .registerMessageHandler(
             [UserRegExps.Trends],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                withTwoArgumentsAfterCommand(trendsByCountryResponse)
-            )
+                withTwoArgumentsAfterCommand(trendsByCountryResponse),
+            ),
+        )
+        // Settings
+        .registerMessageHandler(
+            [UserSettingsRegExps.Language],
+            withSingleParameterAfterCommand(
+                settingsLanguageResponse,
+            ),
+        )
+        // Actions
+        .registerMessageHandler(
+            [UserActionsRegExps.Close],
+            closeActionResponse,
         );
 
     // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {
         messageHandlerRegistry.registerMessageHandler(
             [continent],
-            countriesByContinentResponse(continent)
+            countriesByContinentResponse(continent),
         );
     }
     getAvailableCountries().then((countries: Array<Country>) => {
@@ -154,7 +154,7 @@ export function runTelegramBot(
 
         messageHandlerRegistry.registerMessageHandler(
             [`[~${single}~]`],
-            showCountryByFlag
+            showCountryByFlag,
         );
     });
 
@@ -164,23 +164,23 @@ export function runTelegramBot(
             countriesData: [
                 number,
                 Array<[Country, Array<CountrySituationInfo>]>
-            ]
+            ],
         ) => {
             const [err, result] = await catchAsyncError(
                 subscriptionNotifierHandler(
                     messageHandlerRegistry,
-                    countriesData
-                )
+                    countriesData,
+                ),
             );
             if (err) {
                 logger.error(
                     'subscriptionNotifierHandler failed',
                     err,
-                    LogCategory.SubscriptionNotifierHandler
+                    LogCategory.SubscriptionNotifierHandler,
                 );
             }
         },
-        [SubscriptionType.Country]
+        [SubscriptionType.Country],
     );
     telegramUserService.listenUsers();
 
@@ -189,13 +189,13 @@ export function runTelegramBot(
     });
 
     bot.on('polling_error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.PollingError)
+        logger.log(LogLevel.Error, err, LogCategory.PollingError),
     );
     bot.on('webhook_error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.WebhookError)
+        logger.log(LogLevel.Error, err, LogCategory.WebhookError),
     );
     bot.on('error', (err) =>
-        logger.log(LogLevel.Error, err, LogCategory.TelegramError)
+        logger.log(LogLevel.Error, err, LogCategory.TelegramError),
     );
 
     runSendScheduledNotificationToUsersJob(bot);

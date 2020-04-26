@@ -3,7 +3,7 @@ import {
     getCountryMessage,
     getUserInputWithoutCountryNameMessage,
 } from '../../../messages/feature/countryMessages';
-import { Cache } from '../../../utils/cache';
+import { Cache } from '../../../services/domain/cache';
 import { flag, name } from 'country-emoji';
 import {
     getAfterCountryResponseInlineKeyboard,

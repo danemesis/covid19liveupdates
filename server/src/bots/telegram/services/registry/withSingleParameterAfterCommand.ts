@@ -1,11 +1,7 @@
-import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
-} from '../../models';
+import { CallBackQueryHandlerWithCommandArgument, CallBackQueryParameters } from '../../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { logger } from '../../../../utils/logger';
 import { noResponse } from '../../botResponse/noResponse';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
 import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
 import { LogCategory } from '../../../../models/constants';
 
@@ -15,27 +11,28 @@ import { LogCategory } from '../../../../models/constants';
  * which will be an parameter following after command
  */
 export const withSingleParameterAfterCommand = (
-    context: MessageHandlerRegistry,
-    handlerFn: CallBackQueryHandlerWithCommandArgument
+    handlerFn: CallBackQueryHandlerWithCommandArgument,
 ): CallBackQueryHandlerWithCommandArgument => {
     return ({
-        bot,
-        message,
-        chatId,
-        user,
-        commandParameter,
-    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-        try {
-            const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
-                context.singleParameterAfterCommands,
-                (commandParameter ?? message.text).toLocaleLowerCase()
-            );
-
-            return handlerFn.call(context, {
                 bot,
                 message,
                 chatId,
                 user,
+                messageHandlerRegistry,
+                commandParameter,
+            }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+        try {
+            const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
+                messageHandlerRegistry.singleParameterAfterCommands,
+                (commandParameter ?? message.text).toLocaleLowerCase(),
+            );
+
+            return handlerFn.call(messageHandlerRegistry, {
+                bot,
+                message,
+                chatId,
+                user,
+                messageHandlerRegistry,
                 commandParameter: userEnteredArgumentAfterCommand,
             });
         } catch (err) {
@@ -43,10 +40,10 @@ export const withSingleParameterAfterCommand = (
                 `Error happend inside withSingleParameterAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
                 err,
                 LogCategory.Command,
-                chatId
+                chatId,
             );
 
-            return noResponse({ bot, message, chatId, user });
+            return noResponse({ bot, message, chatId, user, messageHandlerRegistry });
         }
     };
 };
