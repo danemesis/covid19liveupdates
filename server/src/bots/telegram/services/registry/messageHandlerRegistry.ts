@@ -31,10 +31,10 @@ export class MessageHandlerRegistry {
 
     public registerMessageHandler(
         regexps: Array<string>,
-        callback: CallBackQueryHandlerWithCommandArgument,
+        callback: CallBackQueryHandlerWithCommandArgument
     ): MessageHandlerRegistry {
         const systemRegExps = regexps.map((regexp: string) =>
-            regexp.toLocaleLowerCase(),
+            regexp.toLocaleLowerCase()
         );
 
         this.singleParameterAfterCommands = [
@@ -43,21 +43,21 @@ export class MessageHandlerRegistry {
         ];
 
         systemRegExps.forEach(
-            (regexp: string) => (this.messageHandlers[regexp] = callback),
+            (regexp: string) => (this.messageHandlers[regexp] = callback)
         );
         return this;
     }
 
     public sendUserNotification(
         chatId: number,
-        notification: string,
+        notification: string
     ): Promise<TelegramBot.Message> {
         return this.bot.sendMessage(chatId, notification);
     }
 
     public async runCommandHandler(
         message: TelegramBot.Message,
-        ikCbData?: string,
+        ikCbData?: string
     ): Promise<TelegramBot.Message> {
         logger.log('info', message);
         const chatId: number = getChatId(message);
@@ -66,16 +66,14 @@ export class MessageHandlerRegistry {
             (await this.createAndAddUser(message, chatId));
 
         const runCheckupAgainstStr = (ikCbData
-                ? ikCbData
-                : message.text
+            ? ikCbData
+            : message.text
         ).toLocaleLowerCase();
         const cbHandlers = this.messageHandlers;
 
-        const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
-            (cbHandlerRegExpKey: string) =>
-                !!runCheckupAgainstStr.match(
-                    new RegExp(cbHandlerRegExpKey, 'g'),
-                ),
+        const suitableKeys: Array<string> = this.getSuitableCbHandlersKey(
+            cbHandlers,
+            runCheckupAgainstStr
         );
 
         if (suitableKeys.length === 0) {
@@ -86,30 +84,69 @@ export class MessageHandlerRegistry {
             logger.log(
                 'info',
                 `[INFO] (Might be an error) Several suitable keys for ${runCheckupAgainstStr}. \nKEYS:\n${suitableKeys.join(
-                    ';\n',
+                    ';\n'
                 )}`,
                 LogCategory.MoreThenOneAvailableResponse,
-                chatId,
+                chatId
             );
         }
 
-        // This statement will invoke wrapper (withSingleParameterAfterCommand)
-        // around original handler which is defined by default in
-        // this.registerMessageHandler
-        return cbHandlers[suitableKeys[0]].call(this, {
-            bot: this.bot,
-            message,
-            chatId,
-            user,
-            messageHandlerRegistry: this,
-            commandParameter: ikCbData,
-        });
+        // This statement will invoke wrapper/wrappers
+        // (withSingleParameterAfterCommand and/or withTwoArgumentsAfterCommand)
+        // around original handler which is defined in telegram/index.ts file
+        return cbHandlers[suitableKeys[0]]
+            .call(this, {
+                bot: this.bot,
+                message,
+                chatId,
+                user,
+                messageHandlerRegistry: this,
+                commandParameter: ikCbData,
+            })
+            .then(async () => {
+                /**
+                 * This logic is for cases when we have some command from
+                 * a user, although we didn't invoke it for any reason
+                 * @example A user enters /start for the first time (this will **{{1}}**
+                 * be executed in cbHandlers[suitableKeys[0]].call (line)
+                 * thus he doesn't have setup anything yet. We want to offer
+                 * him make language first, therefore we invoke
+                 * /UserSettingsRegExps.Language (/language) script
+                 * which will offer to choose language for user. However,
+                 * after he makes such his decision we still want to execute  **{{1}}**
+                 */
+                const userBeforeExecutionCbHandler: User = user;
+                /**
+                 * We're checking userBeforeExecutionCbHandler because
+                 * interruptedCommand should have been set up in the **{{1}}**
+                 * However, on this cycle we do not want to show user info,
+                 * because we just interrupted his command by our's. After he
+                 * proceeds with our, it will be next cycle and we should then
+                 * check.
+                 */
+                if (userBeforeExecutionCbHandler.state.interruptedCommand) {
+                    const upToDateUser: User = await telegramUserService.getUser(
+                        user
+                    );
+                    /**
+                     * Always update up-to-date user
+                     */
+                    await telegramUserService.setUserInterruptedCommand(
+                        upToDateUser,
+                        null
+                    );
+                    return this.runCommandHandler({
+                        ...message,
+                        text: upToDateUser.state.interruptedCommand,
+                    });
+                }
+            });
     }
 
     private async tryDeduceUserCommand(
         message: TelegramBot.Message,
         chatId: number,
-        user: User,
+        user: User
     ): Promise<TelegramBot.Message> {
         if (isMessageCountryFlag(message.text)) {
             const countryName: string = getCountryNameByFlag(message.text);
@@ -118,7 +155,6 @@ export class MessageHandlerRegistry {
                 message,
                 chatId,
                 user,
-                messageHandlerRegistry: this,
                 commandParameter: countryName,
             });
         }
@@ -126,14 +162,13 @@ export class MessageHandlerRegistry {
         const countries: Array<Country> = await getAvailableCountries();
         const country: Country | undefined = getCountryByMessage(
             getCountryNameFormat(message.text),
-            countries,
+            countries
         );
         if (country) {
             return showCountryResponse({
                 bot: this.bot,
                 message,
                 chatId,
-                messageHandlerRegistry: this,
                 commandParameter: country.name,
                 user,
             });
@@ -149,7 +184,6 @@ export class MessageHandlerRegistry {
             message,
             chatId,
             user,
-            messageHandlerRegistry: this,
         });
     }
 
@@ -164,22 +198,36 @@ export class MessageHandlerRegistry {
                             from, // As in cases of answerCallbackQuery original from in message will be bot sender,
                             // But we do want it still to be user. Do we? :D
                         },
-                        data,
+                        data
                     );
                 });
         });
     }
 
+    private getSuitableCbHandlersKey(
+        cbHandlers: {
+            [regexp: string]: CallBackQueryHandlerWithCommandArgument;
+        },
+        runCheckupAgainstStr: string
+    ): Array<string> {
+        return Object.keys(cbHandlers).filter(
+            (cbHandlerRegExpKey: string) =>
+                !!runCheckupAgainstStr.match(
+                    new RegExp(cbHandlerRegExpKey, 'g')
+                )
+        );
+    }
+
     private async createAndAddUser(
         message: TelegramBot.Message,
-        chatId: number,
+        chatId: number
     ): Promise<User> {
         return telegramUserService.addUser({
             ...DEFAULT_USER_SETTINGS,
             chatId,
-            userName: message.chat.username || '',
-            firstName: message.chat.first_name || '',
-            lastName: message.chat.last_name || '',
+            userName: message.chat?.username,
+            firstName: message.chat?.first_name,
+            lastName: message.chat?.last_name,
             startedOn: Date.now(),
         });
     }

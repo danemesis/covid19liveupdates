@@ -1,13 +1,11 @@
 import * as TelegramBot from 'node-telegram-bot-api';
 import { User } from '../../../models/user.model';
-import { MessageHandlerRegistry } from '../services/registry/messageHandlerRegistry';
 
 export interface CallBackQueryParameters {
     bot: TelegramBot;
     message: TelegramBot.Message;
     chatId: number;
     user: User;
-    messageHandlerRegistry: MessageHandlerRegistry,
     commandParameter?: string;
 }
 

@@ -14,14 +14,11 @@ import { telegramUserService } from '../services/user';
 import { logger } from '../../../utils/logger';
 import { DEFAULT_LOCALE, LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
-import { runInterruptedCommandResponse } from './runInterruptedCommandReponse';
 
 export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     chatId,
     user,
-    messageHandlerRegistry,
     commandParameter,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const locales: Array<string> = await telegramUserService.getAvailableLanguages();
@@ -66,17 +63,11 @@ export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument =
     }
 
     const updatedUser = await telegramUserService.getUser(user);
-    const successFullySetupMessageResponse = await bot.sendMessage(
+    return bot.sendMessage(
         chatId,
         // We cannot use "User" from parameter in the bot.sendMessage(
         // because that "User" still have an old locale, while this
         // "resultUser" has updated user settings
         languageHasBeenSuccessfullySetup(updatedUser.settings.locale)
     );
-
-    return runInterruptedCommandResponse({
-        message,
-        messageHandlerRegistry,
-        user: updatedUser,
-    });
 };

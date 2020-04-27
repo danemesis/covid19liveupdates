@@ -1,5 +1,22 @@
 import * as i18n from 'i18n';
 
+/**
+ * When you want to localize your message, you need to
+ * @param locale
+ * Which is locale you want to have at the end
+ * @param messages
+ * is either Array of messages you want to translate
+ * or Array of Arrays, where the first parameter is message,
+ * all consequent are parameters for the message
+ *
+ * @example
+ * 1) getLocalizedMessage('ua', ['this message will be translated into Ukrainian'])
+ * 2) getLocalizedMessage(
+ * 'ua',
+ * ['this %s will be translated into Ukrainian with two %s', 'message', 'parameters']
+ * ) will be: "this message will be translated into Ukrainian with two parameters"
+ * in Ukrainian
+ */
 export const getLocalizedMessage = (
     locale: string | null,
     messages: Array<string | Array<string>>
