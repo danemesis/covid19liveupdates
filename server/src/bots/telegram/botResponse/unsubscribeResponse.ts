@@ -1,7 +1,6 @@
 import {
     getUnsubscribeResponseMessage,
     unSubscribeErrorMessage,
-    unsubscribeResultMessage,
 } from '../../../messages/feature/unsubscribeMessages';
 import {
     getFullMenuKeyboard,
@@ -16,6 +15,7 @@ import {
     CallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
+import { getLocalizedMessage } from '../../../services/domain/localization.service';
 
 export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -32,7 +32,9 @@ export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgu
 
     return bot.sendMessage(
         chatId,
-        getUnsubscribeResponseMessage(),
+        getLocalizedMessage(user.settings.locale, [
+            'Choose items to unsubscribe from',
+        ])[0],
         getUnsubscribeMessageInlineKeyboard(
             userSubscription.subscriptionsOn.map((v) => v.value)
         )
@@ -58,12 +60,14 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         unsubscribeMeFrom(message.chat, commandParameter)
     );
     if (err) {
-        return bot.sendMessage(chatId, unSubscribeErrorMessage(err.message));
+        return bot.sendMessage(chatId, `${err.message}, sorry 🙇🏽`);
     }
 
     return bot.sendMessage(
         chatId,
-        unsubscribeResultMessage(result),
+        getLocalizedMessage(user.settings.locale, [
+            'You have been unsubscribed from',
+        ])[0] + result,
         getFullMenuKeyboard(chatId)
     );
 };
