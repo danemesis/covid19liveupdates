@@ -22,7 +22,10 @@ export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgu
         chatId
     );
     if (!userSubscription?.subscriptionsOn?.length) {
-        return bot.sendMessage(chatId, noSubscriptionsResponseMessage());
+        return bot.sendMessage(
+            chatId,
+            noSubscriptionsResponseMessage(user.settings.locale)
+        );
     }
 
     return bot.sendMessage(

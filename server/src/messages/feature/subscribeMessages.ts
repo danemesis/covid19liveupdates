@@ -5,17 +5,16 @@ import {
 import { getCountryMessage } from './countryMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { getDiffMessage } from '../covid19Messages';
+import { getLocalized } from '../../services/domain/localization.service';
 
 export const ALREADY_SUBSCRIBED_MESSAGE: string =
     'You are already subscribed on the country';
 
-export const subscriptionManagerResponseMessage = (): string => {
-    return `Easy way to manage your subscriptions 💌`;
-};
+export const subscriptionManagerResponseMessage = (locale: string): string =>
+    getLocalized(locale, `Easy way to manage your subscriptions 💌`);
 
-export const noSubscriptionsResponseMessage = (): string => {
-    return `It seems you haven't subscribed for any 🥺`;
-};
+export const noSubscriptionsResponseMessage = (locale: string): string =>
+    getLocalized(locale, `It seems you haven't subscribed for any 🥺`);
 
 export const subscribeError = (message: string): string => {
     return `${message}, sorry 🙇🏽‍`;

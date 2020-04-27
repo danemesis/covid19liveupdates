@@ -40,3 +40,6 @@ export const getLocalizedMessage = (
         // Or take default. Will leave it as it if no translation find
         return i18n.__(message) ?? message;
     });
+
+export const getLocalized = (locale: string | null, message: string): string =>
+    getLocalizedMessage(locale, [message])[0];

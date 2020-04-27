@@ -27,7 +27,7 @@ export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgumen
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     return bot.sendMessage(
         chatId,
-        subscriptionManagerResponseMessage(),
+        subscriptionManagerResponseMessage(user.settings.locale),
         getSubscriptionMessageInlineKeyboard()
     );
 };
@@ -42,7 +42,10 @@ export const showExistingSubscriptionsResponse: CallBackQueryHandlerWithCommandA
         chatId
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {
-        return bot.sendMessage(chatId, noSubscriptionsResponseMessage());
+        return bot.sendMessage(
+            chatId,
+            noSubscriptionsResponseMessage(user.settings.locale)
+        );
     }
 
     return bot.sendMessage(
