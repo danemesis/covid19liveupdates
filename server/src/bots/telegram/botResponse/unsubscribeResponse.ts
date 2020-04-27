@@ -19,7 +19,6 @@ import { telegramStorage } from '../services/storage';
 
 export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     user,
     chatId,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
@@ -32,7 +31,7 @@ export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgu
 
     return bot.sendMessage(
         chatId,
-        getUnsubscribeResponseMessage(),
+        getUnsubscribeResponseMessage(user.settings?.locale),
         getUnsubscribeMessageInlineKeyboard(
             userSubscription.subscriptionsOn.map((v) => v.value)
         )
@@ -64,6 +63,6 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
     return bot.sendMessage(
         chatId,
         unsubscribeResultMessage(result),
-        getFullMenuKeyboard(chatId)
+        getFullMenuKeyboard(chatId, user.settings?.locale)
     );
 };

@@ -3,7 +3,8 @@ import * as i18n from 'i18n';
 /**
  * When you want to localize your message, you need to
  * @param locale
- * Which is locale you want to have at the end
+ * Which is locale you want to have at the end. When locale is null
+ * it will fetch default system language.
  * @param messages
  * is either Array of messages you want to translate
  * or Array of Arrays, where the first parameter is message,

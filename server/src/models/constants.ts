@@ -31,7 +31,7 @@ export enum UserSettingsRegExps {
 }
 
 export enum UserActionsRegExps {
-    Close = '/close'
+    Close = '/close',
 }
 
 export enum UserInlineActions {
@@ -39,7 +39,7 @@ export enum UserInlineActions {
     Later = 'Later',
     Close = 'Close',
     Next = `Next`,
-    Previous = 'Previous'
+    Previous = 'Previous',
 }
 
 export const DEFAULT_LOCALE: string = 'en';
@@ -111,8 +111,9 @@ export enum LogCategory {
 }
 
 export enum Emojii {
+    Info = 'ℹ',
     Check = ' ☑️',
     Previous = '⏮️',
     Next = '⏭️',
-    Settings = '🔧'
+    Settings = '🔧',
 }

@@ -108,7 +108,7 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     await bot.sendMessage(
         chatId,
         getCountryMessage(name, confirmed, recovered, deaths, date),
-        getFullMenuKeyboard(chatId)
+        getFullMenuKeyboard(chatId, user.settings?.locale)
     );
     return bot.sendMessage(
         chatId,

@@ -4,12 +4,16 @@ import {
     CallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { getFullMenuKeyboard } from '../services/keyboard';
 
 export const helpInfoResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     user,
     chatId,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    return bot.sendMessage(chatId, getHelpMessage());
+    return bot.sendMessage(
+        chatId,
+        getHelpMessage(),
+        getFullMenuKeyboard(chatId, user.settings?.locale)
+    );
 };
