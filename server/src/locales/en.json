@@ -21,5 +21,7 @@
 	"Existing": "Existing",
 	"Unsubscribe": "Unsubscribe",
 	"ℹ What can you do?": "ℹ What can you do?",
-	"Привіт, %s": "Привіт, %s"
+	"Привіт, %s": "Привіт, %s",
+	"You have been unsubscribed from": "You have been unsubscribed from ",
+	"Choose items to unsubscribe from": "Choose items to unsubscribe from"
 }

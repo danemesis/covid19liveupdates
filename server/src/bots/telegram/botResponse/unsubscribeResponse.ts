@@ -1,8 +1,4 @@
 import {
-    getUnsubscribeResponseMessage,
-    unSubscribeErrorMessage,
-} from '../../../messages/feature/unsubscribeMessages';
-import {
     getFullMenuKeyboard,
     getUnsubscribeMessageInlineKeyboard,
 } from '../services/keyboard';

@@ -20,5 +20,7 @@
   "Subscriptions \uD83D\uDC8C": "Підписки \uD83D\uDC8C",
   "Existing": "Існуючі",
   "Unsubscribe": "Відписатись",
-  "ℹ What can you do?": "ℹ Що я вмію"
+  "ℹ What can you do?": "ℹ Що я вмію",
+  "You have been unsubscribed from": "Вас відписано від розсилки по ",
+	"Choose items to unsubscribe from": "Оберіть країну, від оновлень якої хочете віписатися"
 }
