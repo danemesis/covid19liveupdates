@@ -15,7 +15,6 @@ import { getLocalizedMessage } from '../../../services/domain/localization.servi
 
 export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     user,
     chatId,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
@@ -64,6 +63,6 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         getLocalizedMessage(user.settings.locale, [
             'You have been unsubscribed from',
         ])[0] + result,
-        getFullMenuKeyboard(chatId)
+        getFullMenuKeyboard(chatId, user.settings?.locale)
     );
 };

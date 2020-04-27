@@ -15,7 +15,6 @@ import { Frequency } from './../../../models/constants';
 
 export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     chatId,
     commandParameter: requestedCountry,
     secondCommandParameter: requestedFrequency,

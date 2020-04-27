@@ -15,7 +15,10 @@ import { UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getLocalizedMessage } from '../../../services/domain/localization.service';
 
-export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
+export const getFullMenuKeyboard = (
+    chatId: number,
+    locale: string
+): TelegramBot.SendMessageOptions => {
     const rk = new ReplyKeyboard();
     const latestSelectedCountries: Array<string> = Cache.get(
         `${chatId}_commands_country`
@@ -25,9 +28,22 @@ export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
         rk.addRow.apply(rk, latestSelectedCountries);
     }
 
-    rk.addRow(UserMessages.CountriesData, UserMessages.AvailableCountries)
-        .addRow(UserMessages.Assistant, UserMessages.GetAdviceHowToBehave)
-        .addRow(UserMessages.SubscriptionManager, UserMessages.Help);
+    rk.addRow(
+        getLocalizedMessage(locale, [UserMessages.CountriesData]).join(''),
+        getLocalizedMessage(locale, [UserMessages.AvailableCountries]).join('')
+    )
+        .addRow(
+            getLocalizedMessage(locale, [UserMessages.Assistant]).join(''),
+            getLocalizedMessage(locale, [
+                UserMessages.GetAdviceHowToBehave,
+            ]).join('')
+        )
+        .addRow(
+            getLocalizedMessage(locale, [
+                UserMessages.SubscriptionManager,
+            ]).join(''),
+            getLocalizedMessage(locale, [UserMessages.Help]).join('')
+        );
 
     return rk.open({ resize_keyboard: true });
 };

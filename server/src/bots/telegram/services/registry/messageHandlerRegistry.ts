@@ -124,7 +124,7 @@ export class MessageHandlerRegistry {
                  * proceeds with our, it will be next cycle and we should then
                  * check.
                  */
-                if (userBeforeExecutionCbHandler.state.interruptedCommand) {
+                if (userBeforeExecutionCbHandler.state?.interruptedCommand) {
                     const upToDateUser: User = await telegramUserService.getUser(
                         user
                     );
