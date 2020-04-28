@@ -3,23 +3,26 @@ import {
     WorldOverallInformation,
 } from '../../../models/covid19.models';
 import {
-    getCountriesTableHTML,
+    getCountriesTableHTMLMessage,
     getCountriesWorldMessage,
     getTableCountryRowMessage,
     getTableHeader,
 } from '../../../messages/feature/countriesMessages';
 import { getContinentsInlineKeyboard } from '../services/keyboard';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import {
     getContinentOverallInformation,
     getWorldOverallInformation,
 } from '../../../services/domain/countries';
 
-export const countriesByContinentResponse = (continent) => async (
+export const countriesByContinentResponse = (continent) => async ({
     bot,
-    message,
-    chatId
-) => {
+    user,
+    chatId,
+}: CallBackQueryParameters) => {
     const {
         confirmed,
         recovered,
@@ -27,7 +30,7 @@ export const countriesByContinentResponse = (continent) => async (
         countriesSituation,
     } = await getContinentOverallInformation(continent);
 
-    const portionMessage = [getTableHeader()];
+    const portionMessage = [getTableHeader(user.settings?.locale)];
     portionMessage.push();
 
     countriesSituation
@@ -40,7 +43,8 @@ export const countriesByContinentResponse = (continent) => async (
 
     return bot.sendMessage(
         chatId,
-        getCountriesTableHTML(
+        getCountriesTableHTMLMessage(
+            user.settings?.locale,
             continent,
             confirmed,
             recovered,
@@ -52,11 +56,11 @@ export const countriesByContinentResponse = (continent) => async (
     );
 };
 
-export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async (
+export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
-    chatId
-) => {
+    user,
+    chatId,
+}: CallBackQueryParameters) => {
     const {
         confirmed,
         recovered,
@@ -68,6 +72,7 @@ export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async 
     return bot.sendMessage(
         chatId,
         getCountriesWorldMessage(
+            user.settings?.locale,
             confirmed,
             recovered,
             deaths,

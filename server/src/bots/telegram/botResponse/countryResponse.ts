@@ -3,13 +3,16 @@ import {
     getCountryMessage,
     getUserInputWithoutCountryNameMessage,
 } from '../../../messages/feature/countryMessages';
-import { Cache } from '../../../utils/cache';
+import { Cache } from '../../../services/domain/cache';
 import { flag, name } from 'country-emoji';
 import {
     getAfterCountryResponseInlineKeyboard,
     getFullMenuKeyboard,
 } from '../services/keyboard';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
@@ -21,29 +24,32 @@ import {
 } from '../../../services/domain/countries';
 import { LogCategory } from '../../../models/constants';
 
-export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number,
-    commandParameter?: string
-): Promise<TelegramBot.Message> => {
+export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    chatId,
+    user,
+    commandParameter,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
 
-    return showCountryResponse(
+    return showCountryResponse({
         bot,
         message,
         chatId,
-        getCountryNameFormat(commandParameter)
-    );
+        user,
+        commandParameter: getCountryNameFormat(commandParameter),
+    });
 };
 
-export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-): Promise<TelegramBot.Message> => {
+export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    chatId,
+    user,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const countryFlag = message.text;
     if (
         !countryFlag ||
@@ -59,20 +65,21 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
 
-    return showCountryResponse(
+    return showCountryResponse({
         bot,
         message,
         chatId,
-        getCountryNameFormat(name(countryFlag))
-    );
+        user,
+        commandParameter: getCountryNameFormat(name(countryFlag)),
+    });
 };
 
-export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number,
-    requestedCountry: string
-): Promise<TelegramBot.Message> => {
+export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    chatId,
+    user,
+    commandParameter: requestedCountry,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const [err, result]: [
         Error,
         [Country, Array<CountrySituationInfo>]
@@ -100,11 +107,11 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     await bot.sendMessage(
         chatId,
         getCountryMessage(name, confirmed, recovered, deaths, date),
-        getFullMenuKeyboard(chatId)
+        getFullMenuKeyboard(chatId, user.settings?.locale)
     );
     return bot.sendMessage(
         chatId,
         getCountryIKActionMessage(name),
-        getAfterCountryResponseInlineKeyboard(name)
+        getAfterCountryResponseInlineKeyboard(name, user.settings?.locale)
     );
 };

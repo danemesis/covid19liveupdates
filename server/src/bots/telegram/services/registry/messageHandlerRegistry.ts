@@ -16,7 +16,8 @@ import { noResponse } from '../../botResponse/noResponse';
 import { LogCategory } from '../../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
-import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
+import { telegramUserService } from '../user';
+import { DEFAULT_USER_SETTINGS, User } from '../../../../models/user.model';
 
 export class MessageHandlerRegistry {
     private messageHandlers: {
@@ -42,11 +43,7 @@ export class MessageHandlerRegistry {
         ];
 
         systemRegExps.forEach(
-            (regexp: string) =>
-                (this.messageHandlers[regexp] = withSingleParameterAfterCommand(
-                    this,
-                    callback
-                ))
+            (regexp: string) => (this.messageHandlers[regexp] = callback)
         );
         return this;
     }
@@ -63,6 +60,10 @@ export class MessageHandlerRegistry {
         ikCbData?: string
     ): Promise<TelegramBot.Message> {
         logger.log('info', message);
+        const chatId: number = getChatId(message);
+        const user: User | null =
+            (await telegramUserService.getUser(chatId)) ??
+            (await this.createAndAddUser(message, chatId));
 
         const runCheckupAgainstStr = (ikCbData
             ? ikCbData
@@ -70,15 +71,13 @@ export class MessageHandlerRegistry {
         ).toLocaleLowerCase();
         const cbHandlers = this.messageHandlers;
 
-        const suitableKeys: Array<string> = Object.keys(cbHandlers).filter(
-            (cbHandlerRegExpKey: string) =>
-                !!runCheckupAgainstStr.match(
-                    new RegExp(cbHandlerRegExpKey, 'g')
-                )
+        const suitableKeys: Array<string> = this.getSuitableCbHandlersKey(
+            cbHandlers,
+            runCheckupAgainstStr
         );
 
         if (suitableKeys.length === 0) {
-            return this.tryDeduceUserCommand(message);
+            return this.tryDeduceUserCommand(message, chatId, user);
         }
 
         if (suitableKeys.length > 1) {
@@ -88,20 +87,104 @@ export class MessageHandlerRegistry {
                     ';\n'
                 )}`,
                 LogCategory.MoreThenOneAvailableResponse,
-                getChatId(message)
+                chatId
             );
         }
 
-        // This statement will invoke wrapper (withSingleParameterAfterCommand)
-        // around original handler which is defined by default in
-        // this.registerMessageHandler
-        return cbHandlers[suitableKeys[0]].call(
-            this,
-            this.bot,
-            message,
-            getChatId(message),
-            ikCbData
+        // This statement will invoke wrapper/wrappers
+        // (withSingleParameterAfterCommand and/or withTwoArgumentsAfterCommand)
+        // around original handler which is defined in telegram/index.ts file
+        return cbHandlers[suitableKeys[0]]
+            .call(this, {
+                bot: this.bot,
+                message,
+                chatId,
+                user,
+                messageHandlerRegistry: this,
+                commandParameter: ikCbData,
+            })
+            .then(async () => {
+                /**
+                 * This logic is for cases when we have some command from
+                 * a user, although we didn't invoke it for any reason
+                 * @example A user enters /start for the first time (this will **{{1}}**
+                 * be executed in cbHandlers[suitableKeys[0]].call (line)
+                 * thus he doesn't have setup anything yet. We want to offer
+                 * him make language first, therefore we invoke
+                 * /UserSettingsRegExps.Language (/language) script
+                 * which will offer to choose language for user. However,
+                 * after he makes such his decision we still want to execute  **{{1}}**
+                 */
+                const userBeforeExecutionCbHandler: User = user;
+                /**
+                 * We're checking userBeforeExecutionCbHandler because
+                 * interruptedCommand should have been set up in the **{{1}}**
+                 * However, on this cycle we do not want to show user info,
+                 * because we just interrupted his command by our's. After he
+                 * proceeds with our, it will be next cycle and we should then
+                 * check.
+                 */
+                if (userBeforeExecutionCbHandler.state?.interruptedCommand) {
+                    const upToDateUser: User = await telegramUserService.getUser(
+                        user
+                    );
+                    /**
+                     * Always update up-to-date user
+                     */
+                    await telegramUserService.setUserInterruptedCommand(
+                        upToDateUser,
+                        null
+                    );
+                    return this.runCommandHandler({
+                        ...message,
+                        text: upToDateUser.state.interruptedCommand,
+                    });
+                }
+            });
+    }
+
+    private async tryDeduceUserCommand(
+        message: TelegramBot.Message,
+        chatId: number,
+        user: User
+    ): Promise<TelegramBot.Message> {
+        if (isMessageCountryFlag(message.text)) {
+            const countryName: string = getCountryNameByFlag(message.text);
+            return showCountryResponse({
+                bot: this.bot,
+                message,
+                chatId,
+                user,
+                commandParameter: countryName,
+            });
+        }
+
+        const countries: Array<Country> = await getAvailableCountries();
+        const country: Country | undefined = getCountryByMessage(
+            getCountryNameFormat(message.text),
+            countries
         );
+        if (country) {
+            return showCountryResponse({
+                bot: this.bot,
+                message,
+                chatId,
+                commandParameter: country.name,
+                user,
+            });
+        }
+
+        const answers: Array<Answer> = await fetchAnswer(message.text);
+        if (answers?.length) {
+            return assistantResponse(this.bot, answers, chatId, user);
+        }
+
+        return noResponse({
+            bot: this.bot,
+            message,
+            chatId,
+            user,
+        });
     }
 
     private registerCallBackQuery() {
@@ -121,30 +204,31 @@ export class MessageHandlerRegistry {
         });
     }
 
-    private async tryDeduceUserCommand(
-        message: TelegramBot.Message
-    ): Promise<TelegramBot.Message> {
-        const chatId = getChatId(message);
-
-        if (isMessageCountryFlag(message.text)) {
-            const countryName: string = getCountryNameByFlag(message.text);
-            return showCountryResponse(this.bot, message, chatId, countryName);
-        }
-
-        const countries: Array<Country> = await getAvailableCountries();
-        const country: Country | undefined = getCountryByMessage(
-            getCountryNameFormat(message.text),
-            countries
+    private getSuitableCbHandlersKey(
+        cbHandlers: {
+            [regexp: string]: CallBackQueryHandlerWithCommandArgument;
+        },
+        runCheckupAgainstStr: string
+    ): Array<string> {
+        return Object.keys(cbHandlers).filter(
+            (cbHandlerRegExpKey: string) =>
+                !!runCheckupAgainstStr.match(
+                    new RegExp(cbHandlerRegExpKey, 'g')
+                )
         );
-        if (country) {
-            return showCountryResponse(this.bot, message, chatId, country.name);
-        }
+    }
 
-        const answers: Array<Answer> = await fetchAnswer(message.text);
-        if (answers?.length) {
-            return assistantResponse(this.bot, answers, chatId);
-        }
-
-        return noResponse(this.bot, message, chatId);
+    private async createAndAddUser(
+        message: TelegramBot.Message,
+        chatId: number
+    ): Promise<User> {
+        return telegramUserService.addUser({
+            ...DEFAULT_USER_SETTINGS,
+            chatId,
+            userName: message.chat?.username || '',
+            firstName: message.chat?.first_name || '',
+            lastName: message.chat?.last_name || '',
+            startedOn: Date.now(),
+        });
     }
 }

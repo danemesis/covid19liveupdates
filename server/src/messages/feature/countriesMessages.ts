@@ -1,25 +1,45 @@
 import { table, tableConfig } from '../../models/table.models';
 import { flag } from 'country-emoji';
 import { getActiveCases } from '../../services/domain/countries';
+import { getLocalizedMessages } from '../../services/domain/localization.service';
 
 export const getCountriesWorldMessage = (
+    locale: string | null,
     worldConfirmed: number,
     worldRecovered: number,
     worldDeaths: number,
     countries: number,
     continents: number
 ): string =>
-    `In the world 🌍\nConfirmed: ${worldConfirmed}, active: ${getActiveCases(
+    `${getLocalizedMessages(locale, 'In the world')} 🌍\n${getLocalizedMessages(
+        locale,
+        'Confirmed'
+    )}: ${worldConfirmed}, ${getLocalizedMessages(
+        locale,
+        'active'
+    )}: ${getActiveCases(
         worldConfirmed,
         worldRecovered,
         worldDeaths
-    )} recovered: ${worldRecovered}, death: ${worldDeaths} in ${countries} countries, on ${continents} continents`;
+    )} ${getLocalizedMessages(
+        locale,
+        'recovered'
+    )}: ${worldRecovered}, ${getLocalizedMessages(
+        locale,
+        'death'
+    )}: ${worldDeaths} in ${countries} ${getLocalizedMessages(
+        locale,
+        'countries'
+    )}, ${getLocalizedMessages(
+        locale,
+        'on'
+    )} ${continents} ${getLocalizedMessages(locale, 'continents')}`;
 
-export const getTableHeader = (): Array<string> => [
-    'Country',
-    'Active',
-    'Recovered',
-    'Deaths',
+export const getTableHeader = (locale: string | null): Array<string> => [
+    getLocalizedMessages(locale, 'Country'),
+    getLocalizedMessages(locale, 'Active'),
+    getLocalizedMessages(locale, 'Recovered'),
+    getLocalizedMessages(locale, 'Deaths'),
 ];
 
 export const getTableCountryRowMessage = (
@@ -34,7 +54,8 @@ export const getTableCountryRowMessage = (
     `${deaths}`,
 ];
 
-export const getCountriesTableHTML = (
+export const getCountriesTableHTMLMessage = (
+    locale,
     continent,
     confirmed,
     recovered,
@@ -42,10 +63,18 @@ export const getCountriesTableHTML = (
     countriesSituation,
     portionMessage
 ): string =>
-    `🗺️ ${continent}\nConfirmed: ${confirmed}, active: ${getActiveCases(
+    `🗺️ ${continent}\n${getLocalizedMessages(
+        locale,
+        'Confirmed'
+    )}: ${confirmed}, active: ${getActiveCases(
         confirmed,
         recovered,
         deaths
-    )} recovered: ${recovered}, death: ${deaths}` +
-    ` in ${countriesSituation.length} countries, ${continent}` +
+    )} ${getLocalizedMessages(
+        locale,
+        'recovered'
+    )}: ${recovered}, ${getLocalizedMessages(locale, 'death')}: ${deaths}` +
+    ` ${getLocalizedMessages(locale, 'in')} ${
+        countriesSituation.length
+    } ${getLocalizedMessages(locale, 'countries')}, ${continent}` +
     `\n<pre>${table(portionMessage, tableConfig)}</pre>`;

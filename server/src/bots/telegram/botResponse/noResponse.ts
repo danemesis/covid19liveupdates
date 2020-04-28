@@ -3,12 +3,14 @@ import { logger } from '../../../utils/logger';
 import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { LogCategory } from '../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { CallBackQueryParameters } from '../models';
 
-export const noResponse = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-): Promise<TelegramBot.Message> => {
+export const noResponse = async ({
+    bot,
+    message,
+    user,
+    chatId,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     // TODO: log with another severity type
     logger.error(
         'error',
@@ -21,7 +23,7 @@ export const noResponse = async (
 
     return bot.sendMessage(
         chatId,
-        noResponseForUserMessage(message.text),
-        getHelpProposalInlineKeyboard()
+        noResponseForUserMessage(user?.settings?.locale, message.text),
+        getHelpProposalInlineKeyboard(user.settings.locale)
     );
 };

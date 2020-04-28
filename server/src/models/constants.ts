@@ -1,3 +1,5 @@
+import { getLocalizedMessages } from '../services/domain/localization.service';
+
 export const TIMES = {
     MILLISECONDS_IN_SECOND: 1000,
     MILLISECONDS_IN_MINUTE: 60000,
@@ -25,6 +27,24 @@ export enum UserRegExps {
     Unsubscribe = '/unsubscribe',
     Help = '/help',
 }
+
+export enum UserSettingsRegExps {
+    Language = '/language',
+}
+
+export enum UserActionsRegExps {
+    Close = '/close',
+}
+
+export enum UserInlineActions {
+    NotNow = 'Not now',
+    Later = 'Later',
+    Close = 'Close',
+    Next = `Next`,
+    Previous = 'Previous',
+}
+
+export const DEFAULT_LOCALE: string = 'en';
 
 // TODO: Remove IK handling on those, add
 // usage of simple UserRegExps (add to them one if missing)
@@ -83,9 +103,19 @@ export enum LogCategory {
     SubscriptionNotifier = 'SubscriptionNotifier',
     Assistant = 'Assistant',
     Scheduler = 'Scheduler',
+    Settings = 'Settings',
+    SettingsLanguage = 'SettingsLanguage',
 
     // service types
     TelegramError = 'TelegramError',
     WebhookError = 'WebhookError',
     PollingError = 'PollingError',
+}
+
+export enum Emojii {
+    Info = 'ℹ',
+    Check = ' ☑️',
+    Previous = '⏮️',
+    Next = '⏭️',
+    Settings = '🔧',
 }

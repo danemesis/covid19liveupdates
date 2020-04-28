@@ -6,21 +6,24 @@ import { Answer } from '../../../models/knowledgebase/answer.models';
 import {
     getAnswersOnQuestionMessage,
     getAssistantFeaturesMessage,
-    noAnswersOnQuestionMessage,
     getAssistantIsOnLunchMessage,
+    noAnswersOnQuestionMessage,
 } from '../../../messages/feature/assistantMessages';
-import { KnowledgebaseMeta } from '../../../models/knowledgebase/meta.models';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
+import { User } from '../../../models/user.model';
 
-export const showAssistantFeatures: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number
-): Promise<TelegramBot.Message> => {
+export const showAssistantFeatures: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    user,
+    chatId,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const [err, knowledgebaseMeta] = await catchAsyncError(
         fetchKnowledgeMetainformation()
     );
@@ -34,41 +37,53 @@ export const showAssistantFeatures: CallBackQueryHandlerWithCommandArgument = as
     }
     const messageText =
         err === undefined
-            ? getAssistantFeaturesMessage(knowledgebaseMeta)
-            : getAssistantIsOnLunchMessage();
+            ? getAssistantFeaturesMessage(
+                  user.settings?.locale,
+                  knowledgebaseMeta
+              )
+            : getAssistantIsOnLunchMessage(user.settings?.locale);
 
     return bot.sendMessage(chatId, messageText);
 };
 
-export const assistantNoAnswerResponse = async (
-    bot: TelegramBot,
-    chatId: number
-): Promise<TelegramBot.Message> => {
-    return bot.sendMessage(chatId, noAnswersOnQuestionMessage());
+export const assistantNoAnswerResponse = async ({
+    bot,
+    chatId,
+    user,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    return bot.sendMessage(
+        chatId,
+        noAnswersOnQuestionMessage(user.settings?.locale)
+    );
 };
 
 export const assistantResponse = async (
     bot: TelegramBot,
     answers: Array<Answer>,
-    chatId: number
+    chatId: number,
+    user: User
 ) => {
-    return bot.sendMessage(chatId, getAnswersOnQuestionMessage(answers));
+    return bot.sendMessage(
+        chatId,
+        getAnswersOnQuestionMessage(user.settings?.locale, answers)
+    );
 };
 
-export const assistantStrategyResponse: CallBackQueryHandlerWithCommandArgument = async (
-    bot: TelegramBot,
-    message: TelegramBot.Message,
-    chatId: number,
-    commandParameter?: string
-): Promise<TelegramBot.Message> => {
+export const assistantStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+    bot,
+    message,
+    chatId,
+    user,
+    commandParameter,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
-        return showAssistantFeatures(bot, message, chatId);
+        return showAssistantFeatures({ bot, message, chatId, user });
     }
 
     const answers: Array<Answer> = await fetchAnswer(commandParameter);
     if (!answers.length) {
-        return assistantNoAnswerResponse(bot, chatId);
+        return assistantNoAnswerResponse({ bot, message, chatId, user });
     }
 
-    return assistantResponse(bot, answers, chatId);
+    return assistantResponse(bot, answers, chatId, user);
 };

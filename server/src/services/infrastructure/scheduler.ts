@@ -20,7 +20,7 @@ export const checkCovid19Updates = () => {
     });
 };
 
-export const RunSendScheduledNotificationToUsersJob = async (
+export const runSendScheduledNotificationToUsersJob = async (
     bot: TelegramBot
 ): Promise<void> => {
     // At 08:00 PM, every day

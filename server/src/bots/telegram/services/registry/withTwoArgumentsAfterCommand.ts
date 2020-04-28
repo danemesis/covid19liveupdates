@@ -1,38 +1,49 @@
-import { CallBackQueryHandlerWithCommandArgument } from '../../models';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+} from '../../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { LogCategory } from '../../../../models/constants';
 import { logger } from '../../../../utils/logger';
 import { noResponse } from '../../botResponse/noResponse';
+import { MessageHandlerRegistry } from './messageHandlerRegistry';
 
+/**
+ * This function is wrapper around the original User's query handler
+ * It adds an additional two parameters (if such exists) to original handler,
+ * which will be parameters following after command
+ * @example /trends Ukraine monthly
+ */
 export const withTwoArgumentsAfterCommand = (
+    context: MessageHandlerRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
 ): CallBackQueryHandlerWithCommandArgument => {
-    return (
-        bot: TelegramBot,
-        message: TelegramBot.Message,
-        chatId: number,
-        ikCbData?: string
-    ): Promise<TelegramBot.Message> => {
+    return ({
+        bot,
+        message,
+        chatId,
+        user,
+        commandParameter,
+    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
         try {
-            const [arg1, arg2] = splitArgument(ikCbData);
-
-            return handlerFn.call(
-                this,
+            const [arg1, arg2] = splitArgument(commandParameter);
+            return handlerFn.call(context, {
                 bot,
                 message,
                 chatId,
-                (arg1 && arg1.toLowerCase()) || ikCbData,
-                arg2 && arg2.toLowerCase()
-            );
+                commandParameter:
+                    (arg1 && arg1.toLowerCase()) || commandParameter,
+                secondCommandParameter: arg2 && arg2.toLowerCase(),
+            });
         } catch (err) {
             logger.error(
-                `Error happend inside withTwoArgumentsAfterCommand() for ${chatId} with message: ${message.text} and ikCbData: ${ikCbData}`,
+                `Error happend inside withTwoArgumentsAfterCommand() for ${chatId} with message: ${message.text} and commandParameter: ${commandParameter}`,
                 err,
                 LogCategory.Command,
                 chatId
             );
 
-            return noResponse(this.bot, message, chatId);
+            return noResponse({ bot, message, user, chatId });
         }
     };
 };
@@ -40,6 +51,7 @@ export const withTwoArgumentsAfterCommand = (
 const splitArgsRegexp = new RegExp(
     '(?<firstArg>[^ ]+)[\\s.,;]+(?<secondArg>[^ ]+)'
 );
+
 function splitArgument(argument: string): [string, string] {
     const match = splitArgsRegexp.exec(argument);
     if (!match) {

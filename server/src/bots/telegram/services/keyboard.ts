@@ -1,16 +1,24 @@
-import { Cache } from '../../../utils/cache';
+import { Cache } from '../../../services/domain/cache';
 import {
     Continents,
     CustomSubscriptions,
+    Emojii,
+    Frequency,
+    UserActionsRegExps,
+    UserInlineActions,
     UserMessages,
     UserRegExps,
-    Frequency,
+    UserSettingsRegExps,
 } from '../../../models/constants';
 import { InlineKeyboard, ReplyKeyboard } from 'node-telegram-keyboard-wrapper';
 import { UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
-export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
+export const getFullMenuKeyboard = (
+    chatId: number,
+    locale: string
+): TelegramBot.SendMessageOptions => {
     const rk = new ReplyKeyboard();
     const latestSelectedCountries: Array<string> = Cache.get(
         `${chatId}_commands_country`
@@ -20,31 +28,45 @@ export const getFullMenuKeyboard = (chatId): TelegramBot.SendMessageOptions => {
         rk.addRow.apply(rk, latestSelectedCountries);
     }
 
-    rk.addRow(UserMessages.CountriesData, UserMessages.AvailableCountries)
-        .addRow(UserMessages.Assistant, UserMessages.GetAdviceHowToBehave)
-        .addRow(UserMessages.SubscriptionManager, UserMessages.Help);
+    rk.addRow(
+        getLocalizedMessages(locale, UserMessages.CountriesData),
+        getLocalizedMessages(locale, UserMessages.AvailableCountries)
+    )
+        .addRow(
+            getLocalizedMessages(locale, UserMessages.Assistant),
+            getLocalizedMessages(locale, UserMessages.GetAdviceHowToBehave)
+        )
+        .addRow(
+            getLocalizedMessages(locale, UserMessages.SubscriptionManager),
+            getLocalizedMessages(locale, UserMessages.Help)
+        );
 
     return rk.open({ resize_keyboard: true });
 };
 
 export const getAfterCountryResponseInlineKeyboard = (
-    country: string
+    country: string,
+    locale: string
 ): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
     ik.addRow({
-        text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
-        callback_data: `${UserRegExps.Subscribe} ${country}`,
+        text: `${getLocalizedMessages(locale, [
+            CustomSubscriptions.SubscribeMeOn,
+        ])} ${country}`,
+        callback_data: `${getLocalizedMessages(locale, [
+            UserRegExps.Subscribe,
+        ])} ${country}`,
     }).addRow(
         {
-            text: 'Show weekly chart',
+            text: getLocalizedMessages(locale, 'Show weekly chart'),
             callback_data: `${UserRegExps.Trends} ${country}`,
         },
         {
-            text: 'Show monthly chart',
+            text: getLocalizedMessages(locale, 'Show monthly chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.Monthly}`,
         },
         {
-            text: 'Show whole period chart',
+            text: getLocalizedMessages(locale, 'Show whole period chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.WholePeriod}`,
         }
     );
@@ -52,15 +74,17 @@ export const getAfterCountryResponseInlineKeyboard = (
     return ik.build();
 };
 
-export const getSubscriptionMessageInlineKeyboard = (): TelegramBot.SendMessageOptions => {
+export const getSubscriptionMessageInlineKeyboard = (
+    locale: string
+): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
     ik.addRow(
         {
-            text: UserMessages.Existing,
+            text: getLocalizedMessages(locale, UserMessages.Existing),
             callback_data: `${UserMessages.Existing}`,
         },
         {
-            text: UserMessages.Unsubscribe,
+            text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
             callback_data: UserMessages.Unsubscribe,
         }
     );
@@ -110,13 +134,54 @@ export const getContinentsInlineKeyboard = (): TelegramBot.SendMessageOptions =>
     return ik.build();
 };
 
-export const getHelpProposalInlineKeyboard = (): TelegramBot.SendMessageOptions => {
+export const getHelpProposalInlineKeyboard = (
+    locale: string
+): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
 
     ik.addRow({
-        text: UserMessages.Help,
+        text: getLocalizedMessages(locale, UserMessages.Help),
         callback_data: UserMessages.Help,
     });
 
     return ik.build();
+};
+
+export const getLocalizationInlineKeyboard = (
+    locales: Array<string>,
+    currentLocale: string
+): TelegramBot.SendMessageOptions => {
+    const ik = new InlineKeyboard();
+
+    ik.addRow(getCloseInlineKeyboardRow(currentLocale));
+
+    let i: number = 0;
+    while (i < locales.length) {
+        const rows = [];
+        let rowItem: number = 0;
+        while (!!locales[i] && rowItem < UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER) {
+            rows.push({
+                text:
+                    currentLocale === locales[i]
+                        ? `${locales[i]} ${Emojii.Check}`
+                        : locales[i],
+                callback_data: `${UserSettingsRegExps.Language} ${
+                    locales[i++]
+                }`,
+            });
+            rowItem += 1;
+        }
+        ik.addRow(...rows);
+    }
+
+    return ik.build();
+};
+
+const getCloseInlineKeyboardRow = (
+    locale: string
+): TelegramBot.InlineKeyboardButton => {
+    return {
+        text: getLocalizedMessages(locale, [UserInlineActions.Close]).join(),
+        callback_data: `${UserActionsRegExps.Close}`,
+    };
 };
