@@ -225,9 +225,9 @@ export class MessageHandlerRegistry {
         return telegramUserService.addUser({
             ...DEFAULT_USER_SETTINGS,
             chatId,
-            userName: message.chat?.username,
-            firstName: message.chat?.first_name,
-            lastName: message.chat?.last_name,
+            userName: message.chat?.username || '',
+            firstName: message.chat?.first_name || '',
+            lastName: message.chat?.last_name || '',
             startedOn: Date.now(),
         });
     }
