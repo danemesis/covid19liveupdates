@@ -16,7 +16,7 @@ import {
     CallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
-import { getLocalizedMessage } from '../../../services/domain/localization.service';
+import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
 // TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgument = async ({
@@ -33,7 +33,6 @@ export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgumen
 
 export const showExistingSubscriptionsResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     user,
     chatId,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
@@ -90,7 +89,7 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
     if (err) {
         return bot.sendMessage(
             chatId,
-            getLocalizedMessage(
+            getLocalizedMessages(
                 user?.settings?.locale,
                 'Something went wrong, sorry'
             )

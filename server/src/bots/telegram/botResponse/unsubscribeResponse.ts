@@ -11,7 +11,7 @@ import {
     CallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
-import { getLocalizedMessage } from '../../../services/domain/localization.service';
+import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
 export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -30,7 +30,7 @@ export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgu
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessage(user.settings.locale, [
+        getLocalizedMessages(user.settings.locale, [
             'Choose items to unsubscribe from',
         ])[0],
         getUnsubscribeMessageInlineKeyboard(
@@ -63,7 +63,7 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessage(user.settings.locale, [
+        getLocalizedMessages(user.settings.locale, [
             'You have been unsubscribed from',
         ])[0] + result,
         getFullMenuKeyboard(chatId, user.settings?.locale)

@@ -23,7 +23,7 @@ export const noResponse = async ({
 
     return bot.sendMessage(
         chatId,
-        noResponseForUserMessage(message.text, user?.settings?.locale),
+        noResponseForUserMessage(user?.settings?.locale, message.text),
         getHelpProposalInlineKeyboard(user.settings.locale)
     );
 };

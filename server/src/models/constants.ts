@@ -1,4 +1,4 @@
-import { getLocalizedMessage } from '../services/domain/localization.service';
+import { getLocalizedMessages } from '../services/domain/localization.service';
 
 export const TIMES = {
     MILLISECONDS_IN_SECOND: 1000,

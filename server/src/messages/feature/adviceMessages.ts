@@ -1,8 +1,8 @@
-import { getLocalizedMessage } from '../../services/domain/localization.service';
+import { getLocalizedMessages } from '../../services/domain/localization.service';
 import { Emojii } from '../../models/constants';
 
 export const encouragingMessage = (locale: string): string =>
-    getLocalizedMessage(locale, [
+    getLocalizedMessages(locale, [
         '\n\n',
         '<a href="https://www.youtube.com/watch?v=d914EnpU4Fo&feature=youtu.be">',
         'Wash',
@@ -13,7 +13,7 @@ export const encouragingMessage = (locale: string): string =>
     ]).join('');
 
 export const suggestedBehaviors = (locale: string): string =>
-    getLocalizedMessage(locale, [
+    getLocalizedMessages(locale, [
         '\n🚫🤦',
         'Do not touch your face',
         '\n🚫🤧🤲',
@@ -30,7 +30,7 @@ export const suggestedBehaviors = (locale: string): string =>
     ]).join(' ');
 
 export const socialDistancing = (locale: string): string =>
-    getLocalizedMessage(locale, [
+    getLocalizedMessages(locale, [
         '\n🚫🤝',
         'No handshakes',
         '\n🚫🧑‍🤝‍🧑',
@@ -40,7 +40,7 @@ export const socialDistancing = (locale: string): string =>
     ]).join(' ');
 
 export const alternativeGreetings = (locale: string): string =>
-    getLocalizedMessage(locale, [
+    getLocalizedMessages(locale, [
         '\n👋',
         'Waving Hand – Hello',
         '\n🖖',
@@ -64,7 +64,7 @@ export const getCovid19ExplanationVideo = (): string => {
 };
 
 export const getAdviceMessage = (locale: string | null): string =>
-    getLocalizedMessage(locale, [
+    getLocalizedMessages(locale, [
         `${Emojii.Info}`,
         'Suggested Behaviors for',
         getCovid19ExplanationVideo(),
@@ -72,14 +72,14 @@ export const getAdviceMessage = (locale: string | null): string =>
         .join(' ')
         .concat(suggestedBehaviors(locale))
         .concat(
-            getLocalizedMessage(locale, [
+            getLocalizedMessages(locale, [
                 `\n\n${Emojii.Info}`,
                 'Social Distancing',
             ]).join(' ')
         )
         .concat(socialDistancing(locale))
         .concat(
-            getLocalizedMessage(locale, [
+            getLocalizedMessages(locale, [
                 `\n\n${Emojii.Info}`,
                 'Alternative Greetings',
             ]).join(' ')

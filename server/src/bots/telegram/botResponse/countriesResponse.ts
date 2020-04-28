@@ -3,7 +3,7 @@ import {
     WorldOverallInformation,
 } from '../../../models/covid19.models';
 import {
-    getCountriesTableHTML,
+    getCountriesTableHTMLMessage,
     getCountriesWorldMessage,
     getTableCountryRowMessage,
     getTableHeader,
@@ -20,7 +20,7 @@ import {
 
 export const countriesByContinentResponse = (continent) => async ({
     bot,
-    message,
+    user,
     chatId,
 }: CallBackQueryParameters) => {
     const {
@@ -30,7 +30,7 @@ export const countriesByContinentResponse = (continent) => async ({
         countriesSituation,
     } = await getContinentOverallInformation(continent);
 
-    const portionMessage = [getTableHeader()];
+    const portionMessage = [getTableHeader(user.settings?.locale)];
     portionMessage.push();
 
     countriesSituation
@@ -43,7 +43,8 @@ export const countriesByContinentResponse = (continent) => async ({
 
     return bot.sendMessage(
         chatId,
-        getCountriesTableHTML(
+        getCountriesTableHTMLMessage(
+            user.settings?.locale,
             continent,
             confirmed,
             recovered,
@@ -57,7 +58,7 @@ export const countriesByContinentResponse = (continent) => async ({
 
 export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
+    user,
     chatId,
 }: CallBackQueryParameters) => {
     const {
@@ -71,6 +72,7 @@ export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async 
     return bot.sendMessage(
         chatId,
         getCountriesWorldMessage(
+            user.settings?.locale,
             confirmed,
             recovered,
             deaths,

@@ -18,27 +18,35 @@ import * as i18n from 'i18n';
  * ) will be: "this message will be translated into Ukrainian with two parameters"
  * in Ukrainian
  */
-export function getLocalizedMessage(
+export function getLocalizedMessages(
     locale: string | null,
     messages: string
 ): string;
-export function getLocalizedMessage(
+export function getLocalizedMessages(
     locale: string | null,
     messages: Array<string>
 ): Array<string>;
-export function getLocalizedMessage(
+export function getLocalizedMessages(
     locale: string | null,
     messages: Array<Array<string>>
 ): Array<string>;
-export function getLocalizedMessage(
-    locale: string,
-    messages: Array<string | Array<string>> | string
+export function getLocalizedMessages(
+    locale: string | null,
+    messages: Array<unknown>
+): Array<string>;
+export function getLocalizedMessages(
+    locale: string | null,
+    messages:
+        | string
+        | Array<string>
+        | Array<Array<string> | string>
+        | Array<unknown>
 ): Array<string> | string {
     if (typeof messages === 'string') {
         return i18n.getCatalog(locale)[messages] ?? messages;
     }
 
-    return messages.map((message) => {
+    return (messages as []).map((message) => {
         if (locale) {
             if (typeof message === 'string') {
                 return i18n.getCatalog(locale)[message] ?? message;
@@ -48,7 +56,7 @@ export function getLocalizedMessage(
             return (
                 i18n.__(
                     i18n.getCatalog(locale)[message[0]],
-                    ...message.slice(1)
+                    ...(message as []).slice(1)
                 ) ?? message
             );
         }
@@ -56,4 +64,9 @@ export function getLocalizedMessage(
         // Or take default. Will leave it as it if no translation find
         return i18n.__(message) ?? message;
     });
+}
+
+// TODO: Combine with an above and use recursion on kind of
+export function localizeOnLocales(locales: Array<string>, message: string) {
+    return locales.map((locale) => getLocalizedMessages(locale, message));
 }

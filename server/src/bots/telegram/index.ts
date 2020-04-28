@@ -48,8 +48,9 @@ import { telegramUserService } from './services/user';
 import { withSingleParameterAfterCommand } from './services/registry/withSingleParameterAfterCommand';
 import { settingsLanguageResponse } from './botResponse/settingsResponse';
 import { closeActionResponse } from './botResponse/actionsResponse';
+import { localizeOnLocales } from '../../services/domain/localization.service';
 
-export function runTelegramBot(
+export async function runTelegramBot(
     app: Express,
     appUrl: string,
     telegramToken: string
@@ -65,19 +66,32 @@ export function runTelegramBot(
         res.sendStatus(200);
     });
 
+    const availableLanguages: Array<string> = await telegramUserService.getAvailableLanguages();
     const messageHandlerRegistry = new MessageHandlerRegistry(bot);
     messageHandlerRegistry
         .registerMessageHandler([UserRegExps.Start], startResponse)
         // Message handler for feature  Countries / Country
         .registerMessageHandler(
-            [UserRegExps.CountriesData, UserMessages.CountriesData],
+            [
+                UserRegExps.CountriesData,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.CountriesData
+                ),
+            ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
                 countriesResponse
             )
         )
         .registerMessageHandler(
-            [UserRegExps.AvailableCountries, UserMessages.AvailableCountries],
+            [
+                UserRegExps.AvailableCountries,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.AvailableCountries
+                ),
+            ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
                 showAvailableCountriesResponse
@@ -92,17 +106,32 @@ export function runTelegramBot(
         )
         // Message handler for feature  Advices
         .registerMessageHandler(
-            [UserRegExps.Advice, UserMessages.GetAdviceHowToBehave],
+            [
+                UserRegExps.Advice,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.GetAdviceHowToBehave
+                ),
+            ],
             showAdvicesHowToBehaveResponse
         )
         // Message handler for feature  Help
         .registerMessageHandler(
-            [UserRegExps.Help, UserMessages.Help],
+            [
+                UserRegExps.Help,
+                ...localizeOnLocales(availableLanguages, UserMessages.Help),
+            ],
             helpInfoResponse
         )
         // Message handler for feature  Assistant
         .registerMessageHandler(
-            [UserRegExps.Assistant, UserMessages.Assistant],
+            [
+                UserRegExps.Assistant,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.Assistant
+                ),
+            ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
                 assistantStrategyResponse
@@ -110,11 +139,16 @@ export function runTelegramBot(
         )
         // Message handler for feature  Subscriptions
         .registerMessageHandler(
-            [UserMessages.SubscriptionManager],
+            [
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.SubscriptionManager
+                ),
+            ],
             subscriptionManagerResponse
         )
         .registerMessageHandler(
-            [UserMessages.Existing],
+            [...localizeOnLocales(availableLanguages, UserMessages.Existing)],
             showExistingSubscriptionsResponse
         )
         .registerMessageHandler(
@@ -128,7 +162,10 @@ export function runTelegramBot(
             [
                 CustomSubscriptions.UnsubscribeMeFrom,
                 UserRegExps.Unsubscribe,
-                UserMessages.Unsubscribe,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.Unsubscribe
+                ),
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,

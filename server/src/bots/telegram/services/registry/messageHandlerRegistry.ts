@@ -176,7 +176,7 @@ export class MessageHandlerRegistry {
 
         const answers: Array<Answer> = await fetchAnswer(message.text);
         if (answers?.length) {
-            return assistantResponse(this.bot, answers, chatId);
+            return assistantResponse(this.bot, answers, chatId, user);
         }
 
         return noResponse({
