@@ -9,10 +9,11 @@ import {
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
-import { showCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
+import { getCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
 import { LogCategory } from '../../../models/constants';
 import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
 import { telegramStorage } from './storage';
+import { telegramUserService } from '../services/user';
 
 export const subscriptionNotifierHandler = async (
     messageHandlerRegistry: MessageHandlerRegistry,
@@ -30,12 +31,14 @@ export const subscriptionNotifierHandler = async (
     for (const [chatId, userSubscription] of Object.entries(
         allUsersSubscriptions
     )) {
+        const user = await telegramUserService.getUser(parseInt(chatId, 10));
         const [err, result] = await catchAsyncError(
             getAndSendUserNotificationSubscriptions(
                 messageHandlerRegistry,
                 countriesInfoMap,
                 userSubscription,
-                chatId
+                chatId,
+                user?.settings?.locale
             )
         );
         if (err) {
@@ -52,13 +55,15 @@ const getAndSendUserNotificationSubscriptions = async (
     messageHandlerRegistry: MessageHandlerRegistry,
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
     userSubscription: UserSubscription,
-    chatId: string
+    chatId: string,
+    locale: string
 ) => {
     const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
         countriesInfoMap,
         userSubscription.subscriptionsOn.filter(
             (sub: Subscription) => sub.active
-        )
+        ),
+        locale
     );
 
     if (!!userSubscriptionsUpdate?.length) {
@@ -123,7 +128,8 @@ const getAndSendUserNotificationSubscriptions = async (
 
 const getUserActiveSubscriptionNotifications = (
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
-    userActiveSubscriptions: Array<Subscription>
+    userActiveSubscriptions: Array<Subscription>,
+    locale: string
 ): Array<UserSubscriptionNotification> => {
     let userSubscriptionNotifications: Array<UserSubscriptionNotification> = [];
 
@@ -157,9 +163,10 @@ const getUserActiveSubscriptionNotifications = (
                         lastReceivedData: subscriptionCountryLastInfo,
                         lastUpdate: Date.now(),
                     },
-                    subscriptionMessage: showCountrySubscriptionMessage(
+                    subscriptionMessage: getCountrySubscriptionMessage(
                         subscriptionCountryLastInfo,
-                        subscription.lastReceivedData ?? {}
+                        subscription.lastReceivedData ?? {},
+                        locale
                     ),
                 },
             ];
