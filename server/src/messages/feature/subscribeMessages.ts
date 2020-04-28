@@ -16,17 +16,16 @@ export const subscriptionManagerResponseMessage = (locale: string): string =>
 export const noSubscriptionsResponseMessage = (locale: string): string =>
     getLocalized(locale, `It seems you haven't subscribed for any 🥺`);
 
-export const subscribeError = (message: string): string => {
-    return `${message}, sorry 🙇🏽‍`;
-};
-
-export const subscriptionResultMessage = (message: string): string => {
-    return `Cool, subscribed on ${message} 😎`;
+export const subscriptionResultMessage = (
+    message: string,
+    locale: string
+): string => {
+    return ` ${getLocalized(locale, 'Cool, subscribed on')} ${message} 😎`;
 };
 
 export const showMySubscriptionMessage = (
-    locale: string,
-    userSubscription: UserSubscription
+    userSubscription: UserSubscription,
+    locale: string
 ): string => {
     return getLocalized(locale, `You're 🔔 subscribed on: `).concat(
         userSubscription.subscriptionsOn

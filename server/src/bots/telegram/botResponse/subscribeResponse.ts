@@ -1,7 +1,6 @@
 import {
     noSubscriptionsResponseMessage,
     showMySubscriptionMessage,
-    subscribeError,
     subscriptionManagerResponseMessage,
     subscriptionResultMessage,
 } from '../../../messages/feature/subscribeMessages';
@@ -17,6 +16,7 @@ import {
     CallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
+import { getLocalized } from '../../../services/domain/localization.service';
 
 // TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgument = async ({
@@ -27,7 +27,7 @@ export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgumen
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     return bot.sendMessage(
         chatId,
-        subscriptionManagerResponseMessage(user.settings.locale),
+        subscriptionManagerResponseMessage(user?.settings?.locale),
         getSubscriptionMessageInlineKeyboard()
     );
 };
@@ -44,13 +44,16 @@ export const showExistingSubscriptionsResponse: CallBackQueryHandlerWithCommandA
     if (!activeUserSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
             chatId,
-            noSubscriptionsResponseMessage(user.settings.locale)
+            noSubscriptionsResponseMessage(user?.settings?.locale)
         );
     }
 
     return bot.sendMessage(
         chatId,
-        showMySubscriptionMessage(activeUserSubscription)
+        showMySubscriptionMessage(
+            activeUserSubscription,
+            user?.settings?.locale
+        )
     );
 };
 
@@ -86,8 +89,14 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
         )
     );
     if (err) {
-        return bot.sendMessage(chatId, subscribeError(err.message));
+        return bot.sendMessage(
+            chatId,
+            getLocalized(user?.settings?.locale, 'Something went wrong, sorry')
+        );
     }
 
-    return bot.sendMessage(chatId, subscriptionResultMessage(result));
+    return bot.sendMessage(
+        chatId,
+        subscriptionResultMessage(result, user?.settings?.locale)
+    );
 };
