@@ -13,6 +13,7 @@ describe('withSingleParameterAfterCommand', () => {
     const telegramBotMock: any = {};
     const messageMock: any = { text: 'textMock' };
     const chatIdMock: number = 1;
+    const userMock: any = {};
     const ikCbDataMock: string = 'ikCbDataMock';
 
     let getParameterAfterCommandFromMessageMock: any;
@@ -43,23 +44,31 @@ describe('withSingleParameterAfterCommand', () => {
     });
 
     it('should handleFnMock be called', () => {
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock,
-            ikCbDataMock
-        );
+        withSingleParameterAfterCommand(
+            contextMock,
+            handleFnMock
+        )({
+            bot: telegramBotMock,
+            message: messageMock,
+            user: userMock,
+            chatId: chatIdMock,
+            commandParameter: ikCbDataMock,
+        });
 
         expect(handleFnMock).toBeCalled();
     });
 
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and ikCbDataMock', () => {
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock,
-            ikCbDataMock
-        );
+        withSingleParameterAfterCommand(
+            contextMock,
+            handleFnMock
+        )({
+            bot: telegramBotMock,
+            message: messageMock,
+            user: userMock,
+            chatId: chatIdMock,
+            commandParameter: ikCbDataMock,
+        });
 
         expect(getParameterAfterCommandFromMessageMock).toBeCalledTimes(1);
         expect(getParameterAfterCommandFromMessageMock).toHaveBeenCalledWith(
@@ -69,67 +78,20 @@ describe('withSingleParameterAfterCommand', () => {
     });
 
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and textMock', () => {
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock
-        );
+        withSingleParameterAfterCommand(
+            contextMock,
+            handleFnMock
+        )({
+            bot: telegramBotMock,
+            message: messageMock,
+            user: userMock,
+            chatId: chatIdMock,
+        });
 
         expect(getParameterAfterCommandFromMessageMock).toBeCalledTimes(1);
         expect(getParameterAfterCommandFromMessageMock).toHaveBeenCalledWith(
             'singleParameterAfterCommands',
             'textmock'
-        );
-    });
-
-    it('should handlerFn be called with params', () => {
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock
-        );
-
-        expect(handleFnMock).toBeCalledTimes(1);
-        expect(handleFnMock).toHaveBeenCalledWith(
-            telegramBotMock,
-            messageMock,
-            chatIdMock,
-            'result'
-        );
-    });
-
-    it('should send noResponse', () => {
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock,
-            'error'
-        );
-
-        expect(handleFnMock).not.toBeCalled();
-        expect(noResponseMock).toHaveBeenCalledWith(
-            telegramBotMock,
-            messageMock,
-            chatIdMock
-        );
-    });
-
-    it('should log error', () => {
-        const ikCbDataErrorCauseMock = 'error';
-
-        withSingleParameterAfterCommand(contextMock, handleFnMock)(
-            telegramBotMock,
-            messageMock,
-            chatIdMock,
-            ikCbDataErrorCauseMock
-        );
-
-        expect(handleFnMock).not.toBeCalled();
-        expect(loggerMock).toHaveBeenCalledWith(
-            `Error happend inside withSingleParameterAfterCommand() for ${chatIdMock} with message: ${messageMock.text} and ikCbData: ${ikCbDataErrorCauseMock}`,
-            errorMock,
-            LogCategory.Command,
-            chatIdMock
         );
     });
 });
