@@ -29,43 +29,44 @@ export const getFullMenuKeyboard = (
     }
 
     rk.addRow(
-        getLocalizedMessage(locale, [UserMessages.CountriesData]).join(''),
-        getLocalizedMessage(locale, [UserMessages.AvailableCountries]).join('')
+        getLocalizedMessage(locale, UserMessages.CountriesData),
+        getLocalizedMessage(locale, UserMessages.AvailableCountries)
     )
         .addRow(
-            getLocalizedMessage(locale, [UserMessages.Assistant]).join(''),
-            getLocalizedMessage(locale, [
-                UserMessages.GetAdviceHowToBehave,
-            ]).join('')
+            getLocalizedMessage(locale, UserMessages.Assistant),
+            getLocalizedMessage(locale, UserMessages.GetAdviceHowToBehave)
         )
         .addRow(
-            getLocalizedMessage(locale, [
-                UserMessages.SubscriptionManager,
-            ]).join(''),
-            getLocalizedMessage(locale, [UserMessages.Help]).join('')
+            getLocalizedMessage(locale, UserMessages.SubscriptionManager),
+            getLocalizedMessage(locale, UserMessages.Help)
         );
 
     return rk.open({ resize_keyboard: true });
 };
 
 export const getAfterCountryResponseInlineKeyboard = (
-    country: string
+    country: string,
+    locale: string
 ): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
     ik.addRow({
-        text: `${CustomSubscriptions.SubscribeMeOn} ${country}`,
-        callback_data: `${UserRegExps.Subscribe} ${country}`,
+        text: `${getLocalizedMessage(locale, [
+            CustomSubscriptions.SubscribeMeOn,
+        ])} ${country}`,
+        callback_data: `${getLocalizedMessage(locale, [
+            UserRegExps.Subscribe,
+        ])} ${country}`,
     }).addRow(
         {
-            text: 'Show weekly chart',
+            text: getLocalizedMessage(locale, 'Show weekly chart'),
             callback_data: `${UserRegExps.Trends} ${country}`,
         },
         {
-            text: 'Show monthly chart',
+            text: getLocalizedMessage(locale, 'Show monthly chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.Monthly}`,
         },
         {
-            text: 'Show whole period chart',
+            text: getLocalizedMessage(locale, 'Show whole period chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.WholePeriod}`,
         }
     );
@@ -73,15 +74,17 @@ export const getAfterCountryResponseInlineKeyboard = (
     return ik.build();
 };
 
-export const getSubscriptionMessageInlineKeyboard = (): TelegramBot.SendMessageOptions => {
+export const getSubscriptionMessageInlineKeyboard = (
+    locale: string
+): TelegramBot.SendMessageOptions => {
     const ik = new InlineKeyboard();
     ik.addRow(
         {
-            text: UserMessages.Existing,
+            text: getLocalizedMessage(locale, UserMessages.Existing),
             callback_data: `${UserMessages.Existing}`,
         },
         {
-            text: UserMessages.Unsubscribe,
+            text: getLocalizedMessage(locale, UserMessages.Unsubscribe),
             callback_data: UserMessages.Unsubscribe,
         }
     );
@@ -137,7 +140,7 @@ export const getHelpProposalInlineKeyboard = (
     const ik = new InlineKeyboard();
 
     ik.addRow({
-        text: getLocalizedMessage(locale, [UserMessages.Help]).join(),
+        text: getLocalizedMessage(locale, UserMessages.Help),
         callback_data: UserMessages.Help,
     });
 

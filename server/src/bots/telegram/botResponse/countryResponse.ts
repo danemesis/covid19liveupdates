@@ -76,7 +76,6 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
 
 export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
-    message,
     chatId,
     user,
     commandParameter: requestedCountry,
@@ -113,6 +112,6 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     return bot.sendMessage(
         chatId,
         getCountryIKActionMessage(name),
-        getAfterCountryResponseInlineKeyboard(name)
+        getAfterCountryResponseInlineKeyboard(name, user.settings?.locale)
     );
 };

@@ -5,29 +5,32 @@ import {
 import { getCountryMessage } from './countryMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { getDiffMessage } from '../covid19Messages';
-import { getLocalized } from '../../services/domain/localization.service';
+import { getLocalizedMessage } from '../../services/domain/localization.service';
 
 export const ALREADY_SUBSCRIBED_MESSAGE: string =
     'You are already subscribed on the country';
 
 export const subscriptionManagerResponseMessage = (locale: string): string =>
-    getLocalized(locale, `Easy way to manage your subscriptions 💌`);
+    getLocalizedMessage(locale, `Easy way to manage your subscriptions 💌`);
 
 export const noSubscriptionsResponseMessage = (locale: string): string =>
-    getLocalized(locale, `It seems you haven't subscribed for any 🥺`);
+    getLocalizedMessage(locale, `It seems you haven't subscribed for any 🥺`);
 
 export const subscriptionResultMessage = (
     message: string,
     locale: string
 ): string => {
-    return ` ${getLocalized(locale, 'Cool, subscribed on')} ${message} 😎`;
+    return ` ${getLocalizedMessage(
+        locale,
+        'Cool, subscribed on'
+    )} ${message} 😎`;
 };
 
 export const showMySubscriptionMessage = (
     userSubscription: UserSubscription,
     locale: string
 ): string => {
-    return getLocalized(locale, `You're 🔔 subscribed on: `).concat(
+    return getLocalizedMessage(locale, `You're 🔔 subscribed on: `).concat(
         userSubscription.subscriptionsOn
             .map((sub: Subscription) => `${sub.value}`)
             .join(', ')
@@ -47,7 +50,7 @@ export const getCountrySubscriptionMessage = (
     return (
         `🔔 ` +
         getCountryMessage(name, confirmed, recovered, deaths, date) +
-        `\n\n📈 ${getLocalized(
+        `\n\n📈 ${getLocalizedMessage(
             locale,
             'Country change, since'
         )} ⏱️${prevDate}\n` +

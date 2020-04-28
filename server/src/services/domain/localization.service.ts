@@ -18,11 +18,27 @@ import * as i18n from 'i18n';
  * ) will be: "this message will be translated into Ukrainian with two parameters"
  * in Ukrainian
  */
-export const getLocalizedMessage = (
+export function getLocalizedMessage(
     locale: string | null,
-    messages: Array<string | Array<string>>
-): Array<string> =>
-    messages.map((message) => {
+    messages: string
+): string;
+export function getLocalizedMessage(
+    locale: string | null,
+    messages: Array<string>
+): Array<string>;
+export function getLocalizedMessage(
+    locale: string | null,
+    messages: Array<Array<string>>
+): Array<string>;
+export function getLocalizedMessage(
+    locale: string,
+    messages: Array<string | Array<string>> | string
+): Array<string> | string {
+    if (typeof messages === 'string') {
+        return i18n.getCatalog(locale)[messages] ?? messages;
+    }
+
+    return messages.map((message) => {
         if (locale) {
             if (typeof message === 'string') {
                 return i18n.getCatalog(locale)[message] ?? message;
@@ -40,6 +56,4 @@ export const getLocalizedMessage = (
         // Or take default. Will leave it as it if no translation find
         return i18n.__(message) ?? message;
     });
-
-export const getLocalized = (locale: string | null, message: string): string =>
-    getLocalizedMessage(locale, [message])[0];
+}

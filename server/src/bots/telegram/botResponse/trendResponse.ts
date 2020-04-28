@@ -12,7 +12,7 @@ import { logger } from '../../../utils/logger';
 import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Frequency } from './../../../models/constants';
-import { getLocalized } from '../../../services/domain/localization.service';
+import { getLocalizedMessage } from '../../../services/domain/localization.service';
 
 export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -64,9 +64,11 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
 
     let model = enrichWithTitle(
         Transform(periodSituation),
-        getLocalized(user.settings.locale, frequencyName) +
-            getLocalized(user.settings.locale, 'trends for') +
-            capitalize(getLocalized(user.settings.locale, requestedCountry))
+        getLocalizedMessage(user.settings.locale, frequencyName) +
+            getLocalizedMessage(user.settings.locale, 'trends for') +
+            capitalize(
+                getLocalizedMessage(user.settings.locale, requestedCountry)
+            )
     );
     if (frequency === Frequency.Weekly) {
         model = enrichWithType(model, 'barStacked');

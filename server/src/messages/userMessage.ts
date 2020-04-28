@@ -1,7 +1,7 @@
 import { User } from '../models/user.model';
 import {
     getLocalizedMessage,
-    getLocalized,
+    getLocalizedMessage,
 } from '../services/domain/localization.service';
 
 const FIRST_MESSAGE_EXPLANATION: string =
@@ -28,7 +28,7 @@ export const noResponseForUserMessage = (
     locale: string
 ): string => {
     return (
-        getLocalized(
+        getLocalizedMessage(
             locale,
             `We do not have any response for you as we didn't understand you, 🤦\nHowever, we add your query, we will learn how to respond on`
         ) + message
