@@ -1,14 +1,19 @@
 import {
+    CountryActiveSituationInfo,
     CountrySituationInfo,
     WorldOverallInformation,
 } from '../../../models/covid19.models';
 import {
+    getCountriesForContinentMessage,
     getCountriesTableHTMLMessage,
     getCountriesWorldMessage,
     getTableCountryRowMessage,
     getTableHeader,
 } from '../../../messages/feature/countriesMessages';
-import { getContinentsInlineKeyboard } from '../services/keyboard';
+import {
+    getContinentsInlineKeyboard,
+    getCountriesInlineKeyboard,
+} from '../services/keyboard';
 import {
     CallBackQueryHandlerWithCommandArgument,
     CallBackQueryParameters,
@@ -17,8 +22,30 @@ import {
     getContinentOverallInformation,
     getWorldOverallInformation,
 } from '../../../services/domain/countries';
+import * as TelegramBot from 'node-telegram-bot-api';
 
-export const countriesByContinentResponse = (continent) => async ({
+export const countriesForContinentResponse = async ({
+    bot,
+    user,
+    chatId,
+    commandParameter,
+}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const { countriesSituation } = await getContinentOverallInformation(
+        commandParameter
+    );
+
+    const sortedCountriesSituation: Array<CountryActiveSituationInfo> = countriesSituation.sort(
+        (country1, country2) => country2.active - country1.active
+    );
+
+    return bot.sendMessage(
+        chatId,
+        getCountriesForContinentMessage(user.settings?.locale),
+        getCountriesInlineKeyboard(sortedCountriesSituation)
+    );
+};
+
+export const countriesTableByContinentResponse = (continent) => async ({
     bot,
     user,
     chatId,
@@ -33,13 +60,15 @@ export const countriesByContinentResponse = (continent) => async ({
     const portionMessage = [getTableHeader(user.settings?.locale)];
     portionMessage.push();
 
-    countriesSituation
-        .sort((country1, country2) => country2.active - country1.active)
-        .forEach(({ name, active, recovered, deaths }) =>
-            portionMessage.push(
-                getTableCountryRowMessage(name, active, recovered, deaths)
-            )
-        );
+    const sortedCountriesSituation: Array<CountryActiveSituationInfo> = countriesSituation.sort(
+        (country1, country2) => country2.active - country1.active
+    );
+
+    sortedCountriesSituation.forEach(({ name, active, recovered, deaths }) =>
+        portionMessage.push(
+            getTableCountryRowMessage(name, active, recovered, deaths)
+        )
+    );
 
     return bot.sendMessage(
         chatId,
@@ -52,11 +81,18 @@ export const countriesByContinentResponse = (continent) => async ({
             countriesSituation,
             portionMessage
         ),
-        { parse_mode: 'HTML' }
+        {
+            parse_mode: 'HTML',
+            reply_markup: {
+                inline_keyboard: getCountriesInlineKeyboard(
+                    sortedCountriesSituation
+                ),
+            },
+        }
     );
 };
 
-export const countriesResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const worldByContinentOverallResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,

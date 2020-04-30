@@ -11,9 +11,14 @@ import {
     UserSettingsRegExps,
 } from '../../../models/constants';
 import { InlineKeyboard, ReplyKeyboard } from 'node-telegram-keyboard-wrapper';
-import { UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER } from '../models';
+import {
+    COUNTRIES_ROW_ITEMS_NUMBER,
+    UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
+import { Country } from '../../../models/country.models';
+import { flag } from 'country-emoji';
 
 export const getFullMenuKeyboard = (
     chatId: number,
@@ -169,6 +174,30 @@ export const getLocalizationInlineKeyboard = (
                     locales[i++]
                 }`,
             });
+            rowItem += 1;
+        }
+        ik.addRow(...rows);
+    }
+
+    return ik.build();
+};
+
+export const getCountriesInlineKeyboard = (
+    countries: Array<Country>
+): TelegramBot.SendMessageOptions => {
+    const ik = new InlineKeyboard();
+
+    let i: number = 0;
+    while (i < countries.length) {
+        const rows = [];
+        let rowItem: number = 0;
+        while (!!countries[i] && rowItem < COUNTRIES_ROW_ITEMS_NUMBER) {
+            const country: Country = countries[i];
+            rows.push({
+                text: `${flag(country.name) ?? ''}${country.iso3}`,
+                callback_data: `${UserRegExps.CountryData} ${country.name}`,
+            });
+            i += 1;
             rowItem += 1;
         }
         ik.addRow(...rows);

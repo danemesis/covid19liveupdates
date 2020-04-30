@@ -10,7 +10,11 @@ import * as TelegramBot from 'node-telegram-bot-api';
 export const showAvailableCountriesResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
+    user,
 }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
     const countries: Array<Country> = await getAvailableCountries();
-    return bot.sendMessage(chatId, getShowCountriesMessage(countries));
+    return bot.sendMessage(
+        chatId,
+        getShowCountriesMessage(user.settings?.locale, countries)
+    );
 };
