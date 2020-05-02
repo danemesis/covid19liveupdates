@@ -184,7 +184,10 @@ export async function runTelegramBot(
         )
         // Settings
         .registerMessageHandler(
-            [UserSettingsRegExps.Language],
+            [
+                ...localizeOnLocales(availableLanguages, UserMessages.Language),
+                UserSettingsRegExps.Language,
+            ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
                 settingsLanguageResponse

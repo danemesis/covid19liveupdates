@@ -11,6 +11,7 @@ import {
     getTableHeader,
 } from '../../../messages/feature/countriesMessages';
 import {
+    getContinentCountriesCheckOutOfferMessageInlineKeyboard,
     getContinentsInlineKeyboard,
     getCountriesInlineKeyboard,
 } from '../services/keyboard';
@@ -23,6 +24,8 @@ import {
     getWorldOverallInformation,
 } from '../../../services/domain/countries';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { Continents } from '../../../models/constants';
+import { isTextEqual } from '../../../utils/isEqual';
 
 export const countriesForContinentResponse = async ({
     bot,
@@ -45,7 +48,7 @@ export const countriesForContinentResponse = async ({
     );
 };
 
-export const countriesTableByContinentResponse = (continent) => async ({
+export const countriesTableByContinentResponse = (continent: string) => async ({
     bot,
     user,
     chatId,
@@ -84,8 +87,9 @@ export const countriesTableByContinentResponse = (continent) => async ({
         {
             parse_mode: 'HTML',
             reply_markup: {
-                inline_keyboard: getCountriesInlineKeyboard(
-                    sortedCountriesSituation
+                inline_keyboard: getContinentCountriesCheckOutOfferMessageInlineKeyboard(
+                    user.settings?.locale,
+                    continent
                 ),
             },
         }
@@ -96,7 +100,24 @@ export const worldByContinentOverallResponse: CallBackQueryHandlerWithCommandArg
     bot,
     user,
     chatId,
+    message,
+    commandParameter,
 }: CallBackQueryParameters) => {
+    if (
+        !!commandParameter &&
+        Object.keys(Continents).some((continent) =>
+            isTextEqual(continent, commandParameter)
+        )
+    ) {
+        return countriesForContinentResponse({
+            bot,
+            user,
+            chatId,
+            message,
+            commandParameter,
+        });
+    }
+
     const {
         confirmed,
         recovered,
