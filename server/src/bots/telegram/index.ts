@@ -37,7 +37,7 @@ import {
 } from './botResponse/subscribeResponse';
 import { SubscriptionType } from '../../models/subscription.models';
 import { TelegramMessageRegistry } from './services/registry/telegramMessageRegistry';
-import { withTwoArgumentsAfterCommand } from './services/registry/withTwoArgumentsAfterCommand';
+import { withTwoArgumentsAfterCommand } from '../../services/domain/registry/withTwoArgumentsAfterCommand';
 import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
@@ -45,7 +45,7 @@ import { CountrySituationInfo } from '../../models/covid19.models';
 import { catchAsyncError } from '../../utils/catchError';
 import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
 import { telegramUserService } from './services/user';
-import { withSingleParameterAfterCommand } from './services/registry/withSingleParameterAfterCommand';
+import { withSingleParameterAfterCommand } from '../../services/domain/registry/withSingleParameterAfterCommand';
 import { settingsLanguageResponse } from './botResponse/settingsResponse';
 import { closeActionResponse } from './botResponse/actionsResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';

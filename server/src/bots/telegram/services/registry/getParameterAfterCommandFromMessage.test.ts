@@ -1,4 +1,4 @@
-import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
+import { getParameterAfterCommandFromMessage } from '../../../../services/domain/registry/getParameterAfterCommandFromMessage';
 import {
     Continents,
     CustomSubscriptions,

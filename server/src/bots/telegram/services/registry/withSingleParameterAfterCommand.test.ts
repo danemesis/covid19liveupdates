@@ -1,5 +1,5 @@
-import * as getParameterAfterCommandFromMessage from './getParameterAfterCommandFromMessage';
-import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
+import * as getParameterAfterCommandFromMessage from '../../../../services/domain/registry/getParameterAfterCommandFromMessage';
+import { withSingleParameterAfterCommand } from '../../../../services/domain/registry/withSingleParameterAfterCommand';
 import * as noResponse from '../../botResponse/noResponse';
 import { logger } from '../../../../utils/logger';
 

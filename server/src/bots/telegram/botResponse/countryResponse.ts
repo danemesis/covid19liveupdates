@@ -10,8 +10,8 @@ import {
     getFullMenuKeyboard,
 } from '../services/keyboard';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
@@ -24,13 +24,13 @@ import {
 } from '../../../services/domain/countries';
 import { LogCategory } from '../../../models/constants';
 
-export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryByNameStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
         return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
     }
@@ -44,12 +44,12 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
     });
 };
 
-export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryByFlag: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const countryFlag = message.text;
     if (
         !countryFlag ||
@@ -74,12 +74,12 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
     });
 };
 
-export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,
     commandParameter: requestedCountry,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const [err, result]: [
         Error,
         [Country, Array<CountrySituationInfo>]

@@ -3,8 +3,8 @@ import {
     getLocalizationInlineKeyboard,
 } from '../services/keyboard';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
@@ -18,12 +18,12 @@ import { logger } from '../../../utils/logger';
 import { DEFAULT_LOCALE, LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
 
-export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const settingsLanguageResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const locales: Array<string> = await telegramUserService.getAvailableLanguages();
     if (!commandParameter) {
         return bot.sendMessage(

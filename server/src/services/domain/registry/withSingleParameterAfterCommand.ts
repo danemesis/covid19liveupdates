@@ -1,13 +1,12 @@
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
-} from '../../models';
-import * as TelegramBot from 'node-telegram-bot-api';
-import { logger } from '../../../../utils/logger';
-import { noResponse } from '../../botResponse/noResponse';
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
+} from '../../../bots/telegram/models';
+import { logger } from '../../../utils/logger';
 import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
-import { LogCategory } from '../../../../models/constants';
-import { TelegramMessageRegistry } from './telegramMessageRegistry';
+import { LogCategory } from '../../../models/constants';
+import { MessageRegistry } from './messageRegistry';
+import { Message } from '../../../models/bots';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -16,16 +15,17 @@ import { TelegramMessageRegistry } from './telegramMessageRegistry';
  * * @example /country Ukraine
  */
 export const withSingleParameterAfterCommand = (
-    context: TelegramMessageRegistry,
-    handlerFn: CallBackQueryHandlerWithCommandArgument
-): CallBackQueryHandlerWithCommandArgument => {
+    context: MessageRegistry,
+    handlerFn: TelegramCallBackQueryHandlerWithCommandArgument,
+    noResponseFn: (args: unknown) => Promise<Message>
+): TelegramCallBackQueryHandlerWithCommandArgument => {
     return ({
         bot,
         message,
         chatId,
         user,
         commandParameter,
-    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    }: TelegramCallBackQueryParameters): Promise<Message> => {
         try {
             const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
                 context.singleParameterAfterCommands,
@@ -47,7 +47,7 @@ export const withSingleParameterAfterCommand = (
                 chatId
             );
 
-            return noResponse({ bot, message, chatId, user });
+            return noResponseFn({ bot, message, chatId, user });
         }
     };
 };

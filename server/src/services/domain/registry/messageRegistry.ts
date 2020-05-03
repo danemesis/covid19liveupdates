@@ -1,9 +1,11 @@
-import { CallBackQueryHandlerWithCommandArgument } from '../../bots/telegram/models';
-import { logger } from '../../utils/logger';
-import { User } from '../../models/user.model';
-import { telegramUserService } from '../../bots/telegram/services/user';
-import { LogCategory } from '../../models/constants';
-import { Bot, Message } from '../../models/bots';
+import { logger } from '../../../utils/logger';
+import { User } from '../../../models/user.model';
+import { LogCategory } from '../../../models/constants';
+import {
+    Bot,
+    CallBackQueryHandlerWithCommandArgument,
+    Message,
+} from '../../../models/bots';
 
 export abstract class MessageRegistry {
     private messageHandlers: {
@@ -104,16 +106,11 @@ export abstract class MessageRegistry {
                  * check.
                  */
                 if (userBeforeExecutionCbHandler.state?.interruptedCommand) {
-                    const upToDateUser: User = await telegramUserService.getUser(
-                        user
-                    );
+                    const upToDateUser: User = await this.getUser(user.chatId);
                     /**
                      * Always update up-to-date user
                      */
-                    await telegramUserService.setUserInterruptedCommand(
-                        upToDateUser,
-                        null
-                    );
+                    await this.setUserInterruptedCommand(upToDateUser);
                     return this.runCommandHandler({
                         ...message,
                         text: upToDateUser.state.interruptedCommand,
@@ -139,6 +136,10 @@ export abstract class MessageRegistry {
     ): Promise<User>;
 
     protected abstract async getUser(chatId: number): Promise<User>;
+
+    protected abstract async setUserInterruptedCommand(
+        user: User
+    ): Promise<void>;
 
     private getSuitableCbHandlersKey(
         cbHandlers: {

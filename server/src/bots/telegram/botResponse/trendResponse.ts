@@ -9,12 +9,12 @@ import {
 import { catchAsyncError } from '../../../utils/catchError';
 import { getRequestedCountry } from '../../../services/domain/countries';
 import { logger } from '../../../utils/logger';
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import { TelegramCallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Frequency } from './../../../models/constants';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
-export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const trendsByCountryResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,

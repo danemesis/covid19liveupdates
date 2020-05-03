@@ -14,7 +14,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
 import { telegramUserService } from '../user';
 import { DEFAULT_USER_SETTINGS, User } from '../../../../models/user.model';
-import { MessageRegistry } from '../../../../services/domain/messageRegistry';
+import { MessageRegistry } from '../../../../services/domain/registry/messageRegistry';
 import { Message } from '../../../../models/bots';
 import { getTelegramChatId } from '../../utils/chat';
 
@@ -93,6 +93,10 @@ export class TelegramMessageRegistry extends MessageRegistry {
 
     protected async getUser(chatId: number): Promise<User> {
         return telegramUserService.getUser(chatId);
+    }
+
+    protected async setUserInterruptedCommand(user: User): Promise<void> {
+        return telegramUserService.setUserInterruptedCommand(user, null);
     }
 
     private registerCallBackQuery() {

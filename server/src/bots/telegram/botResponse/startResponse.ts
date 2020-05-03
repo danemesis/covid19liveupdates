@@ -1,20 +1,20 @@
 import { getFullMenuKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { settingsLanguageResponse } from './settingsResponse';
 import { telegramUserService } from '../services/user';
 import { UserRegExps } from '../../../models/constants';
 
-export const startResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const startResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const locale: string | null = user.settings?.locale;
     if (!locale) {
         telegramUserService.setUserInterruptedCommand(user, UserRegExps.Start);

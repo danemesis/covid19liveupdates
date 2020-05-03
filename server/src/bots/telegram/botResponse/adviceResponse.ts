@@ -1,8 +1,8 @@
-import { CallBackQueryHandlerWithCommandArgument } from '../models';
+import { TelegramCallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getAdviceMessage } from '../../../messages/feature/adviceMessages';
 
-export const showAdvicesHowToBehaveResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showAdvicesHowToBehaveResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,

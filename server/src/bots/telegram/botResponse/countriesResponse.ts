@@ -16,8 +16,8 @@ import {
     getCountriesInlineKeyboard,
 } from '../services/keyboard';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import {
     getContinentOverallInformation,
@@ -32,7 +32,7 @@ export const countriesForContinentResponse = async ({
     user,
     chatId,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const { countriesSituation } = await getContinentOverallInformation(
         commandParameter
     );
@@ -52,7 +52,7 @@ export const countriesTableByContinentResponse = (continent: string) => async ({
     bot,
     user,
     chatId,
-}: CallBackQueryParameters) => {
+}: TelegramCallBackQueryParameters) => {
     const {
         confirmed,
         recovered,
@@ -96,13 +96,13 @@ export const countriesTableByContinentResponse = (continent: string) => async ({
     );
 };
 
-export const worldByContinentOverallResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const worldByContinentOverallResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
     message,
     commandParameter,
-}: CallBackQueryParameters) => {
+}: TelegramCallBackQueryParameters) => {
     if (
         !!commandParameter &&
         Object.keys(Continents).some((continent) =>
