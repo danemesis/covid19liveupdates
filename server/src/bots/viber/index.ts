@@ -19,7 +19,7 @@ export async function runViberBot(
     bot.setWebhook(`${appUrl}/viber/webhook`);
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
-        // console.log('message MESSAGE_RECEIVED', message);
+        // console.log('message MESSAGE_RECEIVED', message, response);
         // response.send(new Message.Text('Hi ' + message.text));
     });
 

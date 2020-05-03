@@ -1,22 +1,8 @@
 import { CallBackQueryHandlerWithCommandArgument } from '../../bots/telegram/models';
 import { logger } from '../../utils/logger';
-import { getChatId } from '../../bots/telegram/utils/chat';
 import { User } from '../../models/user.model';
 import { telegramUserService } from '../../bots/telegram/services/user';
 import { LogCategory } from '../../models/constants';
-import {
-    getCountryByMessage,
-    getCountryNameByFlag,
-    isMessageCountryFlag,
-} from '../../utils/featureHelpers/isMessageCountry';
-import { showCountryResponse } from '../../bots/telegram/botResponse/countryResponse';
-import { Country } from '../../models/country.models';
-import { getAvailableCountries } from './covid19';
-import { getCountryNameFormat } from './countries';
-import { Answer } from '../../models/knowledgebase/answer.models';
-import { fetchAnswer } from '../api/api-knowledgebase';
-import { assistantResponse } from '../../bots/telegram/botResponse/assistantResponse';
-import { noResponse } from '../../bots/telegram/botResponse/noResponse';
 import { Bot, Message } from '../../models/bots';
 
 export abstract class MessageRegistry {
@@ -25,9 +11,9 @@ export abstract class MessageRegistry {
     } = {};
     public singleParameterAfterCommands: Array<string> = [];
 
-    constructor(private readonly bot: Bot) {
-        this.registerCallBackQuery();
-    }
+    public abstract getChatId: (params: Message) => number;
+
+    protected constructor(protected readonly bot: Bot) {}
 
     public registerMessageHandler(
         regexps: Array<string>,
@@ -48,19 +34,14 @@ export abstract class MessageRegistry {
         return this;
     }
 
-    public abstract sendUserNotification(
-        chatId: number,
-        notification: string
-    ): Promise<Message>;
-
     public async runCommandHandler(
         message: Message,
         ikCbData?: string
     ): Promise<Message> {
         logger.log('info', message);
-        const chatId: number = getChatId(message);
+        const chatId: number = this.getChatId(message);
         const user: User | null =
-            (await telegramUserService.getUser(chatId)) ??
+            (await this.getUser(chatId)) ??
             (await this.createAndAddUser(message, chatId));
 
         const runCheckupAgainstStr = (ikCbData
@@ -141,66 +122,23 @@ export abstract class MessageRegistry {
             });
     }
 
-    private async tryDeduceUserCommand(
+    public abstract sendUserNotification(
+        chatId: number,
+        notification: string
+    ): Promise<Message>;
+
+    protected abstract async tryDeduceUserCommand(
         message: Message,
         chatId: number,
         user: User
-    ): Promise<Message> {
-        if (isMessageCountryFlag(message.text)) {
-            const countryName: string = getCountryNameByFlag(message.text);
-            return showCountryResponse({
-                bot: this.bot,
-                message,
-                chatId,
-                user,
-                commandParameter: countryName,
-            });
-        }
+    ): Promise<Message>;
 
-        const countries: Array<Country> = await getAvailableCountries();
-        const country: Country | undefined = getCountryByMessage(
-            getCountryNameFormat(message.text),
-            countries
-        );
-        if (country) {
-            return showCountryResponse({
-                bot: this.bot,
-                message,
-                chatId,
-                commandParameter: country.name,
-                user,
-            });
-        }
+    protected abstract async createAndAddUser(
+        message: Message,
+        chatId: number
+    ): Promise<User>;
 
-        const answers: Array<Answer> = await fetchAnswer(message.text);
-        if (answers?.length) {
-            return assistantResponse(this.bot, answers, chatId, user);
-        }
-
-        return noResponse({
-            bot: this.bot,
-            message,
-            chatId,
-            user,
-        });
-    }
-
-    private registerCallBackQuery() {
-        this.bot.on('callback_query', ({ id, data, message, from }) => {
-            this.bot
-                .answerCallbackQuery(id, { text: `${data} in progress...` })
-                .then(() => {
-                    return this.runCommandHandler(
-                        {
-                            ...message,
-                            from, // As in cases of answerCallbackQuery original from in message will be bot sender,
-                            // But we do want it still to be user. Do we? :D
-                        },
-                        data
-                    );
-                });
-        });
-    }
+    protected abstract async getUser(chatId: number): Promise<User>;
 
     private getSuitableCbHandlersKey(
         cbHandlers: {
@@ -215,9 +153,4 @@ export abstract class MessageRegistry {
                 )
         );
     }
-
-    public abstract async createAndAddUser(
-        message: Message,
-        chatId: number
-    ): Promise<User>;
 }

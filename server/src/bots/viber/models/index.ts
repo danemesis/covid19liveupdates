@@ -107,31 +107,35 @@ export interface Response {
 export type StickerMessage = new (stickerId: number) => StickerMessage;
 
 export type KeyboardMessage = new (
-        keyboard: Keyboard,
-        optionalTrackingData?: string,
-        timestamp?: string,
-        token?: string,
-        minApiVersion?: number
-    ) => KeyboardMessage;
+    keyboard: Keyboard,
+    optionalTrackingData?: string,
+    timestamp?: string,
+    token?: string,
+    minApiVersion?: number
+) => KeyboardMessage;
 
 export type RichMediaMessage = new (
-        richMedia: RichMedia,
-        optionalKeyboard?: Keyboard,
-        optionalTrackingData?: string,
-        timestamp?: string,
-        token?: string,
-        optionalAltText?: string,
-        minApiVersion?: number
-    ) => RichMediaMessage;
+    richMedia: RichMedia,
+    optionalKeyboard?: Keyboard,
+    optionalTrackingData?: string,
+    timestamp?: string,
+    token?: string,
+    optionalAltText?: string,
+    minApiVersion?: number
+) => RichMediaMessage;
 
-export type ViberTextMessage = new (
-        message: string,
-        keyboard?: Keyboard,
-        optionalTrackingData?: string,
-        timestamp?: string,
-        token?: string,
-        minApiVersion?: number
-    ) => ViberTextMessage;
+export interface ViberTextMessageBase {
+    text: string;
+    keyboard?: Keyboard;
+    optionalTrackingData?: string;
+    timestamp?: string;
+    token?: string;
+    minApiVersion?: number;
+}
+
+export interface ViberTextMessage extends ViberTextMessageBase {
+    chat: UserProfile;
+}
 
 export interface BaseInfo {
     authToken: string;

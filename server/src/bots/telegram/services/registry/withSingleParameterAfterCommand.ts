@@ -7,7 +7,7 @@ import { logger } from '../../../../utils/logger';
 import { noResponse } from '../../botResponse/noResponse';
 import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
 import { LogCategory } from '../../../../models/constants';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+import { TelegramMessageRegistry } from './telegramMessageRegistry';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -16,7 +16,7 @@ import { MessageHandlerRegistry } from './messageHandlerRegistry';
  * * @example /country Ukraine
  */
 export const withSingleParameterAfterCommand = (
-    context: MessageHandlerRegistry,
+    context: TelegramMessageRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
 ): CallBackQueryHandlerWithCommandArgument => {
     return ({

@@ -1,13 +1,13 @@
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+import { TelegramMessageRegistry } from './telegramMessageRegistry';
 
-describe('MessageHandlerRegistry', () => {
-    let messageHandlerRegistry: MessageHandlerRegistry;
+describe('TelegramMessageRegistry', () => {
+    let messageHandlerRegistry: TelegramMessageRegistry;
     const botMock: any = {
         sendMessage: jest.fn().mockReturnValue(Promise.resolve('message')),
         on: jest.fn(),
     };
     beforeAll(() => {
-        messageHandlerRegistry = new MessageHandlerRegistry(botMock);
+        messageHandlerRegistry = new TelegramMessageRegistry(botMock);
     });
 
     it('should be created', () => {

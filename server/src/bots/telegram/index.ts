@@ -36,7 +36,7 @@ import {
     subscriptionManagerResponse,
 } from './botResponse/subscribeResponse';
 import { SubscriptionType } from '../../models/subscription.models';
-import { MessageHandlerRegistry } from './services/registry/messageHandlerRegistry';
+import { TelegramMessageRegistry } from './services/registry/telegramMessageRegistry';
 import { withTwoArgumentsAfterCommand } from './services/registry/withTwoArgumentsAfterCommand';
 import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
@@ -67,7 +67,7 @@ export async function runTelegramBot(
     });
 
     const availableLanguages: Array<string> = await telegramUserService.getAvailableLanguages();
-    const messageHandlerRegistry = new MessageHandlerRegistry(bot);
+    const messageHandlerRegistry = new TelegramMessageRegistry(bot);
     messageHandlerRegistry
         .registerMessageHandler([UserRegExps.Start], startResponse)
         // Message handler for feature  Countries / Country

@@ -2,7 +2,6 @@ import * as getParameterAfterCommandFromMessage from './getParameterAfterCommand
 import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
 import * as noResponse from '../../botResponse/noResponse';
 import { logger } from '../../../../utils/logger';
-import { LogCategory } from '../../../../models/constants';
 
 describe('withSingleParameterAfterCommand', () => {
     const errorMock: any = new Error('error');

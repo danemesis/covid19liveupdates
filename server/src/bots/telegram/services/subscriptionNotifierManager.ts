@@ -11,12 +11,12 @@ import { logger } from '../../../utils/logger';
 import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
 import { getCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
 import { LogCategory } from '../../../models/constants';
-import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
+import { TelegramMessageRegistry } from './registry/telegramMessageRegistry';
 import { telegramStorage } from './storage';
 import { telegramUserService } from '../services/user';
 
 export const subscriptionNotifierHandler = async (
-    messageHandlerRegistry: MessageHandlerRegistry,
+    messageHandlerRegistry: TelegramMessageRegistry,
     countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]
 ): Promise<void> => {
     const allUsersSubscriptions = await telegramStorage.getSubscriptions();
@@ -52,7 +52,7 @@ export const subscriptionNotifierHandler = async (
 };
 
 const getAndSendUserNotificationSubscriptions = async (
-    messageHandlerRegistry: MessageHandlerRegistry,
+    messageHandlerRegistry: TelegramMessageRegistry,
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
     userSubscription: UserSubscription,
     chatId: string,

@@ -6,7 +6,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { LogCategory } from '../../../../models/constants';
 import { logger } from '../../../../utils/logger';
 import { noResponse } from '../../botResponse/noResponse';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+import { TelegramMessageRegistry } from './telegramMessageRegistry';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -15,7 +15,7 @@ import { MessageHandlerRegistry } from './messageHandlerRegistry';
  * @example /trends Ukraine monthly
  */
 export const withTwoArgumentsAfterCommand = (
-    context: MessageHandlerRegistry,
+    context: TelegramMessageRegistry,
     handlerFn: CallBackQueryHandlerWithCommandArgument
 ): CallBackQueryHandlerWithCommandArgument => {
     return ({
