@@ -1,4 +1,7 @@
-import { getLocalizationInlineKeyboard } from '../services/keyboard';
+import {
+    getFullMenuKeyboard,
+    getLocalizationInlineKeyboard,
+} from '../services/keyboard';
 import {
     CallBackQueryHandlerWithCommandArgument,
     CallBackQueryParameters,
@@ -68,6 +71,7 @@ export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument =
         // We cannot use "User" from parameter in the bot.sendMessage(
         // because that "User" still have an old locale, while this
         // "resultUser" has updated user settings
-        languageHasBeenSuccessfullySetup(updatedUser.settings.locale)
+        languageHasBeenSuccessfullySetup(updatedUser.settings.locale),
+        getFullMenuKeyboard(chatId, updatedUser.settings?.locale)
     );
 };

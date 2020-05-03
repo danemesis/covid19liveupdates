@@ -11,9 +11,14 @@ import {
     UserSettingsRegExps,
 } from '../../../models/constants';
 import { InlineKeyboard, ReplyKeyboard } from 'node-telegram-keyboard-wrapper';
-import { UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER } from '../models';
+import {
+    COUNTRIES_ROW_ITEMS_NUMBER,
+    UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER,
+} from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
+import { Country } from '../../../models/country.models';
+import { flag } from 'country-emoji';
 
 export const getFullMenuKeyboard = (
     chatId: number,
@@ -30,14 +35,14 @@ export const getFullMenuKeyboard = (
 
     rk.addRow(
         getLocalizedMessages(locale, UserMessages.CountriesData),
-        getLocalizedMessages(locale, UserMessages.AvailableCountries)
+        getLocalizedMessages(locale, UserMessages.SubscriptionManager)
     )
         .addRow(
             getLocalizedMessages(locale, UserMessages.Assistant),
             getLocalizedMessages(locale, UserMessages.GetAdviceHowToBehave)
         )
         .addRow(
-            getLocalizedMessages(locale, UserMessages.SubscriptionManager),
+            getLocalizedMessages(locale, UserMessages.Language),
             getLocalizedMessages(locale, UserMessages.Help)
         );
 
@@ -173,6 +178,104 @@ export const getLocalizationInlineKeyboard = (
         }
         ik.addRow(...rows);
     }
+
+    return ik.build();
+};
+
+export const getContinentCountriesCheckOutOfferMessageInlineKeyboard = (
+    locale: string,
+    continent: string
+): Array<Array<TelegramBot.InlineKeyboardButton>> => {
+    const inlineKeyboard = [];
+
+    inlineKeyboard.push([
+        {
+            text: getLocalizedMessages(locale, 'Get all continents'),
+            callback_data: UserRegExps.CountriesData,
+        },
+        {
+            text: getLocalizedMessages(locale, [
+                [`Check %s countries out`, continent],
+            ]).join(''),
+            callback_data: `${UserRegExps.CountriesData} ${continent}`,
+        },
+    ]);
+
+    return inlineKeyboard;
+};
+
+export const getCountriesInlineKeyboard = (
+    countries: Array<Country>
+): TelegramBot.SendMessageOptions => {
+    const ik = new InlineKeyboard();
+
+    let i: number = 0;
+    while (i < countries.length) {
+        const rows = [];
+        let rowItem: number = 0;
+        while (!!countries[i] && rowItem < COUNTRIES_ROW_ITEMS_NUMBER) {
+            const country: Country = countries[i];
+            rows.push({
+                text: `${flag(country.name) ?? ''}${country.iso3}`,
+                callback_data: `${UserRegExps.CountryData} ${country.name}`,
+            });
+            i += 1;
+            rowItem += 1;
+        }
+        ik.addRow(...rows);
+    }
+
+    return ik.build();
+};
+
+export const getFullClickableFeaturesInlineKeyBoard = (
+    locale: string
+): TelegramBot.SendMessageOptions => {
+    const ik = new InlineKeyboard();
+
+    ik.addRow(
+        {
+            text: getLocalizedMessages(locale, UserMessages.CountriesData),
+            callback_data: UserRegExps.CountryData,
+        },
+        {
+            text: getLocalizedMessages(locale, UserMessages.AvailableCountries),
+            callback_data: UserRegExps.AvailableCountries,
+        }
+    )
+        .addRow(
+            {
+                text: getLocalizedMessages(locale, UserMessages.Assistant),
+                callback_data: UserRegExps.Assistant,
+            },
+            {
+                text: getLocalizedMessages(
+                    locale,
+                    UserMessages.GetAdviceHowToBehave
+                ),
+                callback_data: UserRegExps.Advice,
+            }
+        )
+        .addRow(
+            {
+                text: getLocalizedMessages(locale, UserMessages.Existing),
+                callback_data: UserRegExps.Subscribe,
+            },
+            {
+                text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
+                callback_data: UserRegExps.Unsubscribe,
+            }
+        )
+        .addRow(
+            {
+                text: getLocalizedMessages(locale, 'Choose language'),
+                callback_data: UserSettingsRegExps.Language,
+            },
+            {
+                text: getLocalizedMessages(locale, UserMessages.Help),
+                callback_data: UserRegExps.Help,
+            }
+        );
 
     return ik.build();
 };

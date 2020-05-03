@@ -78,3 +78,6 @@ export const getCountriesTableHTMLMessage = (
         countriesSituation.length
     } ${getLocalizedMessages(locale, 'countries')}, ${continent}` +
     `\n<pre>${table(portionMessage, tableConfig)}</pre>`;
+
+export const getCountriesForContinentMessage = (locale: string): string =>
+    getLocalizedMessages(locale, 'Check continent\'s countries statistic');

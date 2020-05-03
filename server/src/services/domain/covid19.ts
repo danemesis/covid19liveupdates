@@ -3,7 +3,7 @@ import {
     ApiCovid19Situation,
     CountrySituationInfo,
 } from '../../models/covid19.models';
-import { COVID19_FETCH_SALT, TIMES, LogCategory } from '../../models/constants';
+import { COVID19_FETCH_SALT, LogCategory, TIMES } from '../../models/constants';
 import { Country } from '../../models/country.models';
 import { fetchCovid19Data } from '../api/api-covid19';
 import { CountryLookup } from '../../models/country-code-lookup.models';
@@ -98,6 +98,7 @@ function adaptApiCountriesResponse(
                 name: adaptedCountry,
                 region: countryLookup.region,
                 continent: countryLookup.continent,
+                iso3: countryLookup.iso3,
             };
 
             return [

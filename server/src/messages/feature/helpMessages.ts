@@ -1,11 +1,12 @@
 import { UserRegExps } from '../../models/constants';
 import { getNumberEmoji } from '../../utils/emoji';
+import { getLocalizedMessages } from '../../services/domain/localization.service';
 
 const codesExplanations: Map<string, string> = new Map<string, string>([
     [UserRegExps.Start, 'My greetings 👋'],
     [
         UserRegExps.Assistant,
-        `Overall and all, I am your personal assistant 👦. You can ask me some COVID-19 related question and I will try to help you. Just follow a pattern /assistant [your question]. To see my features available type just ${UserRegExps.Assistant}`,
+        'Overall and all, I am your personal assistant 👦. You can ask me some COVID-19 related question and I will try to help you.',
     ],
     [UserRegExps.CountriesData, 'Show all countries 🌍 COVID-19 data'],
     [
@@ -14,11 +15,11 @@ const codesExplanations: Map<string, string> = new Map<string, string>([
     ],
     [
         UserRegExps.CountryData,
-        `Show data for any country. Just follow a pattern ${UserRegExps.CountryData} [country name]`,
+        'Show data for any country. Type [this command] [country name] to check it out.',
     ],
     [
         UserRegExps.Trends,
-        `Can provide you with chart for weekly trend in any country. Just follow a pattern ${UserRegExps.Trends} [country name]`,
+        'Can provide you with chart for weekly trend in any country. Type [this command] [country name]',
     ],
     [
         UserRegExps.Advice,
@@ -26,11 +27,11 @@ const codesExplanations: Map<string, string> = new Map<string, string>([
     ],
     [
         UserRegExps.Subscribe,
-        `Subscribe to a country for updates 💌. Just follow a pattern ${UserRegExps.Subscribe} [country name]`,
+        'Subscribe to a country for updates 💌. Type [this command] [country name]',
     ],
     [
         UserRegExps.Unsubscribe,
-        `Unsubscribe from any of your subscriptions. Just follow a pattern ${UserRegExps.Unsubscribe} [country name]. Alternatively, open Manager from the Dashboard`,
+        'Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard',
     ],
     [UserRegExps.Help, 'Open help (this) ℹ'],
 ]);
@@ -39,12 +40,15 @@ const USING_DATASOURCES: string =
     `COVID-19 data source we are using is operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE).` +
     ` JSON-based wrap is provided by pomber/covid19 library available on GitHub. Information is updated daily`;
 
-export const getHelpMessage = (): string =>
-    `ℹ Things I can do are\n${Object.values(UserRegExps)
+export const getHelpMessage = (locale: string): string =>
+    `ℹ ${getLocalizedMessages(locale, 'Things I can do are')}\n${Object.values(
+        UserRegExps
+    )
         .map(
             (userRegerxp: string, idx: number) =>
-                `${getNumberEmoji(idx)} ${userRegerxp} ${codesExplanations.get(
-                    userRegerxp
+                `${getNumberEmoji(idx)} ${userRegerxp} ${getLocalizedMessages(
+                    locale,
+                    codesExplanations.get(userRegerxp)
                 )}`
         )
         .join('\n')

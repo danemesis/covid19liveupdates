@@ -1,6 +1,6 @@
 import {
-    countriesByContinentResponse,
-    countriesResponse,
+    countriesTableByContinentResponse,
+    worldByContinentOverallResponse,
 } from './botResponse/countriesResponse';
 import {
     showCountryByFlag,
@@ -81,7 +81,7 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                countriesResponse
+                worldByContinentOverallResponse
             )
         )
         .registerMessageHandler(
@@ -184,7 +184,10 @@ export async function runTelegramBot(
         )
         // Settings
         .registerMessageHandler(
-            [UserSettingsRegExps.Language],
+            [
+                ...localizeOnLocales(availableLanguages, UserMessages.Language),
+                UserSettingsRegExps.Language,
+            ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
                 settingsLanguageResponse
@@ -200,7 +203,7 @@ export async function runTelegramBot(
     for (const continent of Object.keys(Continents)) {
         messageHandlerRegistry.registerMessageHandler(
             [continent],
-            countriesByContinentResponse(continent)
+            countriesTableByContinentResponse(continent)
         );
     }
     getAvailableCountries().then((countries: Array<Country>) => {

@@ -20,4 +20,5 @@ export type CallBackQueryHandlerWithCommandArgument<
 > = (parameters: P) => Promise<T>;
 
 export const TELEGRAM_PREFIX: string = 'telegram';
+export const COUNTRIES_ROW_ITEMS_NUMBER: number = 4;
 export const UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 3;

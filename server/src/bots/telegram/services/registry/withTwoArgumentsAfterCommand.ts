@@ -30,6 +30,7 @@ export const withTwoArgumentsAfterCommand = (
             return handlerFn.call(context, {
                 bot,
                 message,
+                user,
                 chatId,
                 commandParameter:
                     (arg1 && arg1.toLowerCase()) || commandParameter,

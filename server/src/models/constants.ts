@@ -1,5 +1,3 @@
-import { getLocalizedMessages } from '../services/domain/localization.service';
-
 export const TIMES = {
     MILLISECONDS_IN_SECOND: 1000,
     MILLISECONDS_IN_MINUTE: 60000,
@@ -56,6 +54,7 @@ export enum UserMessages {
     SubscriptionManager = 'Subscriptions 💌',
     Existing = 'Existing',
     Unsubscribe = 'Unsubscribe',
+    Language = 'Language',
     Help = 'ℹ What can you do?',
 }
 

@@ -1,4 +1,4 @@
-import { getHelpProposalInlineKeyboard } from '../services/keyboard';
+import { getFullMenuKeyboard } from '../services/keyboard';
 import { greetUser } from '../../../messages/userMessage';
 import {
     CallBackQueryHandlerWithCommandArgument,
@@ -30,6 +30,6 @@ export const startResponse: CallBackQueryHandlerWithCommandArgument = async ({
     return bot.sendMessage(
         chatId,
         greetUser(locale, user),
-        getHelpProposalInlineKeyboard(locale)
+        getFullMenuKeyboard(chatId, locale)
     );
 };
