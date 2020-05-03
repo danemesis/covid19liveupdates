@@ -101,5 +101,9 @@
 	"Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard": "Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard",
 	"Open help (this) ℹ": "Open help (this) ℹ",
 	"Привіт, %s": "Привіт, %s",
-	"/subscribe": "/subscribe"
+	"/subscribe": "/subscribe",
+	"trends for": "trends for",
+	"Monthly": "Monthly",
+	"Weekly": "Weekly",
+	"Whole period": "Whole Period"
 }

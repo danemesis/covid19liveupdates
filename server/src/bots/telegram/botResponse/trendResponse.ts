@@ -64,11 +64,13 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
 
     let model = enrichWithTitle(
         Transform(periodSituation),
-        getLocalizedMessages(user.settings?.locale, frequencyName) +
-            getLocalizedMessages(user.settings?.locale, 'trends for') +
+        [
+            getLocalizedMessages(user.settings?.locale, frequencyName),
+            getLocalizedMessages(user.settings?.locale, 'trends for'),
             capitalize(
                 getLocalizedMessages(user.settings?.locale, requestedCountry)
-            )
+            ),
+        ].join(' ')
     );
     if (frequency === Frequency.Weekly) {
         model = enrichWithType(model, 'barStacked');
