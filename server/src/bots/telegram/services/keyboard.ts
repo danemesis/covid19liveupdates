@@ -68,11 +68,11 @@ export const getAfterCountryResponseInlineKeyboard = (
         },
         {
             text: getLocalizedMessages(locale, 'Monthly chart'),
-            callback_data: `${UserRegExps.Trends} ${country} ${Frequency.Monthly}`,
+            callback_data: `${UserRegExps.Trends} \"${country}\" ${Frequency.Monthly}`,
         },
         {
             text: getLocalizedMessages(locale, 'Whole period chart'),
-            callback_data: `${UserRegExps.Trends} ${country} ${Frequency.WholePeriod}`,
+            callback_data: `${UserRegExps.Trends} \"${country}\" ${Frequency.WholePeriod}`,
         }
     );
 
