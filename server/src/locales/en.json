@@ -55,9 +55,9 @@
 	"We do not have any response for you as we didn't understand you, 🤦\nHowever, we add your query, we will learn how to respond on": "We do not have any response for you as we didn't understand you, 🤦\nHowever, we add your query, we will learn how to respond on",
 	"Subscribe me on": "Subscribe me on",
 	"Unsubscribe me from": "Unsubscribe me from",
-	"Show weekly chart": "Show weekly chart",
-	"Show monthly chart": "Show monthly chart",
-	"Show whole period chart": "Show whole period chart",
+	"Weekly chart": "Weekly 📊",
+	"Monthly chart": "Monthly 📊",
+	"Whole period chart": "Whole period 📊",
 	"Typically, people ask me": "Typically, people ask me",
 	"If you have a question, type": "If you have a question, type",
 	"My knowledge base": "My knowledge base",
@@ -100,5 +100,6 @@
 	"Subscribe to a country for updates 💌. Type [this command] [country name]": "Subscribe to a country for updates 💌. Type [this command] [country name]",
 	"Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard": "Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard",
 	"Open help (this) ℹ": "Open help (this) ℹ",
-	"Привіт, %s": "Привіт, %s"
+	"Привіт, %s": "Привіт, %s",
+	"/subscribe": "/subscribe"
 }

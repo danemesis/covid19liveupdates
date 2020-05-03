@@ -63,15 +63,15 @@ export const getAfterCountryResponseInlineKeyboard = (
         ])} ${country}`,
     }).addRow(
         {
-            text: getLocalizedMessages(locale, 'Show weekly chart'),
+            text: getLocalizedMessages(locale, 'Weekly chart'),
             callback_data: `${UserRegExps.Trends} ${country}`,
         },
         {
-            text: getLocalizedMessages(locale, 'Show monthly chart'),
+            text: getLocalizedMessages(locale, 'Monthly chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.Monthly}`,
         },
         {
-            text: getLocalizedMessages(locale, 'Show whole period chart'),
+            text: getLocalizedMessages(locale, 'Whole period chart'),
             callback_data: `${UserRegExps.Trends} ${country} ${Frequency.WholePeriod}`,
         }
     );
