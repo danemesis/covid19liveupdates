@@ -13,6 +13,7 @@ import { CallBackQueryHandlerWithCommandArgument } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Frequency } from './../../../models/constants';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
+import { Status } from '../../../models/constants';
 
 export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -62,8 +63,21 @@ export const trendsByCountryResponse: CallBackQueryHandlerWithCommandArgument = 
             ? 'Whole period'
             : capitalize(frequency);
 
+    const statuses = {};
+    statuses[Status.Confirmed] = getLocalizedMessages(
+        user.settings?.locale,
+        Status.Confirmed
+    );
+    statuses[Status.Deaths] = getLocalizedMessages(
+        user.settings?.locale,
+        Status.Deaths
+    );
+    statuses[Status.Recovered] = getLocalizedMessages(
+        user.settings?.locale,
+        Status.Recovered
+    );
     let model = enrichWithTitle(
-        Transform(periodSituation),
+        Transform(periodSituation, statuses),
         [
             getLocalizedMessages(user.settings?.locale, frequencyName),
             getLocalizedMessages(user.settings?.locale, 'trends for'),

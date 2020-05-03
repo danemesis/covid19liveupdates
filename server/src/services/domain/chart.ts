@@ -1,7 +1,11 @@
 import { ChartModel } from '../../models/chart.models';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { Status } from '../../models/constants';
-export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
+
+export const Transform = (
+    situations: CountrySituationInfo[],
+    statuses: any
+): ChartModel => {
     const days = situations.map((x) => x.date);
     return {
         type: 'line',
@@ -9,21 +13,21 @@ export const Transform = (situations: CountrySituationInfo[]): ChartModel => {
             labels: days,
             datasets: [
                 {
-                    label: Status.Confirmed,
+                    label: statuses[Status.Confirmed],
                     data: situations.map((x) => x.confirmed),
                     fill: false,
                     borderColor: 'rgb(230, 165, 96)',
                     backgroundColor: 'rgb(230, 165, 96)',
                 },
                 {
-                    label: Status.Deaths,
+                    label: statuses[Status.Deaths],
                     data: situations.map((x) => x.deaths),
                     fill: false,
                     borderColor: 'rgb(222, 66, 91)',
                     backgroundColor: 'rgb(222, 66, 91)',
                 },
                 {
-                    label: Status.Recovered,
+                    label: statuses[Status.Recovered],
                     data: situations.map((x) => x.recovered),
                     fill: false,
                     borderColor: 'rgb(62, 148, 107)',
