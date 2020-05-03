@@ -107,6 +107,7 @@ export enum LogCategory {
 
     // service types
     TelegramError = 'TelegramError',
+    ViberError = 'ViberError',
     WebhookError = 'WebhookError',
     PollingError = 'PollingError',
 }

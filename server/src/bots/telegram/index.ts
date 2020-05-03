@@ -258,5 +258,6 @@ export async function runTelegramBot(
         logger.log(LogLevel.Error, err, LogCategory.TelegramError)
     );
 
-    runSendScheduledNotificationToUsersJob(bot);
+    await runSendScheduledNotificationToUsersJob(bot);
+    return true;
 }

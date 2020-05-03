@@ -8,6 +8,8 @@ import {
     CONSOLE_LOG_DELIMITER,
     CONSOLE_LOG_EASE_DELIMITER,
     DEFAULT_LOCALE,
+    LogCategory,
+    LogLevel,
 } from './models/constants';
 import * as firebase from 'firebase';
 import { checkCovid19Updates } from './services/infrastructure/scheduler';
@@ -15,12 +17,18 @@ import { catchAsyncError } from './utils/catchError';
 import * as i18n from 'i18n';
 import { runViberBot } from './bots/viber';
 import * as bodyParser from 'body-parser';
+import { logger } from './utils/logger';
 
 export const app = express();
 const PORT = process.env.PORT || 3000;
 const environmentName = process.env.ENVIRONMENT_NAME;
 
+// Has to be commented because Viber lib cannot work properly with it
+// app.use(bodyParser.json());
+// Has to be uncommented because Telegram lib cannot work properly without it
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Simple information of the API
 app.get('/', baseController.base);
 
 i18n.configure({
@@ -61,11 +69,27 @@ const server = app.listen(PORT, async () => {
     checkCovid19Updates();
     // tslint:disable-next-line:no-console
     console.log(`${CONSOLE_LOG_DELIMITER}Starting Telegram bot`);
-    runTelegramBot(app, appUrl, environments.TELEGRAM_TOKEN);
+    const [tErr, tResult] = await catchAsyncError(
+        runTelegramBot(app, appUrl, environments.TELEGRAM_TOKEN)
+    );
+    if (tErr) {
+        logger.log(LogLevel.Error, tErr, LogCategory.TelegramError);
+    } else {
+        // tslint:disable-next-line:no-console
+        console.log(`${CONSOLE_LOG_EASE_DELIMITER}Telegram started`);
+    }
 
     // tslint:disable-next-line:no-console
     console.log(`${CONSOLE_LOG_DELIMITER}Starting Viber bot`);
-    runViberBot(app, appUrl, environments.VIBER_TOKEN);
+    const [vErr, vResult] = await catchAsyncError(
+        runViberBot(app, appUrl, environments.VIBER_TOKEN)
+    );
+    if (vErr) {
+        logger.log(LogLevel.Error, vErr, LogCategory.ViberError);
+    } else {
+        // tslint:disable-next-line:no-console
+        console.log(`${CONSOLE_LOG_EASE_DELIMITER}Viber started`);
+    }
 });
 
 process.on('SIGTERM', () => {
