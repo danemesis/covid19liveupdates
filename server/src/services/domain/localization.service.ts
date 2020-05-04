@@ -1,4 +1,5 @@
 import * as i18n from 'i18n';
+import { DEFAULT_LOCALE } from '../../models/constants';
 
 /**
  * When you want to localize your message, you need to
@@ -42,20 +43,21 @@ export function getLocalizedMessages(
         | Array<Array<string> | string>
         | Array<unknown>
 ): Array<string> | string {
+    const loc = locale ?? DEFAULT_LOCALE;
     if (typeof messages === 'string') {
-        return i18n.getCatalog(locale)[messages] ?? messages;
+        return i18n.getCatalog(loc)[messages] ?? messages;
     }
 
     return (messages as []).map((message) => {
-        if (locale) {
+        if (loc) {
             if (typeof message === 'string') {
-                return i18n.getCatalog(locale)[message] ?? message;
+                return i18n.getCatalog(loc)[message] ?? message;
             }
 
             // Otherwise it's message with parameters
             return (
                 i18n.__(
-                    i18n.getCatalog(locale)[message[0]],
+                    i18n.getCatalog(loc)[message[0]],
                     ...(message as []).slice(1)
                 ) ?? message
             );
