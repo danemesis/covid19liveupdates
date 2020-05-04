@@ -102,5 +102,10 @@
   "I have some good advices for you how to stay safe & sound": "Я маю деякі поради як залишатись здоровим",
   "Subscribe to a country for updates \uD83D\uDC8C. Type [this command] [country name]": "Підписатись на оновлення даних по країни \uD83D\uDC8C. Просто введіть [цю комманду] [країна]",
   "Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard": "Відписатись від оновлень. Просто введіть [цю комманду] [країна], або ж зробити це можна через меню",
-  "Open help (this) ℹ": "Відкрити підсказки (це меню) ℹ"
+  "Open help (this) ℹ": "Відкрити підсказки (це меню) ℹ",
+  "You are already subscribed on the country": "Ви вже підписані на цю країну",
+  "More on": "Більше про",
+  "Sorry, but I can show country only by country name": "Вибачьте, але я можу показати країну по назві",
+  "Enter country name by a pattern": "Введіть назву країни слідуючи паттерну",
+  "[country name]": "[назва країни]"
 }

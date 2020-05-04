@@ -32,7 +32,10 @@ export const showCountryByNameStrategyResponse: TelegramCallBackQueryHandlerWith
     commandParameter,
 }: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
-        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
+        return bot.sendMessage(
+            chatId,
+            getUserInputWithoutCountryNameMessage(user.settings?.locale)
+        );
     }
 
     return showCountryResponse({
@@ -62,7 +65,10 @@ export const showCountryByFlag: TelegramCallBackQueryHandlerWithCommandArgument 
         // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
         !getCountryNameFormat(name(countryFlag))
     ) {
-        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
+        return bot.sendMessage(
+            chatId,
+            getUserInputWithoutCountryNameMessage(user.settings?.locale)
+        );
     }
 
     return showCountryResponse({
@@ -106,12 +112,19 @@ export const showCountryResponse: TelegramCallBackQueryHandlerWithCommandArgumen
     // two send messages due to https://stackoverflow.com/a/41841237/6803463
     await bot.sendMessage(
         chatId,
-        getCountryMessage(name, confirmed, recovered, deaths, date),
+        getCountryMessage(
+            user.settings?.locale,
+            name,
+            confirmed,
+            recovered,
+            deaths,
+            date
+        ),
         getFullMenuKeyboard(chatId, user.settings?.locale)
     );
     return bot.sendMessage(
         chatId,
-        getCountryIKActionMessage(name),
+        getCountryIKActionMessage(user.settings?.locale, name),
         getAfterCountryResponseInlineKeyboard(name, user.settings?.locale)
     );
 };

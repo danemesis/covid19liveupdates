@@ -1,8 +1,10 @@
 import { CountrySituationInfo } from '../models/covid19.models';
 import { addNumberChangeSymbol } from '../utils/addNumberChangeSymbol';
 import { getActiveCases } from '../services/domain/countries';
+import { getLocalizedMessages } from '../services/domain/localization.service';
 
 export const getDiffMessage = (
+    locale: string | null,
     { confirmed, recovered, deaths }: Partial<CountrySituationInfo>,
     {
         confirmed: prevConfirmed,
@@ -13,6 +15,12 @@ export const getDiffMessage = (
     `${addNumberChangeSymbol(
         getActiveCases(confirmed, recovered, deaths) -
             getActiveCases(prevConfirmed, prevRecovered, prevDeaths)
-    )} active, ` +
-    `${addNumberChangeSymbol(recovered - prevRecovered)} recovered, ` +
-    `${addNumberChangeSymbol(deaths - prevDeaths)} death`;
+    )} ${getLocalizedMessages(locale, 'active')}, ` +
+    `${addNumberChangeSymbol(recovered - prevRecovered)} ${getLocalizedMessages(
+        locale,
+        'recovered'
+    )}, ` +
+    `${addNumberChangeSymbol(deaths - prevDeaths)} ${getLocalizedMessages(
+        locale,
+        'death'
+    )}`;

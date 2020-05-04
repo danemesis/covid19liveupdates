@@ -5,12 +5,13 @@ import {
     SubscriptionType,
 } from '../../models/subscription.models';
 import { catchAsyncError } from '../../utils/catchError';
-import { ALREADY_SUBSCRIBED_MESSAGE } from '../../messages/feature/subscribeMessages';
+import { getAlreadySubscribedMessage } from '../../messages/feature/subscribeMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { isTextEqual } from '../../utils/isEqual';
 import { getCountryNameFormat } from './countries';
 import { telegramStorage } from '../../bots/telegram/services/storage';
+import { User } from '../../models/user.model';
 
 /*
     @params
@@ -18,6 +19,7 @@ import { telegramStorage } from '../../bots/telegram/services/storage';
  */
 export const subscribeOn = async (
     chat: TelegramBot.Chat,
+    user: User,
     subscribeMeOn: string
 ): Promise<string> => {
     const subscribeMeOnTheCountry: string = getCountryNameFormat(subscribeMeOn);
@@ -50,7 +52,9 @@ export const subscribeOn = async (
         );
     if (!!checkIfAlreadySubscribed) {
         // TODO: it's not actually error, re-write it be not an error
-        throw new Error(`${ALREADY_SUBSCRIBED_MESSAGE}`);
+        throw new Error(
+            `${getAlreadySubscribedMessage(user.settings?.locale)}`
+        );
     }
 
     await telegramStorage.setSubscription({

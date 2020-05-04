@@ -7,8 +7,8 @@ import { CountrySituationInfo } from '../../models/covid19.models';
 import { getDiffMessage } from '../covid19Messages';
 import { getLocalizedMessages } from '../../services/domain/localization.service';
 
-export const ALREADY_SUBSCRIBED_MESSAGE: string =
-    'You are already subscribed on the country';
+export const getAlreadySubscribedMessage = (locale: string | null): string =>
+    getLocalizedMessages(locale, 'You are already subscribed on the country');
 
 export const subscriptionManagerResponseMessage = (locale: string): string =>
     getLocalizedMessages(locale, `Easy way to manage your subscriptions 💌`);
@@ -49,12 +49,13 @@ export const getCountrySubscriptionMessage = (
 ): string => {
     return (
         `🔔 ` +
-        getCountryMessage(name, confirmed, recovered, deaths, date) +
+        getCountryMessage(locale, name, confirmed, recovered, deaths, date) +
         `\n\n📈 ${getLocalizedMessages(
             locale,
             'Country change, since'
         )} ⏱️${prevDate}\n` +
         getDiffMessage(
+            locale,
             { confirmed, recovered, deaths },
             {
                 confirmed: prevConfirmed,

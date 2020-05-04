@@ -76,6 +76,7 @@ export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithComman
     const [err, result] = await catchAsyncError<string>(
         subscribeOn(
             message.chat,
+            user,
             removeCommandFromMessageIfExist(
                 getUserMessageFromIKorText(
                     message,
