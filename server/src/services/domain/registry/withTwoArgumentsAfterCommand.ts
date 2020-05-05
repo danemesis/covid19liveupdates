@@ -50,7 +50,7 @@ export const withTwoArgumentsAfterCommand = (
 };
 
 const splitArgsRegexp = new RegExp(
-    '(?<firstArg>[^ ]+)[\\s.,;]+(?<secondArg>[^ ]+)'
+    '"(?<firstArg>.+)"[\\s.,;]+(?<secondArg>[^ ]+)'
 );
 
 function splitArgument(argument: string): [string, string] {
