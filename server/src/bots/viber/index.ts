@@ -40,24 +40,27 @@ export async function runViberBot(
         });
     });
 
-    bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
-        // console.log('message', message);
-    });
     bot.on(Events.MESSAGE_SENT, (message, userProfile) => {
         // console.log('message sent', message);
     });
+
     bot.on(
         Events.CONVERSATION_STARTED,
-        (userProfile, isSubscribed, context, onFinish) => {
-            // console.log('message con started', userProfile);
+        (response, isSubscribed, context, onFinish) => {
+            viberMessageRegistry.runCommandHandler({
+                text: '/start',
+                chat: { ...response.userProfile },
+            });
         }
     );
     bot.on(Events.ERROR, (err) => {
         logger.log(LogLevel.Error, err, LogCategory.ViberError);
     });
+
     bot.on(Events.UNSUBSCRIBED, (response) =>
         response.send(`We are sorry to hear that, ${response.userProfile.name}`)
     );
+
     bot.on(Events.SUBSCRIBED, (response) =>
         response.send(`Thanks for subscribing, ${response.userProfile.name}`)
     );

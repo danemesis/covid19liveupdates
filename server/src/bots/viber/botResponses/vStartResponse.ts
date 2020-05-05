@@ -5,6 +5,9 @@ import {
     ViberTextMessage,
 } from '../models';
 import { Message } from 'viber-bot';
+import { viberUserService } from '../services/user';
+import { vSettingsLanguageResponse } from './vSettingsResponse';
+import { UserRegExps } from '../../../models/constants';
 
 export const vStartResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -13,16 +16,16 @@ export const vStartResponse: ViberCallBackQueryHandlerWithCommandArgument = asyn
     user,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
     const locale: string | null = user.settings?.locale;
-    // if (!locale) {
-    //     viberUserService.setUserInterruptedCommand(user, UserRegExps.Start);
-    //
-    //     return settingsLanguageResponse({
-    //         bot,
-    //         message,
-    //         chatId,
-    //         user,
-    //     });
-    // }
+    if (!locale) {
+        viberUserService().setUserInterruptedCommand(user, UserRegExps.Start);
+
+        return vSettingsLanguageResponse({
+            bot,
+            message,
+            chatId,
+            user,
+        });
+    }
 
     return bot.sendMessage({ id: chatId }, [
         new Message.Text(greetUserMessage(locale, user)),

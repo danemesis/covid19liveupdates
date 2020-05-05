@@ -25,9 +25,9 @@ export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgu
     user,
     commandParameter,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
-    const locales: Array<string> = await viberUserService.getAvailableLanguages();
+    const locales: Array<string> = await viberUserService().getAvailableLanguages();
     if (!commandParameter) {
-        return bot.sendMessage({ id: chatId.toString() }, [
+        return bot.sendMessage({ id: chatId }, [
             chooseLanguageMessage(user.settings?.locale),
             getLocalizationInlineKeyboard(
                 locales,
