@@ -18,7 +18,7 @@ export const buildUnsubscribeInlineResponse: TelegramCallBackQueryHandlerWithCom
     user,
     chatId,
 }: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const userSubscription = await telegramStorage.getActiveUserSubscriptions(
+    const userSubscription = await telegramStorage().getActiveUserSubscriptions(
         chatId
     );
     if (!userSubscription?.subscriptionsOn?.length) {

@@ -42,7 +42,7 @@ export const subscribeOn = async (
 
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await telegramStorage.getUserSubscriptions(chat.id)) ?? {})
+        ((await telegramStorage().getUserSubscriptions(chat.id)) ?? {})
             .subscriptionsOn ?? [];
 
     const checkIfAlreadySubscribed = existingSubscriptions
@@ -57,7 +57,7 @@ export const subscribeOn = async (
         );
     }
 
-    await telegramStorage.setSubscription({
+    await telegramStorage().setSubscription({
         chat,
         subscriptionsOn: [
             ...existingSubscriptions,
@@ -84,7 +84,7 @@ export const unsubscribeMeFrom = async (
     );
     // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await telegramStorage.getUserSubscriptions(chat.id)) ?? {})
+        ((await telegramStorage().getUserSubscriptions(chat.id)) ?? {})
             .subscriptionsOn ?? [];
     let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions.map(
@@ -101,7 +101,7 @@ export const unsubscribeMeFrom = async (
     }
 
     const [err, result] = await catchAsyncError(
-        telegramStorage.setSubscription({
+        telegramStorage().setSubscription({
             chat,
             subscriptionsOn: updatedSubscriptions,
         })

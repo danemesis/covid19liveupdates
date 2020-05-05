@@ -1,39 +1,39 @@
-import {
-    getFullMenuKeyboard,
-    getLocalizationInlineKeyboard,
-} from '../services/keyboard';
-import {
-    TelegramCallBackQueryHandlerWithCommandArgument,
-    TelegramCallBackQueryParameters,
-} from '../models';
-import * as TelegramBot from 'node-telegram-bot-api';
+import { telegramUserService } from '../../telegram/services/user';
 import {
     cannotSetupLanguageMessage,
     chooseLanguageMessage,
     languageHasBeenSuccessfullySetup,
     languageIsNotSupportableMessage,
 } from '../../../messages/feature/settingsMessages';
-import { telegramUserService } from '../services/user';
-import { logger } from '../../../utils/logger';
+import {
+    getFullMenuKeyboard,
+    getLocalizationInlineKeyboard,
+} from '../../telegram/services/keyboard';
 import { DEFAULT_LOCALE, LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
+import { logger } from '../../../utils/logger';
+import {
+    ViberCallBackQueryHandlerWithCommandArgument,
+    ViberCallBackQueryParameters,
+    ViberTextMessage,
+} from '../models';
+import { viberUserService } from '../services/user';
 
-export const settingsLanguageResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
+export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,
     commandParameter,
-}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const locales: Array<string> = await telegramUserService().getAvailableLanguages();
+}: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
+    const locales: Array<string> = await viberUserService.getAvailableLanguages();
     if (!commandParameter) {
-        return bot.sendMessage(
-            chatId,
+        return bot.sendMessage({ id: chatId.toString() }, [
             chooseLanguageMessage(user.settings?.locale),
             getLocalizationInlineKeyboard(
                 locales,
                 user.settings?.locale ?? DEFAULT_LOCALE
-            )
-        );
+            ),
+        ]);
     }
 
     const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();

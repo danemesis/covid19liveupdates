@@ -19,7 +19,7 @@ export const subscriptionNotifierHandler = async (
     messageHandlerRegistry: TelegramMessageRegistry,
     countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]
 ): Promise<void> => {
-    const allUsersSubscriptions = await telegramStorage.getSubscriptions();
+    const allUsersSubscriptions = await telegramStorage().getSubscriptions();
     const [_, countriesInfo] = countriesData;
     const countriesInfoMap: Map<string, Array<CountrySituationInfo>> = new Map(
         countriesInfo.map(([country, countrySituations]) => [
@@ -31,7 +31,7 @@ export const subscriptionNotifierHandler = async (
     for (const [chatId, userSubscription] of Object.entries(
         allUsersSubscriptions
     )) {
-        const user = await telegramUserService.getUser(parseInt(chatId, 10));
+        const user = await telegramUserService().getUser(parseInt(chatId, 10));
         const [err, result] = await catchAsyncError(
             getAndSendUserNotificationSubscriptions(
                 messageHandlerRegistry,
@@ -111,7 +111,7 @@ const getAndSendUserNotificationSubscriptions = async (
             updatingUserSubscriptionErr,
             updatingUserSubscriptionResult,
         ] = await catchAsyncError(
-            telegramStorage.setSubscription({
+            telegramStorage().setSubscription({
                 chat: userSubscription.chat,
                 subscriptionsOn: mergeAllUserSubscriptions,
             })

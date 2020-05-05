@@ -1,5 +1,5 @@
 import { getFullMenuKeyboard } from '../services/keyboard';
-import { greetUser } from '../../../messages/userMessage';
+import { greetUserMessage } from '../../../messages/userMessage';
 import {
     TelegramCallBackQueryHandlerWithCommandArgument,
     TelegramCallBackQueryParameters,
@@ -17,7 +17,10 @@ export const startResponse: TelegramCallBackQueryHandlerWithCommandArgument = as
 }: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const locale: string | null = user.settings?.locale;
     if (!locale) {
-        telegramUserService.setUserInterruptedCommand(user, UserRegExps.Start);
+        telegramUserService().setUserInterruptedCommand(
+            user,
+            UserRegExps.Start
+        );
 
         return settingsLanguageResponse({
             bot,
@@ -29,7 +32,7 @@ export const startResponse: TelegramCallBackQueryHandlerWithCommandArgument = as
 
     return bot.sendMessage(
         chatId,
-        greetUser(locale, user),
+        greetUserMessage(locale, user),
         getFullMenuKeyboard(chatId, locale)
     );
 };

@@ -8,7 +8,7 @@ export type Message = ViberTextMessage | TelegramBot.Message;
 export interface CallBackQueryParameters<B extends Bot, M extends Message> {
     bot: B;
     message: M;
-    chatId: number;
+    chatId: number | string;
     user: User;
     commandParameter?: string;
 }

@@ -1,8 +1,11 @@
 import { Express } from 'express';
 import { Bot, Events, Message } from 'viber-bot';
 import { logger } from '../../utils/logger';
-import { LogCategory, LogLevel } from '../../models/constants';
+import { LogCategory, LogLevel, UserRegExps } from '../../models/constants';
 import { Keyboard, ReceivedTextMessage, Response, ViberBot } from './models';
+import { viberUserService } from './services/user';
+import { ViberMessageRegistry } from './services/viberMessageRegistry';
+import { vStartResponse } from './botResponses/vStartResponse';
 
 export async function runViberBot(
     app: Express,
@@ -18,9 +21,23 @@ export async function runViberBot(
     app.use('/viber/webhook', bot.middleware());
     bot.setWebhook(`${appUrl}/viber/webhook`);
 
+    const availableLanguages: Array<string> = await viberUserService().getAvailableLanguages();
+    const viberMessageRegistry: ViberMessageRegistry = new ViberMessageRegistry(
+        bot,
+        viberUserService()
+    );
+    viberMessageRegistry.registerMessageHandler(
+        [UserRegExps.Start],
+        vStartResponse
+    );
+
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
         // console.log('message MESSAGE_RECEIVED', message, response);
         // response.send(new Message.Text('Hi ' + message.text));
+        viberMessageRegistry.runCommandHandler({
+            ...message,
+            chat: { ...response.userProfile },
+        });
     });
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {

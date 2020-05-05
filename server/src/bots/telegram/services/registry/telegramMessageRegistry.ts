@@ -12,17 +12,20 @@ import { assistantResponse } from '../../botResponse/assistantResponse';
 import { noResponse } from '../../botResponse/noResponse';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getCountryNameFormat } from '../../../../services/domain/countries';
-import { telegramUserService } from '../user';
 import { DEFAULT_USER_SETTINGS, User } from '../../../../models/user.model';
 import { MessageRegistry } from '../../../../services/domain/registry/messageRegistry';
 import { Message } from '../../../../models/bots';
 import { getTelegramChatId } from '../../utils/chat';
+import { UserService } from '../../../../services/domain/user.service';
 
 export class TelegramMessageRegistry extends MessageRegistry {
     public getChatId: (params: Message) => number = getTelegramChatId;
 
-    constructor(protected readonly bot: TelegramBot) {
-        super(bot);
+    constructor(
+        protected readonly bot: TelegramBot,
+        protected readonly userService: UserService
+    ) {
+        super(bot, userService);
         this.registerCallBackQuery();
     }
 
@@ -77,26 +80,15 @@ export class TelegramMessageRegistry extends MessageRegistry {
         return this.bot.sendMessage(chatId, notification);
     }
 
-    protected async createAndAddUser(
-        message: TelegramBot.Message,
-        chatId: number
-    ): Promise<User> {
-        return telegramUserService.addUser({
+    protected createUser(message: TelegramBot.Message, chatId: number): User {
+        return {
             ...DEFAULT_USER_SETTINGS,
             chatId,
             userName: message.chat?.username || '',
             firstName: message.chat?.first_name || '',
             lastName: message.chat?.last_name || '',
             startedOn: Date.now(),
-        });
-    }
-
-    protected async getUser(chatId: number): Promise<User> {
-        return telegramUserService.getUser(chatId);
-    }
-
-    protected async setUserInterruptedCommand(user: User): Promise<void> {
-        return telegramUserService.setUserInterruptedCommand(user, null);
+        };
     }
 
     private registerCallBackQuery() {

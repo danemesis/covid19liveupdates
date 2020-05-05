@@ -12,7 +12,7 @@ export const getUserName = ({
     return firstName ?? lastName ?? userName ?? 'friend';
 };
 
-export const greetUser = (locale: string | null, user: User): string => {
+export const greetUserMessage = (locale: string | null, user: User): string => {
     return getLocalizedMessages(locale, [
         ['Hi, %s', getUserName(user)],
         '. ',

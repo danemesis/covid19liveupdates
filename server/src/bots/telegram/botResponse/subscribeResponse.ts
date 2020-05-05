@@ -36,7 +36,7 @@ export const showExistingSubscriptionsResponse: TelegramCallBackQueryHandlerWith
     user,
     chatId,
 }: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const activeUserSubscription = await telegramStorage.getActiveUserSubscriptions(
+    const activeUserSubscription = await telegramStorage().getActiveUserSubscriptions(
         chatId
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {

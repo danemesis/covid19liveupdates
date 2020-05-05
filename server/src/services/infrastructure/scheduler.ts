@@ -36,7 +36,7 @@ export const runSendScheduledNotificationToUsersJob = async (
                 return;
             }
             const [err, users] = await catchAsyncError(
-                telegramStorage.getAllUsers()
+                telegramStorage().getAllUsers()
             );
             if (err) {
                 logger.error(
@@ -47,7 +47,7 @@ export const runSendScheduledNotificationToUsersJob = async (
                 return;
             }
             const [err1, message] = await catchAsyncError(
-                telegramStorage.getNotificationMessage()
+                telegramStorage().getNotificationMessage()
             );
             if (err) {
                 logger.error(

@@ -104,7 +104,7 @@ export enum LogCategory {
     Scheduler = 'Scheduler',
     Settings = 'Settings',
     SettingsLanguage = 'SettingsLanguage',
-
+    ViberTryingDeduceCommand = 'ViberTryingDeduceCommand',
     // service types
     TelegramError = 'TelegramError',
     ViberError = 'ViberError',

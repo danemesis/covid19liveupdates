@@ -6,6 +6,7 @@ import {
     CallBackQueryHandlerWithCommandArgument,
     Message,
 } from '../../../models/bots';
+import { UserService } from '../user.service';
 
 export abstract class MessageRegistry {
     private messageHandlers: {
@@ -13,9 +14,12 @@ export abstract class MessageRegistry {
     } = {};
     public singleParameterAfterCommands: Array<string> = [];
 
-    public abstract getChatId: (params: Message) => number;
+    public abstract getChatId: (params: Message) => number | string;
 
-    protected constructor(protected readonly bot: Bot) {}
+    protected constructor(
+        protected readonly bot: Bot,
+        protected readonly userService: UserService
+    ) {}
 
     public registerMessageHandler(
         regexps: Array<string>,
@@ -41,10 +45,12 @@ export abstract class MessageRegistry {
         ikCbData?: string
     ): Promise<Message> {
         logger.log('info', message);
-        const chatId: number = this.getChatId(message);
-        const user: User | null =
-            (await this.getUser(chatId)) ??
-            (await this.createAndAddUser(message, chatId));
+        const chatId: number | string = this.getChatId(message);
+        let user: User | null = await this.getUser(chatId);
+        if (!user) {
+            user = this.createUser(message, chatId);
+            await this.addUser(user);
+        }
 
         const runCheckupAgainstStr = (ikCbData
             ? ikCbData
@@ -120,26 +126,32 @@ export abstract class MessageRegistry {
     }
 
     public abstract sendUserNotification(
-        chatId: number,
+        chatId: number | string,
         notification: string
     ): Promise<Message>;
 
     protected abstract async tryDeduceUserCommand(
         message: Message,
-        chatId: number,
+        chatId: number | string,
         user: User
     ): Promise<Message>;
 
-    protected abstract async createAndAddUser(
+    protected abstract createUser(
         message: Message,
-        chatId: number
-    ): Promise<User>;
+        chatId: number | string
+    ): User;
 
-    protected abstract async getUser(chatId: number): Promise<User>;
+    protected async addUser(user: User): Promise<User> {
+        return this.userService.addUser(user);
+    }
 
-    protected abstract async setUserInterruptedCommand(
-        user: User
-    ): Promise<void>;
+    protected async getUser(chatId: number | string): Promise<User> {
+        return this.userService.getUser(chatId);
+    }
+
+    protected async setUserInterruptedCommand(user: User): Promise<void> {
+        return this.userService.setUserInterruptedCommand(user, null);
+    }
 
     private getSuitableCbHandlersKey(
         cbHandlers: {

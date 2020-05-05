@@ -1,11 +1,11 @@
-import { TELEGRAM_PREFIX } from '../models';
 import { StorageService } from '../../../services/domain/storage.service';
+import { VIBER_PREFIX } from '../models';
 
-export function telegramStorage() {
+export function viberStorage() {
     let storage;
     return (() => {
         if (!storage) {
-            storage = new StorageService(TELEGRAM_PREFIX);
+            storage = new StorageService(VIBER_PREFIX);
             return storage;
         }
         return storage;

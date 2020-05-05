@@ -6,7 +6,9 @@ import {
 } from '../../../models/bots';
 
 export interface TelegramCallBackQueryParameters
-    extends CallBackQueryParameters<TelegramBot, TelegramBot.Message> {}
+    extends CallBackQueryParameters<TelegramBot, TelegramBot.Message> {
+    chatId: number;
+}
 
 export interface TelegramCallBackQueryParametersWithTwoArguments
     extends CallBackQueryParametersWithTwoArguments<

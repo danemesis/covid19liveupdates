@@ -1,3 +1,9 @@
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+    CallBackQueryParametersWithTwoArguments,
+} from '../../../models/bots';
+
 export interface UserProfile {
     id: string;
     name: string;
@@ -142,3 +148,23 @@ export interface BaseInfo {
     name: string;
     avatar: string;
 }
+
+export interface ViberCallBackQueryParameters
+    extends CallBackQueryParameters<ViberBot, ViberTextMessage> {
+    chatId: string;
+}
+
+export interface ViberCallBackQueryParametersWithTwoArguments
+    extends CallBackQueryParametersWithTwoArguments<
+        ViberBot,
+        ViberTextMessage
+    > {
+    secondCommandParameter?: string;
+}
+
+export type ViberCallBackQueryHandlerWithCommandArgument = CallBackQueryHandlerWithCommandArgument<
+    ViberTextMessage,
+    ViberCallBackQueryParametersWithTwoArguments
+>;
+
+export const VIBER_PREFIX = 'viber';

@@ -66,8 +66,11 @@ export async function runTelegramBot(
         res.sendStatus(200);
     });
 
-    const availableLanguages: Array<string> = await telegramUserService.getAvailableLanguages();
-    const messageHandlerRegistry = new TelegramMessageRegistry(bot);
+    const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();
+    const messageHandlerRegistry = new TelegramMessageRegistry(
+        bot,
+        telegramUserService()
+    );
     messageHandlerRegistry
         .registerMessageHandler([UserRegExps.Start], startResponse)
         // Message handler for feature  Countries / Country
@@ -242,7 +245,6 @@ export async function runTelegramBot(
         },
         [SubscriptionType.Country]
     );
-    telegramUserService.listenUsers();
 
     bot.on('message', (message) => {
         messageHandlerRegistry.runCommandHandler(message);
