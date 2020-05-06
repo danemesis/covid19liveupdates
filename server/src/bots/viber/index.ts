@@ -81,32 +81,31 @@ export async function runViberBot(
             //         `Hi there ${response.userProfile.name}. I am ${bot.name}`,
             //     ),
             // );
-
-            const SAMPLE_KEYBOARD: Keyboard = {
-                Type: 'keyboard',
-                Revision: 1,
-                Buttons: [
-                    {
-                        Columns: 3,
-                        Rows: 2,
-                        BgColor: '#e6f5ff',
-                        BgMedia:
-                            'http://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg',
-                        BgMediaType: 'picture',
-                        BgLoop: true,
-                        ActionType: 'reply',
-                        ActionBody: 'Yes',
-                    },
-                ],
-            };
-
-            const messageKeybard = new Message.Keyboard(SAMPLE_KEYBOARD);
-            return bot.sendMessage({ id: response.userProfile.id }, [
-                new Message.Text(
-                    `Hi there ${response.userProfile.name}. I am ${bot.name}`
-                ),
-                messageKeybard,
-            ]);
+            // const SAMPLE_KEYBOARD: Keyboard = {
+            //     Type: 'keyboard',
+            //     Revision: 1,
+            //     Buttons: [
+            //         {
+            //             Columns: 3,
+            //             Rows: 2,
+            //             BgColor: '#e6f5ff',
+            //             BgMedia:
+            //                 'http://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg',
+            //             BgMediaType: 'picture',
+            //             BgLoop: true,
+            //             ActionType: 'reply',
+            //             ActionBody: 'Yes',
+            //         },
+            //     ],
+            // };
+            //
+            // const messageKeybard = new Message.Keyboard(SAMPLE_KEYBOARD);
+            // return bot.sendMessage({ id: response.userProfile.id }, [
+            //     new Message.Text(
+            //         `Hi there ${response.userProfile.name}. I am ${bot.name}`
+            //     ),
+            //     messageKeybard,
+            // ]);
         }
     );
 
