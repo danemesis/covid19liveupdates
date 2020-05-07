@@ -24,5 +24,5 @@ export type TelegramCallBackQueryHandlerWithCommandArgument = CallBackQueryHandl
 >;
 
 export const TELEGRAM_PREFIX: string = 'telegram';
-export const COUNTRIES_ROW_ITEMS_NUMBER: number = 4;
-export const UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 3;
+export const TELEGRAM_COUNTRIES_ROW_ITEMS_NUMBER: number = 4;
+export const TELEGRAM_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 3;

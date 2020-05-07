@@ -68,11 +68,11 @@ export async function runTelegramBot(
     });
 
     const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();
-    const messageHandlerRegistry = new TelegramMessageRegistry(
+    const telegranMessageRegistry = new TelegramMessageRegistry(
         bot,
         telegramUserService()
     );
-    messageHandlerRegistry
+    telegranMessageRegistry
         .registerMessageHandler([UserRegExps.Start], startResponse)
         // Message handler for feature  Countries / Country
         .registerMessageHandler(
@@ -84,7 +84,7 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 worldByContinentOverallResponse,
                 noResponse
             )
@@ -98,7 +98,7 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 showAvailableCountriesResponse,
                 noResponse
             )
@@ -106,7 +106,7 @@ export async function runTelegramBot(
         .registerMessageHandler(
             [UserRegExps.CountryData],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 showCountryByNameStrategyResponse,
                 noResponse
             )
@@ -140,7 +140,7 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 assistantStrategyResponse,
                 noResponse
             )
@@ -162,7 +162,7 @@ export async function runTelegramBot(
         .registerMessageHandler(
             [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 subscribingStrategyResponse,
                 noResponse
             )
@@ -177,7 +177,7 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 unsubscribeStrategyResponse,
                 noResponse
             )
@@ -185,9 +185,9 @@ export async function runTelegramBot(
         .registerMessageHandler(
             [UserRegExps.Trends],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 withTwoArgumentsAfterCommand(
-                    messageHandlerRegistry,
+                    telegranMessageRegistry,
                     trendsByCountryResponse,
                     noResponse
                 ),
@@ -201,7 +201,7 @@ export async function runTelegramBot(
                 UserSettingsRegExps.Language,
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 settingsLanguageResponse,
                 noResponse
             )
@@ -214,7 +214,7 @@ export async function runTelegramBot(
 
     // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {
-        messageHandlerRegistry.registerMessageHandler(
+        telegranMessageRegistry.registerMessageHandler(
             [continent],
             countriesTableByContinentResponse(continent)
         );
@@ -225,7 +225,7 @@ export async function runTelegramBot(
             .filter((v) => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
             .join('><');
 
-        messageHandlerRegistry.registerMessageHandler(
+        telegranMessageRegistry.registerMessageHandler(
             [`[~${single}~]`],
             showCountryByFlag
         );
@@ -241,7 +241,7 @@ export async function runTelegramBot(
         ) => {
             const [err, result] = await catchAsyncError(
                 subscriptionNotifierHandler(
-                    messageHandlerRegistry,
+                    telegranMessageRegistry,
                     countriesData
                 )
             );
@@ -257,7 +257,7 @@ export async function runTelegramBot(
     );
 
     bot.on('message', (message) => {
-        messageHandlerRegistry.runCommandHandler(message);
+        telegranMessageRegistry.runCommandHandler(message);
     });
 
     bot.on('polling_error', (err) =>

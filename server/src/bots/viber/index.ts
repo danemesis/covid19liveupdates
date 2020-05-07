@@ -2,6 +2,7 @@ import { Express } from 'express';
 import { Bot, Events } from 'viber-bot';
 import { logger } from '../../utils/logger';
 import {
+    Continents,
     LogCategory,
     LogLevel,
     UserActionsRegExps,
@@ -15,10 +16,15 @@ import { ViberMessageRegistry } from './services/viberMessageRegistry';
 import { vStartResponse } from './botResponses/vStartResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';
 import { withSingleParameterAfterCommand } from '../../services/domain/registry/withSingleParameterAfterCommand';
-import { noResponse } from '../telegram/botResponse/noResponse';
 import { vActionsResponse } from './botResponses/vActionsResponse';
 import { vSettingsLanguageResponse } from './botResponses/vSettingsResponse';
 import { vHelpResponse } from './botResponses/vHelpResponse';
+import {
+    vCountriesTableByContinentResponse,
+    vWorldByContinentOverallResponse,
+} from './botResponses/vCountriesResponse';
+import { vNoResponse } from './botResponses/vNoResponse';
+import { vShowCountryByNameStrategyResponse } from './botResponses/vCountryResponse';
 
 export async function runViberBot(
     app: Express,
@@ -41,6 +47,29 @@ export async function runViberBot(
     );
     viberMessageRegistry
         .registerMessageHandler([UserRegExps.Start], vStartResponse)
+        // Message handler for feature  Countries / Country
+        .registerMessageHandler(
+            [
+                UserRegExps.CountriesData,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.CountriesData
+                ),
+            ],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vWorldByContinentOverallResponse,
+                vNoResponse
+            )
+        )
+        .registerMessageHandler(
+            [UserRegExps.CountryData],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vShowCountryByNameStrategyResponse,
+                vNoResponse
+            )
+        )
         // Message handler for feature  Help
         .registerMessageHandler(
             [
@@ -58,11 +87,19 @@ export async function runViberBot(
             withSingleParameterAfterCommand(
                 viberMessageRegistry,
                 vSettingsLanguageResponse,
-                noResponse
+                vNoResponse
             )
         )
         // Actions
         .registerMessageHandler([UserActionsRegExps.Close], vActionsResponse);
+
+    // Message handler for feature  Countries / Country
+    for (const continent of Object.keys(Continents)) {
+        viberMessageRegistry.registerMessageHandler(
+            [continent],
+            vCountriesTableByContinentResponse(continent)
+        );
+    }
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
         // console.log('message MESSAGE_RECEIVED', message, response);
