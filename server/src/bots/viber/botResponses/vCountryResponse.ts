@@ -17,7 +17,10 @@ import { CountrySituationInfo } from '../../../models/covid19.models';
 import { catchAsyncError } from '../../../utils/catchError';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
-import { vGetAfterCountryResponseInlineKeyboard } from '../services/keyboard';
+import {
+    vGetAfterCountryResponseInlineKeyboard,
+    vGetFullMenuKeyboard,
+} from '../services/keyboard';
 
 export const vShowCountryByNameStrategyResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -27,12 +30,14 @@ export const vShowCountryByNameStrategyResponse: ViberCallBackQueryHandlerWithCo
     commandParameter,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
     if (!commandParameter) {
-        return bot.sendMessage(
-            { id: chatId },
+        return bot.sendMessage({ id: chatId }, [
             new Message.Text(
                 getUserInputWithoutCountryNameMessage(user.settings?.locale)
-            )
-        );
+            ),
+            new Message.Keyboard(
+                vGetFullMenuKeyboard(user.settings?.locale, chatId)
+            ),
+        ]);
     }
 
     return vShowCountryResponse({
@@ -64,7 +69,12 @@ export const vShowCountryResponse: ViberCallBackQueryHandlerWithCommandArgument 
             chatId
         );
 
-        return bot.sendMessage({ id: chatId }, new Message.Text(err.message));
+        return bot.sendMessage({ id: chatId }, [
+            new Message.Text(err.message),
+            new Message.Keyboard(
+                vGetFullMenuKeyboard(user.settings?.locale, chatId)
+            ),
+        ]);
     }
 
     const [{ name }, foundSituation] = result;

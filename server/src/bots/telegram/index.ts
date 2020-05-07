@@ -38,7 +38,6 @@ import {
 import { SubscriptionType } from '../../models/subscription.models';
 import { TelegramMessageRegistry } from './services/registry/telegramMessageRegistry';
 import { withTwoArgumentsAfterCommand } from '../../services/domain/registry/withTwoArgumentsAfterCommand';
-import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
 import { CountrySituationInfo } from '../../models/covid19.models';
@@ -50,6 +49,8 @@ import { settingsLanguageResponse } from './botResponse/settingsResponse';
 import { closeActionResponse } from './botResponse/actionsResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';
 import { noResponse } from './botResponse/noResponse';
+import { subscriptionNotifierHandler } from '../../services/domain/subscription.service';
+import { telegramStorage } from './services/storage';
 
 export async function runTelegramBot(
     app: Express,
@@ -243,6 +244,7 @@ export async function runTelegramBot(
             const [err, result] = await catchAsyncError(
                 subscriptionNotifierHandler(
                     telegranMessageRegistry,
+                    telegramStorage(),
                     countriesData
                 )
             );

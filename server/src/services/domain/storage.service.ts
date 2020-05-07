@@ -135,7 +135,7 @@ export class StorageService {
         return this.getRef('users');
     }
 
-    public async getUser(chatId: number): Promise<User> {
+    public async getUser(chatId: number | string): Promise<User> {
         return this.getRef(`users/${chatId}`);
     }
 

@@ -3,13 +3,13 @@ import {
     KeyboardButton,
     VIBER_COUNTRIES_ROW_ITEMS_NUMBER,
     VIBER_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER,
+    ViberUserMessages,
 } from '../models';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
 import {
     Continents,
     CustomSubscriptions,
     Emojii,
-    Frequency,
     UserActionsRegExps,
     UserInlineActions,
     UserMessages,
@@ -104,7 +104,7 @@ export const vGetAfterCountryResponseInlineKeyboard = (
                 ActionBody: `${getLocalizedMessages(locale, [
                     UserRegExps.Subscribe,
                 ])} ${country}`,
-                Columns: 6,
+                Columns: 3,
                 Rows: 1,
                 Text: `${getLocalizedMessages(locale, [
                     CustomSubscriptions.SubscribeMeOn,
@@ -113,24 +113,31 @@ export const vGetAfterCountryResponseInlineKeyboard = (
             {
                 ActionType: 'reply',
                 ActionBody: `${UserRegExps.Trends} ${country}`,
-                Columns: 2,
+                Columns: 3,
                 Rows: 1,
                 Text: getLocalizedMessages(locale, 'Weekly chart'),
             },
             {
                 ActionType: 'reply',
-                ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.Monthly}`,
-                Columns: 2,
+                ActionBody: ViberUserMessages.MainMenu,
+                Columns: 6,
                 Rows: 1,
-                Text: getLocalizedMessages(locale, 'Monthly chart'),
+                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
             },
-            {
-                ActionType: 'reply',
-                ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.WholePeriod}`,
-                Columns: 2,
-                Rows: 1,
-                Text: getLocalizedMessages(locale, 'Whole period chart'),
-            },
+            // {
+            //     ActionType: 'reply',
+            //     ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.Monthly}`,
+            //     Columns: 2,
+            //     Rows: 1,
+            //     Text: getLocalizedMessages(locale, 'Monthly chart'),
+            // },
+            // {
+            //     ActionType: 'reply',
+            //     ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.WholePeriod}`,
+            //     Columns: 2,
+            //     Rows: 1,
+            //     Text: getLocalizedMessages(locale, 'Whole period chart'),
+            // },
         ],
     };
 };
@@ -155,6 +162,13 @@ export const vGetSubscriptionMessageInlineKeyboard = (
                 Columns: 3,
                 Rows: 1,
                 Text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: ViberUserMessages.MainMenu,
+                Columns: 6,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
             },
         ],
     };
@@ -259,6 +273,13 @@ export const vGetContinentCountriesCheckOutOfferMessageInlineKeyboard = (
                 Text: getLocalizedMessages(locale, [
                     [`Check %s countries out`, continent],
                 ]).join(''),
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: ViberUserMessages.MainMenu,
+                Columns: 6,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
             },
         ],
     };
@@ -367,9 +388,16 @@ export const vGetHelpProposalInlineKeyboard = (locale: string): Keyboard => ({
         {
             ActionType: 'reply',
             ActionBody: getLocalizedMessages(locale, UserMessages.Help),
-            Columns: 1,
+            Columns: 6,
             Rows: 1,
             Text: getLocalizedMessages(locale, UserMessages.Help),
+        },
+        {
+            ActionType: 'reply',
+            ActionBody: ViberUserMessages.MainMenu,
+            Columns: 6,
+            Rows: 1,
+            Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
         },
     ],
 });

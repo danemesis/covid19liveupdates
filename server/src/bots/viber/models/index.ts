@@ -161,6 +161,7 @@ export interface ViberCallBackQueryParametersWithTwoArguments
         ViberBot,
         ViberTextMessage
     > {
+    chatId: string;
     secondCommandParameter?: string;
 }
 
@@ -172,3 +173,7 @@ export type ViberCallBackQueryHandlerWithCommandArgument = CallBackQueryHandlerW
 export const VIBER_PREFIX = 'viber';
 export const VIBER_COUNTRIES_ROW_ITEMS_NUMBER: number = 5;
 export const VIBER_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 3;
+
+export enum ViberUserMessages {
+    MainMenu = 'Main menu',
+}

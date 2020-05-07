@@ -11,13 +11,16 @@ import {
     UserRegExps,
     UserSettingsRegExps,
 } from '../../models/constants';
-import { ViberBot } from './models';
+import { ViberBot, ViberUserMessages } from './models';
 import { viberUserService } from './services/user';
 import { ViberMessageRegistry } from './services/viberMessageRegistry';
 import { vStartResponse } from './botResponses/vStartResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';
 import { withSingleParameterAfterCommand } from '../../services/domain/registry/withSingleParameterAfterCommand';
-import { vActionsResponse } from './botResponses/vActionsResponse';
+import {
+    vActionsResponse,
+    vMainMenuResponse,
+} from './botResponses/vActionsResponse';
 import { vSettingsLanguageResponse } from './botResponses/vSettingsResponse';
 import { vHelpResponse } from './botResponses/vHelpResponse';
 import {
@@ -32,6 +35,17 @@ import {
     vSubscriptionManagerResponse,
 } from './botResponses/vSubscribeResponse';
 import { vUnsubscribeStrategyResponse } from './botResponses/vUnsubscribeResponse';
+import { cachedCovid19CountriesData } from '../../services/domain/covid19';
+import { Country } from '../../models/country.models';
+import { CountrySituationInfo } from '../../models/covid19.models';
+import { catchAsyncError } from '../../utils/catchError';
+import { subscriptionNotifierHandler } from '../../services/domain/subscription.service';
+import { SubscriptionType } from '../../models/subscription.models';
+import { viberStorage } from './services/storage';
+import { withTwoArgumentsAfterCommand } from '../../services/domain/registry/withTwoArgumentsAfterCommand';
+import { vTrendsByCountryResponse } from './botResponses/vTrendResponse';
+import { vAdviceResponse } from './botResponses/vAdviceResponse';
+import { vAssistantStrategyResponse } from './botResponses/vAssistantResponse';
 
 export async function runViberBot(
     app: Express,
@@ -77,6 +91,17 @@ export async function runViberBot(
                 vNoResponse
             )
         )
+        // Message handler for feature  Advices
+        .registerMessageHandler(
+            [
+                UserRegExps.Advice,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.GetAdviceHowToBehave
+                ),
+            ],
+            vAdviceResponse
+        )
         // Message handler for feature "Subscriptions"
         .registerMessageHandler(
             [
@@ -115,18 +140,18 @@ export async function runViberBot(
             )
         )
         // Message handler for feature "Trends"
-        // .registerMessageHandler(
-        //     [UserRegExps.Trends],
-        //     withSingleParameterAfterCommand(
-        //         viberMessageRegistry,
-        //         withTwoArgumentsAfterCommand(
-        //             viberMessageRegistry,
-        //             trendsByCountryResponse,
-        //             noResponse,
-        //         ),
-        //         noResponse,
-        //     ),
-        // )
+        .registerMessageHandler(
+            [UserRegExps.Trends],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                withTwoArgumentsAfterCommand(
+                    viberMessageRegistry,
+                    vTrendsByCountryResponse,
+                    vNoResponse
+                ),
+                vNoResponse
+            )
+        )
         // Message handler for feature  Help
         .registerMessageHandler(
             [
@@ -134,6 +159,21 @@ export async function runViberBot(
                 ...localizeOnLocales(availableLanguages, UserMessages.Help),
             ],
             vHelpResponse
+        )
+        // Message handler for feature  Assistant
+        .registerMessageHandler(
+            [
+                UserRegExps.Assistant,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.Assistant
+                ),
+            ],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vAssistantStrategyResponse,
+                vNoResponse
+            )
         )
         // Settings
         .registerMessageHandler(
@@ -148,7 +188,17 @@ export async function runViberBot(
             )
         )
         // Actions
-        .registerMessageHandler([UserActionsRegExps.Close], vActionsResponse);
+        .registerMessageHandler([UserActionsRegExps.Close], vActionsResponse)
+        // Viber - only features
+        .registerMessageHandler(
+            [
+                ...localizeOnLocales(
+                    availableLanguages,
+                    ViberUserMessages.MainMenu
+                ),
+            ],
+            vMainMenuResponse
+        );
 
     // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {
@@ -157,6 +207,32 @@ export async function runViberBot(
             vCountriesTableByContinentResponse(continent)
         );
     }
+
+    // Sending subscriptions
+    cachedCovid19CountriesData.subscribe(
+        async (
+            countriesData: [
+                number,
+                Array<[Country, Array<CountrySituationInfo>]>
+            ]
+        ) => {
+            const [err, result] = await catchAsyncError(
+                subscriptionNotifierHandler(
+                    viberMessageRegistry,
+                    viberStorage(),
+                    countriesData
+                )
+            );
+            if (err) {
+                logger.error(
+                    'subscriptionNotifierHandler failed',
+                    err,
+                    LogCategory.SubscriptionNotifierHandler
+                );
+            }
+        },
+        [SubscriptionType.Country]
+    );
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
         viberMessageRegistry.runCommandHandler({

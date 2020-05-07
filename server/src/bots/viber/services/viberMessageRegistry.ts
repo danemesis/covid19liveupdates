@@ -6,6 +6,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { UserService } from '../../../services/domain/user.service';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
+import { Message } from 'viber-bot';
 
 export class ViberMessageRegistry extends MessageRegistry {
     public getChatId: (params: ViberTextMessage) => string = getViberChatId;
@@ -36,7 +37,10 @@ export class ViberMessageRegistry extends MessageRegistry {
         chatId: number,
         notification: string
     ): Promise<TelegramBot.Message> {
-        return this.bot.sendMessage({ id: chatId.toString() }, [notification]);
+        return this.bot.sendMessage(
+            { id: chatId.toString() },
+            new Message.Text(notification)
+        );
     }
 
     protected createUser(message: ViberTextMessage, chatId: number): User {
