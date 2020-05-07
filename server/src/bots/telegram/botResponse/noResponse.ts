@@ -3,14 +3,14 @@ import { logger } from '../../../utils/logger';
 import { getHelpProposalInlineKeyboard } from '../services/keyboard';
 import { LogCategory } from '../../../models/constants';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { CallBackQueryParameters } from '../models';
+import { TelegramCallBackQueryParameters } from '../models';
 
 export const noResponse = async ({
     bot,
     message,
     user,
     chatId,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     // TODO: log with another severity type
     logger.error(
         'error',

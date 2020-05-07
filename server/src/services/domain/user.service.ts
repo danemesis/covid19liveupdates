@@ -10,26 +10,34 @@ export class UserService {
     private users: UserStorage;
 
     constructor(private storage: StorageService) {
+        // In order to listen User's from the very beginning
+        // and have them "in memory"
+        this.listenUsers();
     }
 
-    public getUser(user: number): Promise<User | null>;
+    public getUser(user: number | string): Promise<User | null>;
     public getUser(user: User): Promise<User | null>;
-    public getUser(user: User | number): Promise<User | null> {
+    public getUser(user: User | number | string): Promise<User | null> {
         return Promise.resolve(
-            this.users[
-                Object.keys(this.users).find(
-                    (key) => typeof user === 'number'
-                        ? parseInt(key, 10) === user
-                        : this.users[key].chatId === user.chatId,
-                )
-                ],
+            !this.users
+                ? null
+                : this.users[
+                      Object.keys(this.users).find((key) => {
+                          if (typeof user === 'number') {
+                              return parseInt(key, 10) === user;
+                          }
+
+                          if (typeof user === 'string') {
+                              return key === user;
+                          }
+
+                          return this.users[key].chatId === user.chatId;
+                      })
+                  ]
         );
     }
 
-    public async setUserLocale(
-        user: User,
-        locale: string,
-    ): Promise<void> {
+    public async setUserLocale(user: User, locale: string): Promise<void> {
         return this.storage.addUser({
             ...user,
             settings: {
@@ -41,7 +49,7 @@ export class UserService {
 
     public async setUserInterruptedCommand(
         user: User,
-        interruptedCommand: string,
+        interruptedCommand: string
     ): Promise<void> {
         return this.storage.addUser({
             ...user,
@@ -60,7 +68,7 @@ export class UserService {
                 `An error occurred while trying to add new user ${user.chatId}`,
                 err,
                 LogCategory.Command,
-                user.chatId,
+                user.chatId
             );
             return null;
         } else {
@@ -68,7 +76,7 @@ export class UserService {
                 'info',
                 `New user ${user.chatId} was successfully added`,
                 LogCategory.Command,
-                user.chatId,
+                user.chatId
             );
             return user;
         }
@@ -82,7 +90,7 @@ export class UserService {
         this.storage.subscribeOnUsers(
             (users: UserStorage | null, b?: string | null) => {
                 this.users = users;
-            },
+            }
         );
     }
 }

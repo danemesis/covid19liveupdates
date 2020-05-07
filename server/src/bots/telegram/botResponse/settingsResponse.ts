@@ -3,8 +3,8 @@ import {
     getLocalizationInlineKeyboard,
 } from '../services/keyboard';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
@@ -18,13 +18,13 @@ import { logger } from '../../../utils/logger';
 import { DEFAULT_LOCALE, LogCategory } from '../../../models/constants';
 import { catchAsyncError } from '../../../utils/catchError';
 
-export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const settingsLanguageResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const locales: Array<string> = await telegramUserService.getAvailableLanguages();
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const locales: Array<string> = await telegramUserService().getAvailableLanguages();
     if (!commandParameter) {
         return bot.sendMessage(
             chatId,
@@ -36,7 +36,7 @@ export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument =
         );
     }
 
-    const availableLanguages: Array<string> = await telegramUserService.getAvailableLanguages();
+    const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();
     if (!availableLanguages.find((language) => language === commandParameter)) {
         return bot.sendMessage(
             chatId,
@@ -49,7 +49,7 @@ export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument =
     }
 
     const [err, resultUser] = await catchAsyncError(
-        telegramUserService.setUserLocale(user, commandParameter)
+        telegramUserService().setUserLocale(user, commandParameter)
     );
     if (err) {
         logger.error(
@@ -65,7 +65,7 @@ export const settingsLanguageResponse: CallBackQueryHandlerWithCommandArgument =
         );
     }
 
-    const updatedUser = await telegramUserService.getUser(user);
+    const updatedUser = await telegramUserService().getUser(user);
     return bot.sendMessage(
         chatId,
         // We cannot use "User" from parameter in the bot.sendMessage(

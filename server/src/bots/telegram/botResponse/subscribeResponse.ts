@@ -12,18 +12,17 @@ import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText'
 import { removeCommandFromMessageIfExist } from '../../../utils/removeCommandFromMessageIfExist';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
-// TODO: Take a look in all handlers and remove unneeded parameters where they are not used
-export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const subscriptionManagerResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     return bot.sendMessage(
         chatId,
         subscriptionManagerResponseMessage(user.settings?.locale),
@@ -31,12 +30,12 @@ export const subscriptionManagerResponse: CallBackQueryHandlerWithCommandArgumen
     );
 };
 
-export const showExistingSubscriptionsResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showExistingSubscriptionsResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const activeUserSubscription = await telegramStorage.getActiveUserSubscriptions(
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const activeUserSubscription = await telegramStorage().getActiveUserSubscriptions(
         chatId
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {
@@ -55,15 +54,13 @@ export const showExistingSubscriptionsResponse: CallBackQueryHandlerWithCommandA
     );
 };
 
-// If it's called from InlineKeyboard, then @param ikCbData will be available
-// otherwise @param ikCbData will be null
-export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
         return showExistingSubscriptionsResponse({
             bot,
@@ -76,6 +73,8 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
     const [err, result] = await catchAsyncError<string>(
         subscribeOn(
             message.chat,
+            user,
+            // TODO: Probably should be replaced with 'commandParameter'
             removeCommandFromMessageIfExist(
                 getUserMessageFromIKorText(
                     message,
@@ -83,7 +82,8 @@ export const subscribingStrategyResponse: CallBackQueryHandlerWithCommandArgumen
                     ''
                 ),
                 UserRegExps.Subscribe
-            )
+            ),
+            telegramStorage()
         )
     );
     if (err) {

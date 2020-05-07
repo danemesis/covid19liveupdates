@@ -7,18 +7,18 @@ import { unsubscribeMeFrom } from '../../../services/domain/subscriptions';
 import { noSubscriptionsResponseMessage } from '../../../messages/feature/subscribeMessages';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import { telegramStorage } from '../services/storage';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
-export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const buildUnsubscribeInlineResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    const userSubscription = await telegramStorage.getActiveUserSubscriptions(
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
+    const userSubscription = await telegramStorage().getActiveUserSubscriptions(
         chatId
     );
     if (!userSubscription?.subscriptionsOn?.length) {
@@ -30,32 +30,29 @@ export const buildUnsubscribeInlineResponse: CallBackQueryHandlerWithCommandArgu
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessages(user.settings.locale, [
-            'Choose items to unsubscribe from',
-        ])[0],
+        getLocalizedMessages(
+            user.settings.locale,
+            'Choose items to unsubscribe from'
+        ),
         getUnsubscribeMessageInlineKeyboard(
             userSubscription.subscriptionsOn.map((v) => v.value)
         )
     );
 };
 
-// If it's called from InlineKeyboard, then @param ikCbData will be available
-// otherwise @param ikCbData will be null
-export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const unsubscribeStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     user,
     chatId,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
-    // If it's called from InlineKeyboard, then @param ikCbData will be available
-    // otherwise @param ikCbData will be null
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
         return buildUnsubscribeInlineResponse({ bot, message, chatId, user });
     }
 
     const [err, result] = await catchAsyncError<string>(
-        unsubscribeMeFrom(message.chat, commandParameter)
+        unsubscribeMeFrom(message.chat, commandParameter, telegramStorage())
     );
     if (err) {
         return bot.sendMessage(chatId, `${err.message}, sorry 🙇🏽`);
@@ -63,9 +60,10 @@ export const unsubscribeStrategyResponse: CallBackQueryHandlerWithCommandArgumen
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessages(user.settings.locale, [
-            'You have been unsubscribed from',
-        ])[0] + result,
+        getLocalizedMessages(
+            user.settings.locale,
+            'You have been unsubscribed from'
+        ) + result,
         getFullMenuKeyboard(chatId, user.settings?.locale)
     );
 };

@@ -12,8 +12,8 @@ import {
 } from '../../../models/constants';
 import { InlineKeyboard, ReplyKeyboard } from 'node-telegram-keyboard-wrapper';
 import {
-    COUNTRIES_ROW_ITEMS_NUMBER,
-    UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER,
+    TELEGRAM_COUNTRIES_ROW_ITEMS_NUMBER,
+    TELEGRAM_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
@@ -106,7 +106,10 @@ export const getUnsubscribeMessageInlineKeyboard = (
     while (i < values.length) {
         const rows = [];
         let rowItem: number = 0;
-        while (!!values[i] && rowItem < UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER) {
+        while (
+            !!values[i] &&
+            rowItem < TELEGRAM_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER
+        ) {
             rows.push({
                 text: values[i],
                 callback_data: `${CustomSubscriptions.UnsubscribeMeFrom} ${
@@ -164,7 +167,10 @@ export const getLocalizationInlineKeyboard = (
     while (i < locales.length) {
         const rows = [];
         let rowItem: number = 0;
-        while (!!locales[i] && rowItem < UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER) {
+        while (
+            !!locales[i] &&
+            rowItem < TELEGRAM_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER
+        ) {
             rows.push({
                 text:
                     currentLocale === locales[i]
@@ -213,7 +219,10 @@ export const getCountriesInlineKeyboard = (
     while (i < countries.length) {
         const rows = [];
         let rowItem: number = 0;
-        while (!!countries[i] && rowItem < COUNTRIES_ROW_ITEMS_NUMBER) {
+        while (
+            !!countries[i] &&
+            rowItem < TELEGRAM_COUNTRIES_ROW_ITEMS_NUMBER
+        ) {
             const country: Country = countries[i];
             rows.push({
                 text: `${flag(country.name) ?? ''}${country.iso3}`,
@@ -284,7 +293,7 @@ const getCloseInlineKeyboardRow = (
     locale: string
 ): TelegramBot.InlineKeyboardButton => {
     return {
-        text: getLocalizedMessages(locale, [UserInlineActions.Close]).join(),
+        text: getLocalizedMessages(locale, UserInlineActions.Close),
         callback_data: `${UserActionsRegExps.Close}`,
     };
 };

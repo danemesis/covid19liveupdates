@@ -72,7 +72,7 @@
   "Consider these links": "Спробуйте ці посилання",
   "More links": "Більше посилань",
   "Confirmed": "Підтверджених",
-	"confirmed": "підтверджено",
+  "confirmed": "підтверджено",
   "death": "смертей",
   "in": "в",
   "countries": "країнах",
@@ -106,7 +106,14 @@
   "Unsubscribe from any of your subscriptions. Type [this command] [country name]. Alternatively, open Manager from the Dashboard": "Відписатись від оновлень. Просто введіть [цю комманду] [країна], або ж зробити це можна через меню",
   "Open help (this) ℹ": "Відкрити підсказки (це меню) ℹ",
   "trends for": "статистика",
-	"Monthly": "Місячна",
-	"Weekly": "Тижнева",
-	"Whole period": "За увесь час"
+  "Monthly": "Місячна",
+  "Weekly": "Тижнева",
+  "Whole period": "За увесь час",
+  "You are already subscribed on the country": "Ви вже підписані на цю країну",
+  "More on": "Більше про",
+  "Sorry, but I can show country only by country name": "Вибачьте, але я можу показати країну по назві",
+  "Enter country name by a pattern": "Введіть назву країни слідуючи паттерну",
+  "[country name]": "[назва країни]",
+  "Main menu": "Головна",
+  "Subscribe or type something, anything to start the conversation": "Підпишіться або напишіть будь-що для початку діалогу"
 }

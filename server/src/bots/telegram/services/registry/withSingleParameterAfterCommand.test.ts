@@ -1,8 +1,7 @@
-import * as getParameterAfterCommandFromMessage from './getParameterAfterCommandFromMessage';
-import { withSingleParameterAfterCommand } from './withSingleParameterAfterCommand';
+import * as getParameterAfterCommandFromMessage from '../../../../services/domain/registry/getParameterAfterCommandFromMessage';
+import { withSingleParameterAfterCommand } from '../../../../services/domain/registry/withSingleParameterAfterCommand';
 import * as noResponse from '../../botResponse/noResponse';
 import { logger } from '../../../../utils/logger';
-import { LogCategory } from '../../../../models/constants';
 
 describe('withSingleParameterAfterCommand', () => {
     const errorMock: any = new Error('error');
@@ -46,7 +45,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should handleFnMock be called', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,
@@ -61,7 +61,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and ikCbDataMock', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,
@@ -80,7 +81,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and textMock', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,

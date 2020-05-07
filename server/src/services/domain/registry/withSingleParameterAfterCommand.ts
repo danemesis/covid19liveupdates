@@ -1,13 +1,13 @@
+import { logger } from '../../../utils/logger';
+import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
+import { LogCategory } from '../../../models/constants';
+import { MessageRegistry } from './messageRegistry';
 import {
+    Bot,
     CallBackQueryHandlerWithCommandArgument,
     CallBackQueryParameters,
-} from '../../models';
-import * as TelegramBot from 'node-telegram-bot-api';
-import { logger } from '../../../../utils/logger';
-import { noResponse } from '../../botResponse/noResponse';
-import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
-import { LogCategory } from '../../../../models/constants';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+    Message,
+} from '../../../models/bots';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -16,8 +16,9 @@ import { MessageHandlerRegistry } from './messageHandlerRegistry';
  * * @example /country Ukraine
  */
 export const withSingleParameterAfterCommand = (
-    context: MessageHandlerRegistry,
-    handlerFn: CallBackQueryHandlerWithCommandArgument
+    context: MessageRegistry,
+    handlerFn: CallBackQueryHandlerWithCommandArgument,
+    noResponseFn: (args: unknown) => Promise<Message>
 ): CallBackQueryHandlerWithCommandArgument => {
     return ({
         bot,
@@ -25,7 +26,7 @@ export const withSingleParameterAfterCommand = (
         chatId,
         user,
         commandParameter,
-    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    }: CallBackQueryParameters<Bot, Message>): Promise<Message> => {
         try {
             const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
                 context.singleParameterAfterCommands,
@@ -47,7 +48,7 @@ export const withSingleParameterAfterCommand = (
                 chatId
             );
 
-            return noResponse({ bot, message, chatId, user });
+            return noResponseFn({ bot, message, chatId, user });
         }
     };
 };

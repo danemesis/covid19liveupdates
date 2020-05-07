@@ -12,13 +12,19 @@ export const getUserName = ({
     return firstName ?? lastName ?? userName ?? 'friend';
 };
 
-export const greetUser = (locale: string | null, user: User): string => {
+export const greetUserMessage = (locale: string | null, user: User): string => {
     return getLocalizedMessages(locale, [
         ['Hi, %s', getUserName(user)],
         '. ',
         FIRST_MESSAGE_EXPLANATION,
     ]).join('');
 };
+
+export const callToAction = (locale: string | null): string =>
+    getLocalizedMessages(
+        locale,
+        'Subscribe or type something, anything to start the conversation'
+    );
 
 export const noResponseForUserMessage = (
     locale: string | null,

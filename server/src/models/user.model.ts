@@ -13,7 +13,7 @@ export const DEFAULT_USER_SETTINGS: User = {
 };
 
 export interface User {
-    chatId: number;
+    chatId: number | string;
     userName: string;
     firstName: string;
     lastName: string;

@@ -36,19 +36,21 @@ import {
     subscriptionManagerResponse,
 } from './botResponse/subscribeResponse';
 import { SubscriptionType } from '../../models/subscription.models';
-import { MessageHandlerRegistry } from './services/registry/messageHandlerRegistry';
-import { withTwoArgumentsAfterCommand } from './services/registry/withTwoArgumentsAfterCommand';
-import { subscriptionNotifierHandler } from './services/subscriptionNotifierManager';
+import { TelegramMessageRegistry } from './services/registry/telegramMessageRegistry';
+import { withTwoArgumentsAfterCommand } from '../../services/domain/registry/withTwoArgumentsAfterCommand';
 import { unsubscribeStrategyResponse } from './botResponse/unsubscribeResponse';
 import { trendsByCountryResponse } from './botResponse/trendResponse';
 import { CountrySituationInfo } from '../../models/covid19.models';
 import { catchAsyncError } from '../../utils/catchError';
 import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
 import { telegramUserService } from './services/user';
-import { withSingleParameterAfterCommand } from './services/registry/withSingleParameterAfterCommand';
+import { withSingleParameterAfterCommand } from '../../services/domain/registry/withSingleParameterAfterCommand';
 import { settingsLanguageResponse } from './botResponse/settingsResponse';
 import { closeActionResponse } from './botResponse/actionsResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';
+import { noResponse } from './botResponse/noResponse';
+import { subscriptionNotifierHandler } from '../../services/domain/subscription.service';
+import { telegramStorage } from './services/storage';
 
 export async function runTelegramBot(
     app: Express,
@@ -66,9 +68,12 @@ export async function runTelegramBot(
         res.sendStatus(200);
     });
 
-    const availableLanguages: Array<string> = await telegramUserService.getAvailableLanguages();
-    const messageHandlerRegistry = new MessageHandlerRegistry(bot);
-    messageHandlerRegistry
+    const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();
+    const telegranMessageRegistry = new TelegramMessageRegistry(
+        bot,
+        telegramUserService()
+    );
+    telegranMessageRegistry
         .registerMessageHandler([UserRegExps.Start], startResponse)
         // Message handler for feature  Countries / Country
         .registerMessageHandler(
@@ -80,8 +85,9 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                worldByContinentOverallResponse
+                telegranMessageRegistry,
+                worldByContinentOverallResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
@@ -93,15 +99,17 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                showAvailableCountriesResponse
+                telegranMessageRegistry,
+                showAvailableCountriesResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
             [UserRegExps.CountryData],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                showCountryByNameStrategyResponse
+                telegranMessageRegistry,
+                showCountryByNameStrategyResponse,
+                noResponse
             )
         )
         // Message handler for feature  Advices
@@ -133,11 +141,12 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                assistantStrategyResponse
+                telegranMessageRegistry,
+                assistantStrategyResponse,
+                noResponse
             )
         )
-        // Message handler for feature  Subscriptions
+        // Message handler for feature "Subscriptions"
         .registerMessageHandler(
             [
                 ...localizeOnLocales(
@@ -154,8 +163,9 @@ export async function runTelegramBot(
         .registerMessageHandler(
             [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                subscribingStrategyResponse
+                telegranMessageRegistry,
+                subscribingStrategyResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
@@ -168,18 +178,22 @@ export async function runTelegramBot(
                 ),
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                unsubscribeStrategyResponse
+                telegranMessageRegistry,
+                unsubscribeStrategyResponse,
+                noResponse
             )
         )
+        // Message handler for feature "Trends"
         .registerMessageHandler(
             [UserRegExps.Trends],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
+                telegranMessageRegistry,
                 withTwoArgumentsAfterCommand(
-                    messageHandlerRegistry,
-                    trendsByCountryResponse
-                )
+                    telegranMessageRegistry,
+                    trendsByCountryResponse,
+                    noResponse
+                ),
+                noResponse
             )
         )
         // Settings
@@ -189,8 +203,9 @@ export async function runTelegramBot(
                 UserSettingsRegExps.Language,
             ],
             withSingleParameterAfterCommand(
-                messageHandlerRegistry,
-                settingsLanguageResponse
+                telegranMessageRegistry,
+                settingsLanguageResponse,
+                noResponse
             )
         )
         // Actions
@@ -201,7 +216,7 @@ export async function runTelegramBot(
 
     // Message handler for feature  Countries / Country
     for (const continent of Object.keys(Continents)) {
-        messageHandlerRegistry.registerMessageHandler(
+        telegranMessageRegistry.registerMessageHandler(
             [continent],
             countriesTableByContinentResponse(continent)
         );
@@ -212,7 +227,7 @@ export async function runTelegramBot(
             .filter((v) => !!v) // TODO: Find flag that we lack for [https://github.com/danbilokha/covid19liveupdates/issues/61]
             .join('><');
 
-        messageHandlerRegistry.registerMessageHandler(
+        telegranMessageRegistry.registerMessageHandler(
             [`[~${single}~]`],
             showCountryByFlag
         );
@@ -228,7 +243,8 @@ export async function runTelegramBot(
         ) => {
             const [err, result] = await catchAsyncError(
                 subscriptionNotifierHandler(
-                    messageHandlerRegistry,
+                    telegranMessageRegistry,
+                    telegramStorage(),
                     countriesData
                 )
             );
@@ -242,10 +258,9 @@ export async function runTelegramBot(
         },
         [SubscriptionType.Country]
     );
-    telegramUserService.listenUsers();
 
     bot.on('message', (message) => {
-        messageHandlerRegistry.runCommandHandler(message);
+        telegranMessageRegistry.runCommandHandler(message);
     });
 
     bot.on('polling_error', (err) =>
@@ -258,5 +273,10 @@ export async function runTelegramBot(
         logger.log(LogLevel.Error, err, LogCategory.TelegramError)
     );
 
-    runSendScheduledNotificationToUsersJob(bot);
+    await runSendScheduledNotificationToUsersJob(
+        bot,
+        telegranMessageRegistry,
+        telegramStorage()
+    );
+    return true;
 }

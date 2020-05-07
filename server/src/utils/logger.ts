@@ -15,7 +15,12 @@ if (environment.LOGGLY_TOKEN) {
 }
 
 export const logger = {
-    log(severity: string, message: any, type?: LogCategory, chatId?: number) {
+    log(
+        severity: string,
+        message: any,
+        type?: LogCategory,
+        chatId?: number | string
+    ) {
         if (typeof message === 'string') {
             message = {
                 message,
@@ -33,7 +38,12 @@ export const logger = {
             console.log(severity, message);
         }
     },
-    error(message: any, error: Error, type?: LogCategory, chatId?: number) {
+    error(
+        message: any,
+        error: Error,
+        type?: LogCategory,
+        chatId?: number | string
+    ) {
         if (typeof message === 'string') {
             message = {
                 message,

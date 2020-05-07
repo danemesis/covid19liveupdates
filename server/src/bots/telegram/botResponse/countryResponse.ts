@@ -10,8 +10,8 @@ import {
     getFullMenuKeyboard,
 } from '../services/keyboard';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { catchAsyncError } from '../../../utils/catchError';
@@ -24,15 +24,18 @@ import {
 } from '../../../services/domain/countries';
 import { LogCategory } from '../../../models/constants';
 
-export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryByNameStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
     commandParameter,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     if (!commandParameter) {
-        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
+        return bot.sendMessage(
+            chatId,
+            getUserInputWithoutCountryNameMessage(user.settings?.locale)
+        );
     }
 
     return showCountryResponse({
@@ -44,12 +47,12 @@ export const showCountryByNameStrategyResponse: CallBackQueryHandlerWithCommandA
     });
 };
 
-export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryByFlag: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
     chatId,
     user,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const countryFlag = message.text;
     if (
         !countryFlag ||
@@ -62,7 +65,10 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
         // Theoretically should be fixed with https://github.com/danbilokha/covid19liveupdates/issues/49
         !getCountryNameFormat(name(countryFlag))
     ) {
-        return bot.sendMessage(chatId, getUserInputWithoutCountryNameMessage());
+        return bot.sendMessage(
+            chatId,
+            getUserInputWithoutCountryNameMessage(user.settings?.locale)
+        );
     }
 
     return showCountryResponse({
@@ -74,12 +80,12 @@ export const showCountryByFlag: CallBackQueryHandlerWithCommandArgument = async 
     });
 };
 
-export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const showCountryResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     chatId,
     user,
     commandParameter: requestedCountry,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     const [err, result]: [
         Error,
         [Country, Array<CountrySituationInfo>]
@@ -106,12 +112,19 @@ export const showCountryResponse: CallBackQueryHandlerWithCommandArgument = asyn
     // two send messages due to https://stackoverflow.com/a/41841237/6803463
     await bot.sendMessage(
         chatId,
-        getCountryMessage(name, confirmed, recovered, deaths, date),
+        getCountryMessage(
+            user.settings?.locale,
+            name,
+            confirmed,
+            recovered,
+            deaths,
+            date
+        ),
         getFullMenuKeyboard(chatId, user.settings?.locale)
     );
     return bot.sendMessage(
         chatId,
-        getCountryIKActionMessage(name),
+        getCountryIKActionMessage(user.settings?.locale, name),
         getAfterCountryResponseInlineKeyboard(name, user.settings?.locale)
     );
 };

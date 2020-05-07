@@ -1,16 +1,16 @@
 import { getHelpMessage } from '../../../messages/feature/helpMessages';
 import {
-    CallBackQueryHandlerWithCommandArgument,
-    CallBackQueryParameters,
+    TelegramCallBackQueryHandlerWithCommandArgument,
+    TelegramCallBackQueryParameters,
 } from '../models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { getFullClickableFeaturesInlineKeyBoard } from '../services/keyboard';
 
-export const helpInfoResponse: CallBackQueryHandlerWithCommandArgument = async ({
+export const helpInfoResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
-}: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+}: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
     return bot.sendMessage(
         chatId,
         getHelpMessage(user.settings?.locale),

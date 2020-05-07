@@ -1,25 +1,26 @@
-import { Country } from '../../../models/country.models';
-import { CountrySituationInfo } from '../../../models/covid19.models';
+import { MessageRegistry } from './registry/messageRegistry';
+import { Country } from '../../models/country.models';
+import { CountrySituationInfo } from '../../models/covid19.models';
+import { StorageService } from './storage.service';
+import { catchAsyncError } from '../../utils/catchError';
+import { logger } from '../../utils/logger';
+import { LogCategory } from '../../models/constants';
 import {
     Subscription,
     SubscriptionType,
     UserSubscription,
     UserSubscriptionNotification,
-} from '../../../models/subscription.models';
-import { catchAsyncError } from '../../../utils/catchError';
-import { logger } from '../../../utils/logger';
-import { isCountrySituationHasChangedSinceLastData } from '../../../services/domain/subscriptions';
-import { getCountrySubscriptionMessage } from '../../../messages/feature/subscribeMessages';
-import { LogCategory } from '../../../models/constants';
-import { MessageHandlerRegistry } from './registry/messageHandlerRegistry';
-import { telegramStorage } from './storage';
-import { telegramUserService } from '../services/user';
+} from '../../models/subscription.models';
+import { User } from '../../models/user.model';
+import { isCountrySituationHasChangedSinceLastData } from './subscriptions';
+import { getCountrySubscriptionMessage } from '../../messages/feature/subscribeMessages';
 
 export const subscriptionNotifierHandler = async (
-    messageHandlerRegistry: MessageHandlerRegistry,
+    messageHandlerRegistry: MessageRegistry,
+    storageService: StorageService,
     countriesData: [number, Array<[Country, Array<CountrySituationInfo>]>]
 ): Promise<void> => {
-    const allUsersSubscriptions = await telegramStorage.getSubscriptions();
+    const allUsersSubscriptions = await storageService.getSubscriptions();
     const [_, countriesInfo] = countriesData;
     const countriesInfoMap: Map<string, Array<CountrySituationInfo>> = new Map(
         countriesInfo.map(([country, countrySituations]) => [
@@ -31,14 +32,14 @@ export const subscriptionNotifierHandler = async (
     for (const [chatId, userSubscription] of Object.entries(
         allUsersSubscriptions
     )) {
-        const user = await telegramUserService.getUser(parseInt(chatId, 10));
+        const user = await storageService.getUser(chatId);
         const [err, result] = await catchAsyncError(
             getAndSendUserNotificationSubscriptions(
                 messageHandlerRegistry,
+                storageService,
                 countriesInfoMap,
                 userSubscription,
-                chatId,
-                user?.settings?.locale
+                user
             )
         );
         if (err) {
@@ -52,18 +53,18 @@ export const subscriptionNotifierHandler = async (
 };
 
 const getAndSendUserNotificationSubscriptions = async (
-    messageHandlerRegistry: MessageHandlerRegistry,
+    messageHandlerRegistry: MessageRegistry,
+    storageService: StorageService,
     countriesInfoMap: Map<string, Array<CountrySituationInfo>>,
     userSubscription: UserSubscription,
-    chatId: string,
-    locale: string
+    { settings, chatId }: User
 ) => {
     const userSubscriptionsUpdate: Array<UserSubscriptionNotification> = getUserActiveSubscriptionNotifications(
         countriesInfoMap,
         userSubscription.subscriptionsOn.filter(
             (sub: Subscription) => sub.active
         ),
-        locale
+        settings?.locale
     );
 
     if (!!userSubscriptionsUpdate?.length) {
@@ -72,7 +73,7 @@ const getAndSendUserNotificationSubscriptions = async (
             sendingNotificationResult,
         ] = await catchAsyncError(
             messageHandlerRegistry.sendUserNotification(
-                parseInt(chatId, 10),
+                chatId,
                 userSubscriptionsUpdate
                     .map(
                         (subUp: UserSubscriptionNotification) =>
@@ -81,6 +82,7 @@ const getAndSendUserNotificationSubscriptions = async (
                     .join('\n\n')
             )
         );
+
         if (!!sendingNotificationErr) {
             return logger.error(
                 `User ${chatId} notifications has not been send`,
@@ -99,6 +101,7 @@ const getAndSendUserNotificationSubscriptions = async (
                         type === sub.type &&
                         value === sub.value
                 );
+
                 if (updateUserSub) {
                     return updateUserSub.subscription;
                 }
@@ -111,11 +114,12 @@ const getAndSendUserNotificationSubscriptions = async (
             updatingUserSubscriptionErr,
             updatingUserSubscriptionResult,
         ] = await catchAsyncError(
-            telegramStorage.setSubscription({
+            storageService.setSubscription({
                 chat: userSubscription.chat,
                 subscriptionsOn: mergeAllUserSubscriptions,
             })
         );
+
         if (!!updatingUserSubscriptionErr) {
             return logger.error(
                 `User ${chatId} notifications has not been updated. Thus, system will wrongly send more updates even that it's already sent such messages to a user`,
@@ -135,10 +139,10 @@ const getUserActiveSubscriptionNotifications = (
 
     userActiveSubscriptions.forEach((subscription: Subscription) => {
         if (subscription.type === SubscriptionType.Country) {
-            // TODO: Take into account timezone
             const userSubscriptionCountry = countriesInfoMap.get(
                 subscription.value.toLocaleLowerCase()
             );
+
             if (!userSubscriptionCountry) {
                 return;
             }

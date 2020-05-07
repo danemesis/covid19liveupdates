@@ -1,12 +1,12 @@
+import { LogCategory } from '../../../models/constants';
+import { logger } from '../../../utils/logger';
 import {
+    Bot,
     CallBackQueryHandlerWithCommandArgument,
     CallBackQueryParameters,
-} from '../../models';
-import * as TelegramBot from 'node-telegram-bot-api';
-import { LogCategory } from '../../../../models/constants';
-import { logger } from '../../../../utils/logger';
-import { noResponse } from '../../botResponse/noResponse';
-import { MessageHandlerRegistry } from './messageHandlerRegistry';
+    Message,
+} from '../../../models/bots';
+import { MessageRegistry } from './messageRegistry';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -15,8 +15,9 @@ import { MessageHandlerRegistry } from './messageHandlerRegistry';
  * @example /trends Ukraine monthly
  */
 export const withTwoArgumentsAfterCommand = (
-    context: MessageHandlerRegistry,
-    handlerFn: CallBackQueryHandlerWithCommandArgument
+    context: MessageRegistry,
+    handlerFn: CallBackQueryHandlerWithCommandArgument,
+    noResponseFn: (args: unknown) => Promise<Message>
 ): CallBackQueryHandlerWithCommandArgument => {
     return ({
         bot,
@@ -24,7 +25,7 @@ export const withTwoArgumentsAfterCommand = (
         chatId,
         user,
         commandParameter,
-    }: CallBackQueryParameters): Promise<TelegramBot.Message> => {
+    }: CallBackQueryParameters<Bot, Message>): Promise<Message> => {
         try {
             const [arg1, arg2] = splitArgument(commandParameter);
             return handlerFn.call(context, {
@@ -44,7 +45,7 @@ export const withTwoArgumentsAfterCommand = (
                 chatId
             );
 
-            return noResponse({ bot, message, user, chatId });
+            return noResponseFn({ bot, message, user, chatId });
         }
     };
 };

@@ -1,5 +1,5 @@
 import { CountrySituationInfo } from './covid19.models';
-import * as TelegramBot from 'node-telegram-bot-api';
+import { Chat } from './bots';
 
 export enum SubscriptionType {
     TrackCountryUpdates = 'New country',
@@ -17,7 +17,7 @@ export interface Subscription {
 }
 
 export interface UserSubscription {
-    chat: TelegramBot.Chat;
+    chat: Chat;
     subscriptionsOn: Array<Subscription>;
 }
 
