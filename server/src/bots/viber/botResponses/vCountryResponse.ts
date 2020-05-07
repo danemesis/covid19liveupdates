@@ -21,6 +21,7 @@ import {
     vGetAfterCountryResponseInlineKeyboard,
     vGetFullMenuKeyboard,
 } from '../services/keyboard';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vShowCountryByNameStrategyResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -30,7 +31,7 @@ export const vShowCountryByNameStrategyResponse: ViberCallBackQueryHandlerWithCo
     commandParameter,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
     if (!commandParameter) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(
                 getUserInputWithoutCountryNameMessage(user.settings?.locale)
             ),
@@ -69,7 +70,7 @@ export const vShowCountryResponse: ViberCallBackQueryHandlerWithCommandArgument 
             chatId
         );
 
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(err.message),
             new Message.Keyboard(
                 vGetFullMenuKeyboard(user.settings?.locale, chatId)
@@ -81,7 +82,7 @@ export const vShowCountryResponse: ViberCallBackQueryHandlerWithCommandArgument 
     const { recovered, confirmed, deaths, date } = foundSituation[
         foundSituation.length - 1
     ];
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getCountryMessage(
                 user.settings?.locale,

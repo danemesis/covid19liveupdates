@@ -27,6 +27,7 @@ import {
 import { Message } from 'viber-bot';
 import { Continents } from '../../../models/constants';
 import { isTextEqual } from '../../../utils/isEqual';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vCountriesTableByContinentResponse = (
     continent: string
@@ -51,7 +52,7 @@ export const vCountriesTableByContinentResponse = (
         )
     );
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getCountriesTableHTMLMessage(
                 user.settings?.locale,
@@ -86,7 +87,7 @@ export const vCountriesForContinentResponse: ViberCallBackQueryHandlerWithComman
         (country1, country2) => country2.active - country1.active
     );
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getCountriesForContinentMessage(user.settings?.locale)
         ),
@@ -126,7 +127,7 @@ export const vWorldByContinentOverallResponse: ViberCallBackQueryHandlerWithComm
     }: WorldOverallInformation = await getWorldOverallInformation();
 
     // Send overall world info,
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getCountriesWorldMessage(
                 user.settings?.locale,

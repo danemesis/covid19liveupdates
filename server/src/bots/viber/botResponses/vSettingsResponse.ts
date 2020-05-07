@@ -19,6 +19,7 @@ import {
     vGetFullMenuKeyboard,
     vGetLocalizationInlineKeyboard,
 } from '../services/keyboard';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -28,7 +29,7 @@ export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgu
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
     const locales: Array<string> = await viberUserService().getAvailableLanguages();
     if (!commandParameter) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(chooseLanguageMessage(user.settings?.locale)),
             new Message.Keyboard(
                 vGetLocalizationInlineKeyboard(
@@ -41,7 +42,7 @@ export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgu
 
     const availableLanguages: Array<string> = await telegramUserService().getAvailableLanguages();
     if (!availableLanguages.find((language) => language === commandParameter)) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(
                 languageIsNotSupportableMessage(user.settings?.locale)
             ),
@@ -65,18 +66,18 @@ export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgu
             chatId
         );
 
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(cannotSetupLanguageMessage(commandParameter)),
         ]);
     }
 
     const updatedUser = await viberUserService().getUser(user);
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         // We cannot use "User" from parameter in the bot.sendMessage(
         // because that "User" still have an old locale, while this
         // "resultUser" has updated user settings
         new Message.Text(
-            languageHasBeenSuccessfullySetup(updatedUser.settings.locale)
+            languageHasBeenSuccessfullySetup(updatedUser.settings?.locale)
         ),
         new Message.Keyboard(
             vGetFullMenuKeyboard(chatId, updatedUser.settings?.locale)

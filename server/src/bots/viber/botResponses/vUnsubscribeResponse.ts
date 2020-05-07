@@ -13,6 +13,7 @@ import {
 } from '../services/keyboard';
 import { catchAsyncError } from '../../../utils/catchError';
 import { unsubscribeMeFrom } from '../../../services/domain/subscriptions';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const buildUnsubscribeInlineResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -24,14 +25,14 @@ export const buildUnsubscribeInlineResponse: ViberCallBackQueryHandlerWithComman
     );
     if (!userSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
-            { id: chatId },
+            { id: mapBackToRealViberChatId(chatId) },
             new Message.Text(
                 noSubscriptionsResponseMessage(user.settings.locale)
             )
         );
     }
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getLocalizedMessages(
                 user.settings.locale,
@@ -61,12 +62,12 @@ export const vUnsubscribeStrategyResponse: ViberCallBackQueryHandlerWithCommandA
         unsubscribeMeFrom(message.chat, commandParameter, viberStorage())
     );
     if (err) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(`${err.message}, sorry 🙇🏽`),
         ]);
     }
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getLocalizedMessages(
                 user.settings?.locale,

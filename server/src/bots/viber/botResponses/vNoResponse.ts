@@ -8,6 +8,7 @@ import {
 import { Message } from 'viber-bot';
 import { vGetHelpProposalInlineKeyboard } from '../services/keyboard';
 import { noResponseForUserMessage } from '../../../messages/userMessage';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vNoResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -25,7 +26,7 @@ export const vNoResponse: ViberCallBackQueryHandlerWithCommandArgument = async (
         chatId
     );
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         // We cannot use "User" from parameter in the bot.sendMessage(
         // because that "User" still have an old locale, while this
         // "resultUser" has updated user settings

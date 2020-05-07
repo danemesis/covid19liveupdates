@@ -9,6 +9,7 @@ import { vGetFullMenuKeyboard } from '../services/keyboard';
 import { viberUserService } from '../services/user';
 import { vSettingsLanguageResponse } from './vSettingsResponse';
 import { UserRegExps } from '../../../models/constants';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vStartResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -28,7 +29,7 @@ export const vStartResponse: ViberCallBackQueryHandlerWithCommandArgument = asyn
         });
     }
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(greetUserMessage(locale, user)),
         new Message.Keyboard(vGetFullMenuKeyboard(locale, chatId)),
     ]);

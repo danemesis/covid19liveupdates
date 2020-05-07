@@ -38,7 +38,7 @@ export class ViberMessageRegistry extends MessageRegistry {
         notification: string
     ): Promise<TelegramBot.Message> {
         return this.bot.sendMessage(
-            { id: chatId.toString() },
+            { id: mapBackToRealViberChatId(chatId).toString() },
             new Message.Text(notification)
         );
     }

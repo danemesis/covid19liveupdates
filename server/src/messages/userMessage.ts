@@ -20,6 +20,12 @@ export const greetUserMessage = (locale: string | null, user: User): string => {
     ]).join('');
 };
 
+export const callToAction = (locale: string | null): string =>
+    getLocalizedMessages(
+        locale,
+        'Subscribe or type something, anything to start the conversation'
+    );
+
 export const noResponseForUserMessage = (
     locale: string | null,
     message: string

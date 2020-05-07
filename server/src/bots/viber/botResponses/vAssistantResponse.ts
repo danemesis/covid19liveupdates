@@ -21,6 +21,7 @@ import { LogCategory } from '../../../models/constants';
 import { User } from '../../../models/user.model';
 import { Message } from 'viber-bot';
 import { vGetFullMenuKeyboard } from '../services/keyboard';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vShowAssistantFeatures: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -46,7 +47,7 @@ export const vShowAssistantFeatures: ViberCallBackQueryHandlerWithCommandArgumen
               )
             : getAssistantIsOnLunchMessage(user.settings?.locale);
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(messageText),
         new Message.Keyboard(
             vGetFullMenuKeyboard(user.settings?.locale, chatId)
@@ -59,7 +60,7 @@ export const vAssistantNoAnswerResponse: ViberCallBackQueryHandlerWithCommandArg
     chatId,
     user,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(noAnswersOnQuestionMessage(user.settings?.locale)),
         new Message.Keyboard(
             vGetFullMenuKeyboard(user.settings?.locale, chatId)
@@ -73,7 +74,7 @@ export const vAssistantResponse = async (
     chatId: string,
     user: User
 ) => {
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             getAnswersOnQuestionMessage(user.settings?.locale, answers)
         ),

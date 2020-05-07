@@ -20,6 +20,7 @@ import { withSingleParameterAfterCommand } from '../../services/domain/registry/
 import {
     vActionsResponse,
     vMainMenuResponse,
+    vOnConversationStartResponse,
 } from './botResponses/vActionsResponse';
 import { vSettingsLanguageResponse } from './botResponses/vSettingsResponse';
 import { vHelpResponse } from './botResponses/vHelpResponse';
@@ -235,7 +236,26 @@ export async function runViberBot(
         [SubscriptionType.Country]
     );
 
-    bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
+    let botFirstMessage = false;
+    bot.on(Events.MESSAGE_RECEIVED, async (message, response) => {
+        if (botFirstMessage) {
+            botFirstMessage = false;
+
+            const [err, res] = await catchAsyncError(
+                viberMessageRegistry.runCommandHandler({
+                    text: '/start',
+                    chat: {
+                        ...response.userProfile,
+                    },
+                })
+            );
+            if (err) {
+                logger.log(LogLevel.Error, err, LogCategory.ViberError);
+            }
+
+            return;
+        }
+
         viberMessageRegistry.runCommandHandler({
             ...message,
             chat: { ...response.userProfile },
@@ -249,15 +269,14 @@ export async function runViberBot(
     bot.on(
         Events.CONVERSATION_STARTED,
         async (response, isSubscribed, context, onFinish) => {
-            const [err, res] = await catchAsyncError(
-                viberMessageRegistry.runCommandHandler({
-                    text: '/start',
-                    chat: { ...response.userProfile },
-                })
-            );
-            if (err) {
-                logger.log(LogLevel.Error, err, LogCategory.ViberError);
-            }
+            await vOnConversationStartResponse({
+                bot,
+                message: undefined,
+                chatId: response.userProfile.id,
+                user: response.userProfile,
+            });
+
+            botFirstMessage = true;
         }
     );
     bot.on(Events.ERROR, (err) => {
@@ -265,14 +284,32 @@ export async function runViberBot(
     });
 
     bot.on(Events.UNSUBSCRIBED, (response) =>
-        response.send(
-            `We are sorry to hear that, ${response.userProfile?.name}`
+        logger.log(
+            LogLevel.Error,
+            `User unsubscribed, ${response.userProfile?.id}`,
+            LogCategory.ViberError
         )
     );
 
-    bot.on(Events.SUBSCRIBED, (response) =>
-        response.send(`Thanks for subscribing, ${response.userProfile?.name}`)
-    );
+    bot.on(Events.SUBSCRIBED, async (response) => {
+        if (botFirstMessage) {
+            botFirstMessage = false;
+
+            const [err, res] = await catchAsyncError(
+                viberMessageRegistry.runCommandHandler({
+                    text: '/start',
+                    chat: {
+                        ...response.userProfile,
+                    },
+                })
+            );
+            if (err) {
+                logger.log(LogLevel.Error, err, LogCategory.ViberError);
+            }
+
+            return;
+        }
+    });
 
     await runSendScheduledNotificationToUsersJob(
         bot,

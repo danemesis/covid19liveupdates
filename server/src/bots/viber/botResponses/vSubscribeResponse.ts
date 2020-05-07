@@ -15,13 +15,14 @@ import { viberStorage } from '../services/storage';
 import { catchAsyncError } from '../../../utils/catchError';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vSubscriptionManagerResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
     chatId,
 }: ViberCallBackQueryParameters): Promise<ViberTextMessage> => {
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             subscriptionManagerResponseMessage(user.settings?.locale)
         ),
@@ -41,14 +42,14 @@ export const vShowExistingSubscriptionsResponse: ViberCallBackQueryHandlerWithCo
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {
         return bot.sendMessage(
-            { id: chatId },
+            { id: mapBackToRealViberChatId(chatId) },
             new Message.Text(
                 noSubscriptionsResponseMessage(user?.settings?.locale)
             )
         );
     }
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             showMySubscriptionMessage(
                 activeUserSubscription,
@@ -81,7 +82,7 @@ export const vSubscribingStrategyResponse: ViberCallBackQueryHandlerWithCommandA
         subscribeOn(message.chat, user, commandParameter, viberStorage())
     );
     if (err) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(
                 getLocalizedMessages(
                     user?.settings?.locale,
@@ -91,7 +92,7 @@ export const vSubscribingStrategyResponse: ViberCallBackQueryHandlerWithCommandA
         ]);
     }
 
-    return bot.sendMessage({ id: chatId }, [
+    return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
             subscriptionResultMessage(result, user?.settings?.locale)
         ),

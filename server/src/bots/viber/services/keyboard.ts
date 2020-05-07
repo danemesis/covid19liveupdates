@@ -215,7 +215,7 @@ export const vGetLocalizationInlineKeyboard = (
     const keyboard: Keyboard = {
         Type: 'keyboard',
         Revision: 1,
-        Buttons: [getCloseInlineKeyboardRow(currentLocale)],
+        Buttons: [],
     };
 
     let i: number = 0;
@@ -236,7 +236,7 @@ export const vGetLocalizationInlineKeyboard = (
             const button: KeyboardButton = {
                 ActionType: 'reply',
                 ActionBody: callbackData,
-                Columns: 1,
+                Columns: 3,
                 Rows: 1,
                 Text: text,
             };
@@ -246,6 +246,8 @@ export const vGetLocalizationInlineKeyboard = (
 
         keyboard.Buttons.push(...rows);
     }
+
+    keyboard.Buttons.push(getCloseInlineKeyboardRow(currentLocale));
 
     return keyboard;
 };
@@ -406,7 +408,7 @@ const getCloseInlineKeyboardRow = (locale: string): KeyboardButton => {
     return {
         ActionType: 'reply',
         ActionBody: UserActionsRegExps.Close,
-        Columns: 1,
+        Columns: 6,
         Rows: 1,
         Text: getLocalizedMessages(locale, UserInlineActions.Close),
     };

@@ -20,6 +20,7 @@ import { Status } from '../../../models/constants';
 import { Message } from 'viber-bot';
 import { vGetAfterCountryResponseInlineKeyboard } from '../services/keyboard';
 import * as shortUrl from 'node-url-shortener';
+import { mapBackToRealViberChatId } from '../utils/getViberChatId';
 
 export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -39,7 +40,10 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
             err
         );
 
-        return bot.sendMessage({ id: chatId }, new Message.Text(err.message));
+        return bot.sendMessage(
+            { id: mapBackToRealViberChatId(chatId) },
+            new Message.Text(err.message)
+        );
     }
 
     let startDate: Date;
@@ -102,7 +106,7 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
     if (trendsUrl.length > 2048) {
         shortUrl.short(trendsUrl, async (err, url) => {
             const [error, result] = await catchAsyncError(
-                bot.sendMessage({ id: chatId }, [
+                bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
                     new Message.Picture(url),
                     new Message.Keyboard(
                         vGetAfterCountryResponseInlineKeyboard(
@@ -114,7 +118,7 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
             );
 
             if (error) {
-                bot.sendMessage({ id: chatId }, [
+                bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
                     new Message.Keyboard(
                         vGetAfterCountryResponseInlineKeyboard(
                             requestedCountry,
@@ -132,7 +136,7 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
         return;
     }
     const [error, result] = await catchAsyncError(
-        bot.sendMessage({ id: chatId }, [
+        bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Picture(trendsUrl),
             new Message.Keyboard(
                 vGetAfterCountryResponseInlineKeyboard(
@@ -144,7 +148,7 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
     );
 
     if (error) {
-        return bot.sendMessage({ id: chatId }, [
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Keyboard(
                 vGetAfterCountryResponseInlineKeyboard(
                     requestedCountry,
