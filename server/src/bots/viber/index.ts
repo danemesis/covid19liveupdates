@@ -46,6 +46,7 @@ import { withTwoArgumentsAfterCommand } from '../../services/domain/registry/wit
 import { vTrendsByCountryResponse } from './botResponses/vTrendResponse';
 import { vAdviceResponse } from './botResponses/vAdviceResponse';
 import { vAssistantStrategyResponse } from './botResponses/vAssistantResponse';
+import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
 
 export async function runViberBot(
     app: Express,
@@ -247,11 +248,16 @@ export async function runViberBot(
 
     bot.on(
         Events.CONVERSATION_STARTED,
-        (response, isSubscribed, context, onFinish) => {
-            viberMessageRegistry.runCommandHandler({
-                text: '/start',
-                chat: { ...response.userProfile },
-            });
+        async (response, isSubscribed, context, onFinish) => {
+            const [err, res] = await catchAsyncError(
+                viberMessageRegistry.runCommandHandler({
+                    text: '/start',
+                    chat: { ...response.userProfile },
+                })
+            );
+            if (err) {
+                logger.log(LogLevel.Error, err, LogCategory.ViberError);
+            }
         }
     );
     bot.on(Events.ERROR, (err) => {
@@ -266,6 +272,12 @@ export async function runViberBot(
 
     bot.on(Events.SUBSCRIBED, (response) =>
         response.send(`Thanks for subscribing, ${response.userProfile?.name}`)
+    );
+
+    await runSendScheduledNotificationToUsersJob(
+        bot,
+        viberMessageRegistry,
+        viberStorage()
     );
     return true;
 }

@@ -2,11 +2,12 @@ import * as schedule from 'node-schedule';
 import { tryToUpdateCovid19Cache } from '../domain/covid19';
 import { logger } from '../../utils/logger';
 import { LogCategory } from '../../models/constants';
-import { telegramStorage } from '../../bots/telegram/services/storage';
 import { catchAsyncError } from '../../utils/catchError';
 import environments from '../../environments/environment';
 import { getUserName } from '../../utils/user.utils';
-import TelegramBot = require('node-telegram-bot-api');
+import { Bot } from '../../models/bots';
+import { StorageService } from '../domain/storage.service';
+import { MessageRegistry } from '../domain/registry/messageRegistry';
 
 export const checkCovid19Updates = () => {
     // Check covid19 info every hour (at hh:30 mins, e.g. 1:30, 2:30 ...)
@@ -21,7 +22,9 @@ export const checkCovid19Updates = () => {
 };
 
 export const runSendScheduledNotificationToUsersJob = async (
-    bot: TelegramBot
+    bot: Bot,
+    messageRegistry: MessageRegistry,
+    storageService: StorageService
 ): Promise<void> => {
     // At 08:00 PM, every day
     schedule.scheduleJob(
@@ -36,7 +39,7 @@ export const runSendScheduledNotificationToUsersJob = async (
                 return;
             }
             const [err, users] = await catchAsyncError(
-                telegramStorage().getAllUsers()
+                storageService.getAllUsers()
             );
             if (err) {
                 logger.error(
@@ -47,7 +50,7 @@ export const runSendScheduledNotificationToUsersJob = async (
                 return;
             }
             const [err1, message] = await catchAsyncError(
-                telegramStorage().getNotificationMessage()
+                storageService.getNotificationMessage()
             );
             if (err) {
                 logger.error(
@@ -65,9 +68,9 @@ export const runSendScheduledNotificationToUsersJob = async (
                 );
             }
 
-            for (const usr of users) {
-                message.replace('#UserName#', getUserName(usr));
-                bot.sendMessage(usr.chatId, message);
+            for (const user of users) {
+                message.replace('#UserName#', getUserName(user));
+                messageRegistry.sendUserNotification(user.chatId, message);
             }
         }
     );

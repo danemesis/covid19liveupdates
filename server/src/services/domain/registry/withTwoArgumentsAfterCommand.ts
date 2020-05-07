@@ -1,6 +1,7 @@
 import { LogCategory } from '../../../models/constants';
 import { logger } from '../../../utils/logger';
 import {
+    Bot,
     CallBackQueryHandlerWithCommandArgument,
     CallBackQueryParameters,
     Message,
@@ -24,7 +25,7 @@ export const withTwoArgumentsAfterCommand = (
         chatId,
         user,
         commandParameter,
-    }: CallBackQueryParameters): Promise<Message> => {
+    }: CallBackQueryParameters<Bot, Message>): Promise<Message> => {
         try {
             const [arg1, arg2] = splitArgument(commandParameter);
             return handlerFn.call(context, {

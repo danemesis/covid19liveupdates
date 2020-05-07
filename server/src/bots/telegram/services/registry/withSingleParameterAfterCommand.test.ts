@@ -45,7 +45,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should handleFnMock be called', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,
@@ -60,7 +61,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and ikCbDataMock', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,
@@ -79,7 +81,8 @@ describe('withSingleParameterAfterCommand', () => {
     it('should getParameterAfterCommandFromMessageMock be called with singleParameterAfterCommands and textMock', () => {
         withSingleParameterAfterCommand(
             contextMock,
-            handleFnMock
+            handleFnMock,
+            noResponseMock
         )({
             bot: telegramBotMock,
             message: messageMock,
