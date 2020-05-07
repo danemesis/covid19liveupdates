@@ -115,5 +115,6 @@
   "Enter country name by a pattern": "Введіть назву країни слідуючи паттерну",
   "[country name]": "[назва країни]",
   "Main menu": "Головна",
-  "Subscribe or type something, anything to start the conversation": "Підпишіться або напишіть будь-що для початку діалогу"
+  "Subscribe or type something, anything to start the conversation": "Підпишіться або напишіть будь-що для початку діалогу",
+  "Sorry, we cannot show statistic. Server is unreachable, try later": "Вибачьте, але зараз ми не можемо показати вам статистику. Сервер не достуний, спробуйте пізніше"
 }
