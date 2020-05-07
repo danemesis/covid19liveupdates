@@ -74,6 +74,7 @@ export class TelegramMessageRegistry extends MessageRegistry {
     }
 
     public sendUserNotification(
+        locale: string,
         chatId: number,
         notification: string
     ): Promise<TelegramBot.Message> {

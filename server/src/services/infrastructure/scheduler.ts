@@ -70,7 +70,11 @@ export const runSendScheduledNotificationToUsersJob = async (
 
             for (const user of users) {
                 message.replace('#UserName#', getUserName(user));
-                messageRegistry.sendUserNotification(user.chatId, message);
+                messageRegistry.sendUserNotification(
+                    user.settings?.locale,
+                    user.chatId,
+                    message
+                );
             }
         }
     );

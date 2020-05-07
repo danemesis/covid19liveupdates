@@ -137,6 +137,7 @@ export abstract class MessageRegistry {
     }
 
     public abstract sendUserNotification(
+        locale: string,
         chatId: number | string,
         notification: string
     ): Promise<Message>;

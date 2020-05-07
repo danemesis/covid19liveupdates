@@ -1,12 +1,16 @@
 import { MessageRegistry } from '../../../services/domain/registry/messageRegistry';
 import { ViberBot, ViberTextMessage } from '../models';
-import { getViberChatId } from '../utils/getViberChatId';
+import {
+    getViberChatId,
+    mapBackToRealViberChatId,
+} from '../utils/getViberChatId';
 import { DEFAULT_USER_SETTINGS, User } from '../../../models/user.model';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { UserService } from '../../../services/domain/user.service';
 import { logger } from '../../../utils/logger';
 import { LogCategory } from '../../../models/constants';
 import { Message } from 'viber-bot';
+import { vGetFullMenuKeyboard } from './keyboard';
 
 export class ViberMessageRegistry extends MessageRegistry {
     public getChatId: (params: ViberTextMessage) => string = getViberChatId;
@@ -34,13 +38,14 @@ export class ViberMessageRegistry extends MessageRegistry {
     }
 
     public sendUserNotification(
-        chatId: number,
+        locale: string,
+        chatId: string,
         notification: string
     ): Promise<TelegramBot.Message> {
-        return this.bot.sendMessage(
-            { id: mapBackToRealViberChatId(chatId).toString() },
-            new Message.Text(notification)
-        );
+        return this.bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
+            new Message.Text(notification),
+            new Message.Keyboard(vGetFullMenuKeyboard(locale, chatId)),
+        ]);
     }
 
     protected createUser(message: ViberTextMessage, chatId: number): User {

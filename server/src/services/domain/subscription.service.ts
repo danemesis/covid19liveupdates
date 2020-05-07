@@ -73,6 +73,7 @@ const getAndSendUserNotificationSubscriptions = async (
             sendingNotificationResult,
         ] = await catchAsyncError(
             messageHandlerRegistry.sendUserNotification(
+                settings?.locale,
                 chatId,
                 userSubscriptionsUpdate
                     .map(
