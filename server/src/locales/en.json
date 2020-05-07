@@ -116,5 +116,6 @@
 	"Subscribe or type something, anything to start the conversation": "Type something, anything to start the conversation",
 	"Привіт, %s": "Привіт, %s",
 	"Sorry, we cannot show statistic. Server is unreachable, try later": "Sorry, we cannot show statistic. Server is unreachable, try later",
-	"Подивитись статистику по-країні для %s": "Подивитись статистику по-країні для %s"
+	"Подивитись статистику по-країні для %s": "Подивитись статистику по-країні для %s",
+	"Я маю %s відповідуй на ваше": "Я маю %s відповідуй на ваше"
 }
