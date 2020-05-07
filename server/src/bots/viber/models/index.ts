@@ -171,4 +171,4 @@ export type ViberCallBackQueryHandlerWithCommandArgument = CallBackQueryHandlerW
 
 export const VIBER_PREFIX = 'viber';
 export const VIBER_COUNTRIES_ROW_ITEMS_NUMBER: number = 5;
-export const VIBER_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 4;
+export const VIBER_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER: number = 3;

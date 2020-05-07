@@ -1,9 +1,10 @@
-import { ViberBot, ViberTextMessage } from '../bots/viber/models';
+import { UserProfile, ViberBot, ViberTextMessage } from '../bots/viber/models';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { User } from './user.model';
 
 export type Bot = ViberBot | TelegramBot;
 export type Message = ViberTextMessage | TelegramBot.Message;
+export type Chat = UserProfile | TelegramBot.Chat;
 
 export interface CallBackQueryParameters<B extends Bot, M extends Message> {
     bot: B;

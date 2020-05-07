@@ -30,17 +30,16 @@ export const buildUnsubscribeInlineResponse: TelegramCallBackQueryHandlerWithCom
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessages(user.settings.locale, [
-            'Choose items to unsubscribe from',
-        ])[0],
+        getLocalizedMessages(
+            user.settings.locale,
+            'Choose items to unsubscribe from'
+        ),
         getUnsubscribeMessageInlineKeyboard(
             userSubscription.subscriptionsOn.map((v) => v.value)
         )
     );
 };
 
-// If it's called from InlineKeyboard, then @param ikCbData will be available
-// otherwise @param ikCbData will be null
 export const unsubscribeStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
@@ -48,14 +47,12 @@ export const unsubscribeStrategyResponse: TelegramCallBackQueryHandlerWithComman
     chatId,
     commandParameter,
 }: TelegramCallBackQueryParameters): Promise<TelegramBot.Message> => {
-    // If it's called from InlineKeyboard, then @param ikCbData will be available
-    // otherwise @param ikCbData will be null
     if (!commandParameter) {
         return buildUnsubscribeInlineResponse({ bot, message, chatId, user });
     }
 
     const [err, result] = await catchAsyncError<string>(
-        unsubscribeMeFrom(message.chat, commandParameter)
+        unsubscribeMeFrom(message.chat, commandParameter, telegramStorage())
     );
     if (err) {
         return bot.sendMessage(chatId, `${err.message}, sorry 🙇🏽`);
@@ -63,9 +60,10 @@ export const unsubscribeStrategyResponse: TelegramCallBackQueryHandlerWithComman
 
     return bot.sendMessage(
         chatId,
-        getLocalizedMessages(user.settings.locale, [
-            'You have been unsubscribed from',
-        ])[0] + result,
+        getLocalizedMessages(
+            user.settings.locale,
+            'You have been unsubscribed from'
+        ) + result,
         getFullMenuKeyboard(chatId, user.settings?.locale)
     );
 };

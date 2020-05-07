@@ -18,7 +18,6 @@ import {
 import { telegramStorage } from '../services/storage';
 import { getLocalizedMessages } from '../../../services/domain/localization.service';
 
-// TODO: Take a look in all handlers and remove unneeded parameters where they are not used
 export const subscriptionManagerResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     user,
@@ -55,8 +54,6 @@ export const showExistingSubscriptionsResponse: TelegramCallBackQueryHandlerWith
     );
 };
 
-// If it's called from InlineKeyboard, then @param ikCbData will be available
-// otherwise @param ikCbData will be null
 export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithCommandArgument = async ({
     bot,
     message,
@@ -77,6 +74,7 @@ export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithComman
         subscribeOn(
             message.chat,
             user,
+            // TODO: Probably should be replaced with 'commandParameter'
             removeCommandFromMessageIfExist(
                 getUserMessageFromIKorText(
                     message,
@@ -84,7 +82,8 @@ export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithComman
                     ''
                 ),
                 UserRegExps.Subscribe
-            )
+            ),
+            telegramStorage()
         )
     );
     if (err) {

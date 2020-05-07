@@ -93,7 +93,7 @@ export class StorageService {
     }
 
     public async getUserSubscriptions(
-        chatId: number
+        chatId: number | string
     ): Promise<UserSubscription> {
         return this.getRef<UserSubscription>(`subscriptions/${chatId}`);
     }
@@ -108,7 +108,7 @@ export class StorageService {
     }
 
     public async getActiveUserSubscriptions(
-        chatId: number
+        chatId: number | string
     ): Promise<UserSubscription> {
         const userSubscription = await this.getRef<UserSubscription>(
             `subscriptions/${chatId}`

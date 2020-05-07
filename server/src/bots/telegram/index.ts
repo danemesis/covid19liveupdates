@@ -145,7 +145,7 @@ export async function runTelegramBot(
                 noResponse
             )
         )
-        // Message handler for feature  Subscriptions
+        // Message handler for feature "Subscriptions"
         .registerMessageHandler(
             [
                 ...localizeOnLocales(
@@ -182,6 +182,7 @@ export async function runTelegramBot(
                 noResponse
             )
         )
+        // Message handler for feature "Trends"
         .registerMessageHandler(
             [UserRegExps.Trends],
             withSingleParameterAfterCommand(

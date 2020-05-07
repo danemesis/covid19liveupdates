@@ -7,20 +7,21 @@ import {
 import { catchAsyncError } from '../../utils/catchError';
 import { getAlreadySubscribedMessage } from '../../messages/feature/subscribeMessages';
 import { CountrySituationInfo } from '../../models/covid19.models';
-import * as TelegramBot from 'node-telegram-bot-api';
 import { isTextEqual } from '../../utils/isEqual';
 import { getCountryNameFormat } from './countries';
-import { telegramStorage } from '../../bots/telegram/services/storage';
 import { User } from '../../models/user.model';
+import { Chat } from '../../models/bots';
+import { StorageService } from './storage.service';
 
 /*
     @params
     Assume subscribeMeOn is just country name (for now)
  */
 export const subscribeOn = async (
-    chat: TelegramBot.Chat,
+    chat: Chat,
     user: User,
-    subscribeMeOn: string
+    subscribeMeOn: string,
+    storage: StorageService
 ): Promise<string> => {
     const subscribeMeOnTheCountry: string = getCountryNameFormat(subscribeMeOn);
     const availableCountries: Array<[
@@ -40,10 +41,9 @@ export const subscribeOn = async (
         throw Error('Is not supported, yet');
     }
 
-    // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await telegramStorage().getUserSubscriptions(chat.id)) ?? {})
-            .subscriptionsOn ?? [];
+        ((await storage.getUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
+        [];
 
     const checkIfAlreadySubscribed = existingSubscriptions
         .filter((subscription: Subscription) => subscription.active)
@@ -57,7 +57,7 @@ export const subscribeOn = async (
         );
     }
 
-    await telegramStorage().setSubscription({
+    await storage.setSubscription({
         chat,
         subscriptionsOn: [
             ...existingSubscriptions,
@@ -76,16 +76,16 @@ export const subscribeOn = async (
 };
 
 export const unsubscribeMeFrom = async (
-    chat: TelegramBot.Chat,
-    unsubscribeMeFrom: string
+    chat: Chat,
+    unsubscribeMeFrom: string,
+    storage: StorageService
 ): Promise<string> => {
     const unsubscribeMeFromTheCountry: string = getCountryNameFormat(
         unsubscribeMeFrom
     );
-    // TODO: Remove Telegram dependency
     const existingSubscriptions: Array<Subscription> =
-        ((await telegramStorage().getUserSubscriptions(chat.id)) ?? {})
-            .subscriptionsOn ?? [];
+        ((await storage.getUserSubscriptions(chat.id)) ?? {}).subscriptionsOn ??
+        [];
     let foundSubscription: Subscription;
     const updatedSubscriptions: Array<Subscription> = existingSubscriptions.map(
         (subscription: Subscription) => {
@@ -101,7 +101,7 @@ export const unsubscribeMeFrom = async (
     }
 
     const [err, result] = await catchAsyncError(
-        telegramStorage().setSubscription({
+        storage.setSubscription({
             chat,
             subscriptionsOn: updatedSubscriptions,
         })

@@ -135,6 +135,65 @@ export const vGetAfterCountryResponseInlineKeyboard = (
     };
 };
 
+export const vGetSubscriptionMessageInlineKeyboard = (
+    locale: string
+): Keyboard => {
+    return {
+        Type: 'keyboard',
+        Revision: 1,
+        Buttons: [
+            {
+                ActionType: 'reply',
+                ActionBody: UserMessages.Existing,
+                Columns: 3,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, UserMessages.Existing),
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: UserMessages.Unsubscribe,
+                Columns: 3,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
+            },
+        ],
+    };
+};
+
+export const vGetUnsubscribeMessageInlineKeyboard = (
+    values: Array<string>
+): Keyboard => {
+    const keyboard: Keyboard = {
+        Type: 'keyboard',
+        Revision: 1,
+        Buttons: [],
+    };
+
+    let i: number = 0;
+    while (i < values.length) {
+        const rows = [];
+        let rowItem: number = 0;
+        while (
+            !!values[i] &&
+            rowItem < VIBER_UNSUBSCRIPTIONS_ROW_ITEMS_NUMBER
+        ) {
+            const button: KeyboardButton = {
+                ActionType: 'reply',
+                ActionBody: `${CustomSubscriptions.UnsubscribeMeFrom} ${values[i]}`,
+                Columns: 2,
+                Rows: 1,
+                Text: values[i],
+            };
+            rows.push(button);
+            rowItem += 1;
+            i += 1;
+        }
+        keyboard.Buttons.push(...rows);
+    }
+
+    return keyboard;
+};
+
 export const vGetLocalizationInlineKeyboard = (
     locales: Array<string>,
     currentLocale: string

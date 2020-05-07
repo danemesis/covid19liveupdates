@@ -3,6 +3,7 @@ import { Bot, Events } from 'viber-bot';
 import { logger } from '../../utils/logger';
 import {
     Continents,
+    CustomSubscriptions,
     LogCategory,
     LogLevel,
     UserActionsRegExps,
@@ -25,6 +26,12 @@ import {
 } from './botResponses/vCountriesResponse';
 import { vNoResponse } from './botResponses/vNoResponse';
 import { vShowCountryByNameStrategyResponse } from './botResponses/vCountryResponse';
+import {
+    vShowExistingSubscriptionsResponse,
+    vSubscribingStrategyResponse,
+    vSubscriptionManagerResponse,
+} from './botResponses/vSubscribeResponse';
+import { vUnsubscribeStrategyResponse } from './botResponses/vUnsubscribeResponse';
 
 export async function runViberBot(
     app: Express,
@@ -70,6 +77,56 @@ export async function runViberBot(
                 vNoResponse
             )
         )
+        // Message handler for feature "Subscriptions"
+        .registerMessageHandler(
+            [
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.SubscriptionManager
+                ),
+            ],
+            vSubscriptionManagerResponse
+        )
+        .registerMessageHandler(
+            [...localizeOnLocales(availableLanguages, UserMessages.Existing)],
+            vShowExistingSubscriptionsResponse
+        )
+        .registerMessageHandler(
+            [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vSubscribingStrategyResponse,
+                vNoResponse
+            )
+        )
+        .registerMessageHandler(
+            [
+                CustomSubscriptions.UnsubscribeMeFrom,
+                UserRegExps.Unsubscribe,
+                ...localizeOnLocales(
+                    availableLanguages,
+                    UserMessages.Unsubscribe
+                ),
+            ],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vUnsubscribeStrategyResponse,
+                vNoResponse
+            )
+        )
+        // Message handler for feature "Trends"
+        // .registerMessageHandler(
+        //     [UserRegExps.Trends],
+        //     withSingleParameterAfterCommand(
+        //         viberMessageRegistry,
+        //         withTwoArgumentsAfterCommand(
+        //             viberMessageRegistry,
+        //             trendsByCountryResponse,
+        //             noResponse,
+        //         ),
+        //         noResponse,
+        //     ),
+        // )
         // Message handler for feature  Help
         .registerMessageHandler(
             [
@@ -102,8 +159,6 @@ export async function runViberBot(
     }
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
-        // console.log('message MESSAGE_RECEIVED', message, response);
-        // response.send(new Message.Text('Hi ' + message.text));
         viberMessageRegistry.runCommandHandler({
             ...message,
             chat: { ...response.userProfile },
