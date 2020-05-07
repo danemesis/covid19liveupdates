@@ -1,12 +1,13 @@
-import {
-    TelegramCallBackQueryHandlerWithCommandArgument,
-    TelegramCallBackQueryParameters,
-} from '../../../bots/telegram/models';
 import { logger } from '../../../utils/logger';
 import { getParameterAfterCommandFromMessage } from './getParameterAfterCommandFromMessage';
 import { LogCategory } from '../../../models/constants';
 import { MessageRegistry } from './messageRegistry';
-import { Message } from '../../../models/bots';
+import {
+    Bot,
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+    Message,
+} from '../../../models/bots';
 
 /**
  * This function is wrapper around the original User's query handler
@@ -16,16 +17,16 @@ import { Message } from '../../../models/bots';
  */
 export const withSingleParameterAfterCommand = (
     context: MessageRegistry,
-    handlerFn: TelegramCallBackQueryHandlerWithCommandArgument,
+    handlerFn: CallBackQueryHandlerWithCommandArgument,
     noResponseFn: (args: unknown) => Promise<Message>
-): TelegramCallBackQueryHandlerWithCommandArgument => {
+): CallBackQueryHandlerWithCommandArgument => {
     return ({
         bot,
         message,
         chatId,
         user,
         commandParameter,
-    }: TelegramCallBackQueryParameters): Promise<Message> => {
+    }: CallBackQueryParameters<Bot, Message>): Promise<Message> => {
         try {
             const userEnteredArgumentAfterCommand: string = getParameterAfterCommandFromMessage(
                 context.singleParameterAfterCommands,

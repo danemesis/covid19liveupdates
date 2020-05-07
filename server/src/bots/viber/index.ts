@@ -1,11 +1,24 @@
 import { Express } from 'express';
-import { Bot, Events, Message } from 'viber-bot';
+import { Bot, Events } from 'viber-bot';
 import { logger } from '../../utils/logger';
-import { LogCategory, LogLevel, UserRegExps } from '../../models/constants';
-import { Keyboard, ReceivedTextMessage, Response, ViberBot } from './models';
+import {
+    LogCategory,
+    LogLevel,
+    UserActionsRegExps,
+    UserMessages,
+    UserRegExps,
+    UserSettingsRegExps,
+} from '../../models/constants';
+import { ViberBot } from './models';
 import { viberUserService } from './services/user';
 import { ViberMessageRegistry } from './services/viberMessageRegistry';
 import { vStartResponse } from './botResponses/vStartResponse';
+import { localizeOnLocales } from '../../services/domain/localization.service';
+import { withSingleParameterAfterCommand } from '../../services/domain/registry/withSingleParameterAfterCommand';
+import { noResponse } from '../telegram/botResponse/noResponse';
+import { vActionsResponse } from './botResponses/vActionsResponse';
+import { vSettingsLanguageResponse } from './botResponses/vSettingsResponse';
+import { vHelpResponse } from './botResponses/vHelpResponse';
 
 export async function runViberBot(
     app: Express,
@@ -26,10 +39,30 @@ export async function runViberBot(
         bot,
         viberUserService()
     );
-    viberMessageRegistry.registerMessageHandler(
-        [UserRegExps.Start],
-        vStartResponse
-    );
+    viberMessageRegistry
+        .registerMessageHandler([UserRegExps.Start], vStartResponse)
+        // Message handler for feature  Help
+        .registerMessageHandler(
+            [
+                UserRegExps.Help,
+                ...localizeOnLocales(availableLanguages, UserMessages.Help),
+            ],
+            vHelpResponse
+        )
+        // Settings
+        .registerMessageHandler(
+            [
+                ...localizeOnLocales(availableLanguages, UserMessages.Language),
+                UserSettingsRegExps.Language,
+            ],
+            withSingleParameterAfterCommand(
+                viberMessageRegistry,
+                vSettingsLanguageResponse,
+                noResponse
+            )
+        )
+        // Actions
+        .registerMessageHandler([UserActionsRegExps.Close], vActionsResponse);
 
     bot.on(Events.MESSAGE_RECEIVED, (message, response) => {
         // console.log('message MESSAGE_RECEIVED', message, response);
@@ -58,56 +91,13 @@ export async function runViberBot(
     });
 
     bot.on(Events.UNSUBSCRIBED, (response) =>
-        response.send(`We are sorry to hear that, ${response.userProfile.name}`)
+        response.send(
+            `We are sorry to hear that, ${response.userProfile?.name}`
+        )
     );
 
     bot.on(Events.SUBSCRIBED, (response) =>
-        response.send(`Thanks for subscribing, ${response.userProfile.name}`)
+        response.send(`Thanks for subscribing, ${response.userProfile?.name}`)
     );
-
-    bot.onTextMessage(
-        /^hi|hello$/i,
-        (message: ReceivedTextMessage, response: Response) => {
-            // console.log('message', bot);
-            // console.log('response.userProfile', response.userProfile);
-            // const [err, res] = await catchAsyncError(bot.getUserDetails(response.userProfile));
-            // if (err) {
-            //     console.log(err);
-            // }
-            // console.log('res', res);
-            // console.log('res user prof', response.userProfile);
-            // response.send(
-            //     new Message.Text(
-            //         `Hi there ${response.userProfile.name}. I am ${bot.name}`,
-            //     ),
-            // );
-            // const SAMPLE_KEYBOARD: Keyboard = {
-            //     Type: 'keyboard',
-            //     Revision: 1,
-            //     Buttons: [
-            //         {
-            //             Columns: 3,
-            //             Rows: 2,
-            //             BgColor: '#e6f5ff',
-            //             BgMedia:
-            //                 'http://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg',
-            //             BgMediaType: 'picture',
-            //             BgLoop: true,
-            //             ActionType: 'reply',
-            //             ActionBody: 'Yes',
-            //         },
-            //     ],
-            // };
-            //
-            // const messageKeybard = new Message.Keyboard(SAMPLE_KEYBOARD);
-            // return bot.sendMessage({ id: response.userProfile.id }, [
-            //     new Message.Text(
-            //         `Hi there ${response.userProfile.name}. I am ${bot.name}`
-            //     ),
-            //     messageKeybard,
-            // ]);
-        }
-    );
-
     return true;
 }

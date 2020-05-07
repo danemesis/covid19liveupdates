@@ -1,10 +1,10 @@
-import {
-    TelegramCallBackQueryHandlerWithCommandArgument,
-    TelegramCallBackQueryParameters,
-} from '../../../bots/telegram/models';
 import { LogCategory } from '../../../models/constants';
 import { logger } from '../../../utils/logger';
-import { Message } from '../../../models/bots';
+import {
+    CallBackQueryHandlerWithCommandArgument,
+    CallBackQueryParameters,
+    Message,
+} from '../../../models/bots';
 import { MessageRegistry } from './messageRegistry';
 
 /**
@@ -15,16 +15,16 @@ import { MessageRegistry } from './messageRegistry';
  */
 export const withTwoArgumentsAfterCommand = (
     context: MessageRegistry,
-    handlerFn: TelegramCallBackQueryHandlerWithCommandArgument,
+    handlerFn: CallBackQueryHandlerWithCommandArgument,
     noResponseFn: (args: unknown) => Promise<Message>
-): TelegramCallBackQueryHandlerWithCommandArgument => {
+): CallBackQueryHandlerWithCommandArgument => {
     return ({
         bot,
         message,
         chatId,
         user,
         commandParameter,
-    }: TelegramCallBackQueryParameters): Promise<Message> => {
+    }: CallBackQueryParameters): Promise<Message> => {
         try {
             const [arg1, arg2] = splitArgument(commandParameter);
             return handlerFn.call(context, {

@@ -52,12 +52,14 @@ export interface ViberBot extends BaseInfo {
 
 export interface Keyboard {
     Type: 'keyboard';
+    Revision?: number;
     /** hex color */
-    BgColor: string;
+    BgColor?: string;
     Buttons: KeyboardButton[];
-    InputFieldState: 'hidden' | 'regular' | 'minimized';
+    InputFieldState?: 'hidden' | 'regular' | 'minimized';
 }
 
+// https://developers.viber.com/docs/all/#keyboard-reply-logic
 export interface KeyboardButton {
     Columns?: number;
     Rows?: number;
@@ -65,7 +67,7 @@ export interface KeyboardButton {
     ActionBody: string;
     /** hex color */
     BgColor?: string;
-    Text: string;
+    Text?: string;
     TextVAlign?: string;
     TextHAlign?: string;
     TextSize?: 'regular';

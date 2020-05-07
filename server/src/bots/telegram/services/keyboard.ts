@@ -284,7 +284,7 @@ const getCloseInlineKeyboardRow = (
     locale: string
 ): TelegramBot.InlineKeyboardButton => {
     return {
-        text: getLocalizedMessages(locale, [UserInlineActions.Close]).join(),
+        text: getLocalizedMessages(locale, UserInlineActions.Close),
         callback_data: `${UserActionsRegExps.Close}`,
     };
 };

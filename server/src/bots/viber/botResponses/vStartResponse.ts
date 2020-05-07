@@ -5,6 +5,7 @@ import {
     ViberTextMessage,
 } from '../models';
 import { Message } from 'viber-bot';
+import { vGetFullMenuKeyboard } from '../services/keyboard';
 import { viberUserService } from '../services/user';
 import { vSettingsLanguageResponse } from './vSettingsResponse';
 import { UserRegExps } from '../../../models/constants';
@@ -29,6 +30,6 @@ export const vStartResponse: ViberCallBackQueryHandlerWithCommandArgument = asyn
 
     return bot.sendMessage({ id: chatId }, [
         new Message.Text(greetUserMessage(locale, user)),
-        // getFullMenuKeyboard(chatId, locale),
+        new Message.Keyboard(vGetFullMenuKeyboard(locale, chatId)),
     ]);
 };

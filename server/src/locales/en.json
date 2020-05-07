@@ -111,5 +111,6 @@
 	"More on": "More on",
 	"Sorry, but I can show country only by country name": "Sorry, but I can show country only by country name",
 	"Enter country name by a pattern": "Enter country name by a pattern",
-	"[country name]": "[country name]"
+	"[country name]": "[country name]",
+	"Привіт, %s": "Привіт, %s"
 }

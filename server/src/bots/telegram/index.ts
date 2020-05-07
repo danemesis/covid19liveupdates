@@ -49,6 +49,7 @@ import { withSingleParameterAfterCommand } from '../../services/domain/registry/
 import { settingsLanguageResponse } from './botResponse/settingsResponse';
 import { closeActionResponse } from './botResponse/actionsResponse';
 import { localizeOnLocales } from '../../services/domain/localization.service';
+import { noResponse } from './botResponse/noResponse';
 
 export async function runTelegramBot(
     app: Express,
@@ -84,7 +85,8 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                worldByContinentOverallResponse
+                worldByContinentOverallResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
@@ -97,14 +99,16 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                showAvailableCountriesResponse
+                showAvailableCountriesResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
             [UserRegExps.CountryData],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                showCountryByNameStrategyResponse
+                showCountryByNameStrategyResponse,
+                noResponse
             )
         )
         // Message handler for feature  Advices
@@ -137,7 +141,8 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                assistantStrategyResponse
+                assistantStrategyResponse,
+                noResponse
             )
         )
         // Message handler for feature  Subscriptions
@@ -158,7 +163,8 @@ export async function runTelegramBot(
             [UserRegExps.Subscribe, CustomSubscriptions.SubscribeMeOn],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                subscribingStrategyResponse
+                subscribingStrategyResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
@@ -172,7 +178,8 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                unsubscribeStrategyResponse
+                unsubscribeStrategyResponse,
+                noResponse
             )
         )
         .registerMessageHandler(
@@ -181,8 +188,10 @@ export async function runTelegramBot(
                 messageHandlerRegistry,
                 withTwoArgumentsAfterCommand(
                     messageHandlerRegistry,
-                    trendsByCountryResponse
-                )
+                    trendsByCountryResponse,
+                    noResponse
+                ),
+                noResponse
             )
         )
         // Settings
@@ -193,7 +202,8 @@ export async function runTelegramBot(
             ],
             withSingleParameterAfterCommand(
                 messageHandlerRegistry,
-                settingsLanguageResponse
+                settingsLanguageResponse,
+                noResponse
             )
         )
         // Actions
