@@ -52,14 +52,15 @@ export abstract class MessageRegistry {
             // thus we have to make an request and wait for actual result
             // rather then subscribe on Firebase stream (which is await this.getUser(chatId))
             // does.
-            const syncRequestForUser = await this.userService.getUserRequest(
-                chatId
-            );
-            if (!syncRequestForUser) {
+            const syncRequestForUser:
+                | User
+                | {}
+                | null = await this.userService.getUserRequest(chatId);
+            if (!syncRequestForUser || !(syncRequestForUser as User).chatId) {
                 user = this.createUser(message, chatId);
                 await this.addUser(user);
             } else {
-                user = syncRequestForUser;
+                user = syncRequestForUser as User;
             }
         }
 

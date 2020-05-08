@@ -41,6 +41,7 @@ export const buildUnsubscribeInlineResponse: ViberCallBackQueryHandlerWithComman
         ),
         new Message.Keyboard(
             vGetUnsubscribeMessageInlineKeyboard(
+                user.settings?.locale,
                 userSubscription.subscriptionsOn.map((v) => v.value)
             )
         ),

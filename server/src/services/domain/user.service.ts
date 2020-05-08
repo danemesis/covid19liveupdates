@@ -41,7 +41,7 @@ export class UserService {
                               return key === user;
                           }
 
-                          return this.users[key].chatId === user.chatId;
+                          return this.users[key]?.chatId === user?.chatId;
                       })
                   ]
         );

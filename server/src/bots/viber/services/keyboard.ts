@@ -164,18 +164,13 @@ export const vGetSubscriptionMessageInlineKeyboard = (
                 Rows: 1,
                 Text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
             },
-            {
-                ActionType: 'reply',
-                ActionBody: ViberUserMessages.MainMenu,
-                Columns: 6,
-                Rows: 1,
-                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
-            },
+            vGetMainMenuKeyboardRow(locale, 6),
         ],
     };
 };
 
 export const vGetUnsubscribeMessageInlineKeyboard = (
+    locale: string | null,
     values: Array<string>
 ): Keyboard => {
     const keyboard: Keyboard = {
@@ -205,6 +200,8 @@ export const vGetUnsubscribeMessageInlineKeyboard = (
         }
         keyboard.Buttons.push(...rows);
     }
+
+    keyboard.Buttons.push(vGetMainMenuKeyboardRow(locale, 6));
 
     return keyboard;
 };
@@ -277,13 +274,7 @@ export const vGetContinentCountriesCheckOutOfferMessageInlineKeyboard = (
                     [`Check %s countries out`, continent],
                 ]).join(''),
             },
-            {
-                ActionType: 'reply',
-                ActionBody: ViberUserMessages.MainMenu,
-                Columns: 6,
-                Rows: 1,
-                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
-            },
+            vGetMainMenuKeyboardRow(locale, 6),
         ],
     };
 };
@@ -403,6 +394,17 @@ export const vGetHelpProposalInlineKeyboard = (locale: string): Keyboard => ({
             Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
         },
     ],
+});
+
+const vGetMainMenuKeyboardRow = (
+    locale: string,
+    columns: number = 6
+): KeyboardButton => ({
+    ActionType: 'reply',
+    ActionBody: ViberUserMessages.MainMenu,
+    Columns: columns,
+    Rows: 1,
+    Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
 });
 
 const getCloseInlineKeyboardRow = (locale: string): KeyboardButton => {
