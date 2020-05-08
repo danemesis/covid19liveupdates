@@ -48,8 +48,20 @@ export abstract class MessageRegistry {
         const chatId: number | string = this.getChatId(message);
         let user: User | null = await this.getUser(chatId);
         if (!user) {
-            user = this.createUser(message, chatId);
-            await this.addUser(user);
+            // If application was just started, then it does not have user, yet,
+            // thus we have to make an request and wait for actual result
+            // rather then subscribe on Firebase stream (which is await this.getUser(chatId))
+            // does.
+            const syncRequestForUser:
+                | User
+                | {}
+                | null = await this.userService.getUserRequest(chatId);
+            if (!syncRequestForUser || !(syncRequestForUser as User).chatId) {
+                user = this.createUser(message, chatId);
+                await this.addUser(user);
+            } else {
+                user = syncRequestForUser as User;
+            }
         }
 
         const runCheckupAgainstStr = (ikCbData
@@ -126,6 +138,7 @@ export abstract class MessageRegistry {
     }
 
     public abstract sendUserNotification(
+        locale: string,
         chatId: number | string,
         notification: string
     ): Promise<Message>;

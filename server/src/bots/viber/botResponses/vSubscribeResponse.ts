@@ -41,12 +41,14 @@ export const vShowExistingSubscriptionsResponse: ViberCallBackQueryHandlerWithCo
         chatId
     );
     if (!activeUserSubscription?.subscriptionsOn?.length) {
-        return bot.sendMessage(
-            { id: mapBackToRealViberChatId(chatId) },
+        return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
             new Message.Text(
                 noSubscriptionsResponseMessage(user?.settings?.locale)
-            )
-        );
+            ),
+            new Message.Keyboard(
+                vGetSubscriptionMessageInlineKeyboard(user.settings?.locale)
+            ),
+        ]);
     }
 
     return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
@@ -79,7 +81,14 @@ export const vSubscribingStrategyResponse: ViberCallBackQueryHandlerWithCommandA
     }
 
     const [err, result] = await catchAsyncError<string>(
-        subscribeOn(message.chat, user, commandParameter, viberStorage())
+        subscribeOn(
+            // Because due to user's ids - they might have shashes
+            // And Firebase treat slash as the path, so ...
+            { ...message.chat, id: chatId },
+            user,
+            commandParameter,
+            viberStorage()
+        )
     );
     if (err) {
         return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
@@ -88,6 +97,9 @@ export const vSubscribingStrategyResponse: ViberCallBackQueryHandlerWithCommandA
                     user?.settings?.locale,
                     'Something went wrong, sorry'
                 )
+            ),
+            new Message.Keyboard(
+                vGetSubscriptionMessageInlineKeyboard(user.settings?.locale)
             ),
         ]);
     }

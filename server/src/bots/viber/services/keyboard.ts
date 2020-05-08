@@ -10,6 +10,7 @@ import {
     Continents,
     CustomSubscriptions,
     Emojii,
+    Frequency,
     UserActionsRegExps,
     UserInlineActions,
     UserMessages,
@@ -104,7 +105,7 @@ export const vGetAfterCountryResponseInlineKeyboard = (
                 ActionBody: `${getLocalizedMessages(locale, [
                     UserRegExps.Subscribe,
                 ])} ${country}`,
-                Columns: 3,
+                Columns: 6,
                 Rows: 1,
                 Text: `${getLocalizedMessages(locale, [
                     CustomSubscriptions.SubscribeMeOn,
@@ -113,9 +114,23 @@ export const vGetAfterCountryResponseInlineKeyboard = (
             {
                 ActionType: 'reply',
                 ActionBody: `${UserRegExps.Trends} ${country}`,
-                Columns: 3,
+                Columns: 2,
                 Rows: 1,
                 Text: getLocalizedMessages(locale, 'Weekly chart'),
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.Monthly}`,
+                Columns: 2,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, 'Monthly chart'),
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.WholePeriod}`,
+                Columns: 2,
+                Rows: 1,
+                Text: getLocalizedMessages(locale, 'Whole period chart'),
             },
             {
                 ActionType: 'reply',
@@ -124,20 +139,6 @@ export const vGetAfterCountryResponseInlineKeyboard = (
                 Rows: 1,
                 Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
             },
-            // {
-            //     ActionType: 'reply',
-            //     ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.Monthly}`,
-            //     Columns: 2,
-            //     Rows: 1,
-            //     Text: getLocalizedMessages(locale, 'Monthly chart'),
-            // },
-            // {
-            //     ActionType: 'reply',
-            //     ActionBody: `${UserRegExps.Trends} \"${country}\" ${Frequency.WholePeriod}`,
-            //     Columns: 2,
-            //     Rows: 1,
-            //     Text: getLocalizedMessages(locale, 'Whole period chart'),
-            // },
         ],
     };
 };
@@ -163,18 +164,13 @@ export const vGetSubscriptionMessageInlineKeyboard = (
                 Rows: 1,
                 Text: getLocalizedMessages(locale, UserMessages.Unsubscribe),
             },
-            {
-                ActionType: 'reply',
-                ActionBody: ViberUserMessages.MainMenu,
-                Columns: 6,
-                Rows: 1,
-                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
-            },
+            vGetMainMenuKeyboardRow(locale, 6),
         ],
     };
 };
 
 export const vGetUnsubscribeMessageInlineKeyboard = (
+    locale: string | null,
     values: Array<string>
 ): Keyboard => {
     const keyboard: Keyboard = {
@@ -204,6 +200,8 @@ export const vGetUnsubscribeMessageInlineKeyboard = (
         }
         keyboard.Buttons.push(...rows);
     }
+
+    keyboard.Buttons.push(vGetMainMenuKeyboardRow(locale, 6));
 
     return keyboard;
 };
@@ -276,13 +274,7 @@ export const vGetContinentCountriesCheckOutOfferMessageInlineKeyboard = (
                     [`Check %s countries out`, continent],
                 ]).join(''),
             },
-            {
-                ActionType: 'reply',
-                ActionBody: ViberUserMessages.MainMenu,
-                Columns: 6,
-                Rows: 1,
-                Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
-            },
+            vGetMainMenuKeyboardRow(locale, 6),
         ],
     };
 };
@@ -402,6 +394,17 @@ export const vGetHelpProposalInlineKeyboard = (locale: string): Keyboard => ({
             Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
         },
     ],
+});
+
+const vGetMainMenuKeyboardRow = (
+    locale: string,
+    columns: number = 6
+): KeyboardButton => ({
+    ActionType: 'reply',
+    ActionBody: ViberUserMessages.MainMenu,
+    Columns: columns,
+    Rows: 1,
+    Text: getLocalizedMessages(locale, ViberUserMessages.MainMenu),
 });
 
 const getCloseInlineKeyboardRow = (locale: string): KeyboardButton => {

@@ -80,7 +80,7 @@ export const vSettingsLanguageResponse: ViberCallBackQueryHandlerWithCommandArgu
             languageHasBeenSuccessfullySetup(updatedUser.settings?.locale)
         ),
         new Message.Keyboard(
-            vGetFullMenuKeyboard(chatId, updatedUser.settings?.locale)
+            vGetFullMenuKeyboard(updatedUser.settings?.locale, chatId)
         ),
     ]);
 };

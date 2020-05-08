@@ -63,7 +63,7 @@ export const getCovid19ExplanationVideo = (): string => {
     return '<a href="https://www.youtube.com/watch?v=BtN-goy9VOY">COVID-19</a>';
 };
 
-export const getAdviceMessage = (locale: string | null): string =>
+export const getAdviceWithVideoMessage = (locale: string | null): string =>
     getLocalizedMessages(locale, [
         `${Emojii.Info}`,
         'Suggested Behaviors for',

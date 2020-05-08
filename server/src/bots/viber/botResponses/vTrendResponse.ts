@@ -21,6 +21,7 @@ import { Message } from 'viber-bot';
 import { vGetAfterCountryResponseInlineKeyboard } from '../services/keyboard';
 import * as shortUrl from 'node-url-shortener';
 import { mapBackToRealViberChatId } from '../utils/getViberChatId';
+import { trendsErrorMessage } from '../../../messages/feature/trendMessages';
 
 export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgument = async ({
     bot,
@@ -88,13 +89,9 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
     );
     let model = enrichWithTitle(
         Transform(periodSituation, statuses),
-        [
-            getLocalizedMessages(user.settings?.locale, frequencyName),
-            getLocalizedMessages(user.settings?.locale, 'trends for'),
-            capitalize(
-                getLocalizedMessages(user.settings?.locale, requestedCountry)
-            ),
-        ].join(' ')
+        capitalize(
+            getLocalizedMessages(user.settings?.locale, requestedCountry)
+        )
     );
     if (frequency === Frequency.Weekly) {
         model = enrichWithType(model, 'barStacked');
@@ -104,36 +101,41 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
     // https://developers.viber.com/docs/all/#picture-message
     // Limit is 2048
     if (trendsUrl.length > 2048) {
-        shortUrl.short(trendsUrl, async (err, url) => {
-            const [error, result] = await catchAsyncError(
-                bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
-                    new Message.Picture(url),
-                    new Message.Keyboard(
-                        vGetAfterCountryResponseInlineKeyboard(
-                            requestedCountry,
-                            user.settings?.locale
-                        )
-                    ),
-                ])
-            );
+        return new Promise((resolve, reject) => {
+            // trendsUrl should not have spaces, otherwise it service
+            // will fail and shortUrl will silently fail
+            shortUrl.short(trendsUrl, async (err, url) => {
+                const [error, result] = await catchAsyncError(
+                    bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
+                        new Message.Picture(url),
+                        new Message.Keyboard(
+                            vGetAfterCountryResponseInlineKeyboard(
+                                requestedCountry,
+                                user.settings?.locale
+                            )
+                        ),
+                    ])
+                );
 
-            if (error) {
-                bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
-                    new Message.Keyboard(
-                        vGetAfterCountryResponseInlineKeyboard(
-                            requestedCountry,
-                            user.settings?.locale
-                        )
-                    ),
-                ]);
+                if (error) {
+                    bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
+                        new Message.Text(
+                            trendsErrorMessage(user.settings?.locale)
+                        ),
+                        new Message.Keyboard(
+                            vGetAfterCountryResponseInlineKeyboard(
+                                requestedCountry,
+                                user.settings?.locale
+                            )
+                        ),
+                    ]);
 
-                return;
-            }
+                    return reject(error);
+                }
 
-            return result;
+                return resolve(result);
+            });
         });
-
-        return;
     }
     const [error, result] = await catchAsyncError(
         bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
@@ -149,6 +151,7 @@ export const vTrendsByCountryResponse: ViberCallBackQueryHandlerWithCommandArgum
 
     if (error) {
         return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
+            new Message.Text(trendsErrorMessage(user.settings?.locale)),
             new Message.Keyboard(
                 vGetAfterCountryResponseInlineKeyboard(
                     requestedCountry,
