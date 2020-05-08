@@ -1,4 +1,6 @@
 const nodeExternals = require('webpack-node-externals');
+const CopyPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     entry: './server/src/index.ts',
@@ -18,8 +20,14 @@ module.exports = {
         extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
     },
     externals: [nodeExternals()],
+    plugins: [
+        new CleanWebpackPlugin(),
+        new CopyPlugin([
+            { from: './server/src/locales', to: 'locales' },
+        ]),
+    ],
     output: {
         path: __dirname + '/dist',
         filename: 'server.js',
-    }
+    },
 };

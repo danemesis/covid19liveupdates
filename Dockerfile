@@ -9,5 +9,5 @@ RUN npm install --production
 #RUN ${version}=${( npm version | grep covid19liveupdates | sed "s/'(.*?)'//g")}
 #ENV CONTAINER_VERSION=${version}
 
-COPY dist/server.js .
+COPY dist .
 CMD node server.js

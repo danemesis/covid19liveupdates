@@ -18,6 +18,7 @@ import * as i18n from 'i18n';
 import { runViberBot } from './bots/viber';
 import * as bodyParser from 'body-parser';
 import { logger } from './utils/logger';
+import * as path from 'path';
 
 export const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,7 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', baseController.base);
 
 i18n.configure({
-    directory: __dirname + '/locales',
+    directory: path.resolve('./locales'),
     defaultLocale: DEFAULT_LOCALE,
 });
 

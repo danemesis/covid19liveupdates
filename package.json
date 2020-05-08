@@ -1,10 +1,10 @@
 {
   "name": "covid19liveupdates",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
-    "release:production-iam-sure": "npm run build && cd infrastructure/ && prod.release.bat covid19liveupdbot",
+    "release:production-iam-sure": "npm run build && cd infrastructure/ && prod.release.bat covid19livebot",
     "release:demo": "npm run build && cd infrastructure/ && release.bat demo-covid19livebot",
     "test": "jest --forceExit",
     "test:watch": "jest --watch",
@@ -56,6 +56,8 @@
     "@types/node-telegram-bot-api": "^0.40.3",
     "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
     "coveralls": "^3.0.11",
     "husky": "^4.2.5",
     "jest": "^25.3.0",
