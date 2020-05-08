@@ -4,12 +4,9 @@ import {
     subscriptionManagerResponseMessage,
     subscriptionResultMessage,
 } from '../../../messages/feature/subscribeMessages';
-import { CustomSubscriptions, UserRegExps } from '../../../models/constants';
 import { subscribeOn } from '../../../services/domain/subscriptions';
 import { catchAsyncError } from '../../../utils/catchError';
 import { getSubscriptionMessageInlineKeyboard } from '../services/keyboard';
-import { getUserMessageFromIKorText } from '../utils/getUserMessageFromIKorText';
-import { removeCommandFromMessageIfExist } from '../../../utils/removeCommandFromMessageIfExist';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
     TelegramCallBackQueryHandlerWithCommandArgument,
@@ -71,20 +68,7 @@ export const subscribingStrategyResponse: TelegramCallBackQueryHandlerWithComman
     }
 
     const [err, result] = await catchAsyncError<string>(
-        subscribeOn(
-            message.chat,
-            user,
-            // TODO: Probably should be replaced with 'commandParameter'
-            removeCommandFromMessageIfExist(
-                getUserMessageFromIKorText(
-                    message,
-                    CustomSubscriptions.SubscribeMeOn,
-                    ''
-                ),
-                UserRegExps.Subscribe
-            ),
-            telegramStorage()
-        )
+        subscribeOn(message.chat, user, commandParameter, telegramStorage())
     );
     if (err) {
         return bot.sendMessage(

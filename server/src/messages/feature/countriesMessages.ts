@@ -79,5 +79,30 @@ export const getCountriesTableHTMLMessage = (
     } ${getLocalizedMessages(locale, 'countries')}, ${continent}` +
     `\n<pre>${table(portionMessage, tableConfig)}</pre>`;
 
+export const getCountriesTableMessage = (
+    locale,
+    continent,
+    confirmed,
+    recovered,
+    deaths,
+    countriesSituation,
+    portionMessage
+): string =>
+    `🗺️ ${continent}\n${getLocalizedMessages(
+        locale,
+        'Confirmed'
+    )}: ${confirmed}, active: ${getActiveCases(
+        confirmed,
+        recovered,
+        deaths
+    )} ${getLocalizedMessages(
+        locale,
+        'recovered'
+    )}: ${recovered}, ${getLocalizedMessages(locale, 'death')}: ${deaths}` +
+    ` ${getLocalizedMessages(locale, 'in')} ${
+        countriesSituation.length
+    } ${getLocalizedMessages(locale, 'countries')}, ${continent}` +
+    `\n${table(portionMessage, tableConfig)}`;
+
 export const getCountriesForContinentMessage = (locale: string): string =>
     getLocalizedMessages(locale, 'Check continent\'s countries statistic');

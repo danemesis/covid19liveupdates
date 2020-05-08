@@ -14,7 +14,7 @@ import {
 } from '../../../models/covid19.models';
 import {
     getCountriesForContinentMessage,
-    getCountriesTableHTMLMessage,
+    getCountriesTableMessage,
     getCountriesWorldMessage,
     getTableCountryRowMessage,
     getTableHeader,
@@ -54,7 +54,7 @@ export const vCountriesTableByContinentResponse = (
 
     return bot.sendMessage({ id: mapBackToRealViberChatId(chatId) }, [
         new Message.Text(
-            getCountriesTableHTMLMessage(
+            getCountriesTableMessage(
                 user.settings?.locale,
                 continent,
                 confirmed,

@@ -15,6 +15,16 @@ export class UserService {
         this.listenUsers();
     }
 
+    public getUserRequest(user: number | string): Promise<User | null>;
+    public getUserRequest(user: User): Promise<User | null>;
+    public getUserRequest(user: User | number | string): Promise<User | null> {
+        if (typeof user === 'string' || typeof user === 'number') {
+            return this.storage.getUser(user);
+        }
+
+        return this.storage.getUser(user.chatId);
+    }
+
     public getUser(user: number | string): Promise<User | null>;
     public getUser(user: User): Promise<User | null>;
     public getUser(user: User | number | string): Promise<User | null> {
@@ -31,7 +41,7 @@ export class UserService {
                               return key === user;
                           }
 
-                          return this.users[key].chatId === user.chatId;
+                          return this.users[key]?.chatId === user?.chatId;
                       })
                   ]
         );
