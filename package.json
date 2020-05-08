@@ -1,6 +1,6 @@
 {
   "name": "covid19liveupdates",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Get latest info about COVID-19 (coronavirus) situation around the world and in your country",
   "main": "index.js",
   "scripts": {
