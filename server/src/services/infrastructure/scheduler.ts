@@ -67,13 +67,11 @@ export const runSendScheduledNotificationToUsersJob = async (
                     LogCategory.Scheduler
                 );
             }
-
-            for (const user of users) {
-                message.replace('#UserName#', getUserName(user));
+            for (const [key, user] of Object.entries(users)) {
                 messageRegistry.sendUserNotification(
                     user.settings?.locale,
                     user.chatId,
-                    message
+                    message.replace('#UserName#', getUserName(user))
                 );
             }
         }
