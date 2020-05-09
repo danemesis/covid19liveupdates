@@ -23,7 +23,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new CopyPlugin([
-            { from: './server/src/locales', to: 'locales' },
+            { from: './locales', to: 'locales' },
         ]),
     ],
     output: {
