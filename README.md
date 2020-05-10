@@ -3,7 +3,8 @@
 # covid19liveupdates
 Bot for covid19 data updates in:
 
-- Telegram messenger,
+- Telegram messenger (https://t.me/covid19liveupdates_bot),
+- Viber messenger (viber://pa?chatURI=covid19livebot)
 
 around the world and in your local area. 
 
@@ -11,24 +12,32 @@ around the world and in your local area.
 - <a href='https://github.com/danbilokha/covid19liveupdates/tree/master/CONTRIBUTING.md'>Contribute file</a>,
 - <a href='https://github.com/danbilokha/covid19liveupdates/issues'>Submit bugs</a> and help us verify fixes as they are checked in
 
+## Translate in your language
+- <a href='https://github.com/danbilokha/covid19liveupdates/blob/master/LOCALIZATION.md'>Read here</a>
+
 ## Main features we want to have
-- [ ] Assistant, who knows answers on a lot of questions (we want to apply ML technics here as well), 
+- [x] Assistant, who knows answers on a lot of questions (we want to apply ML technics here as well), 
 - [ ] <s>predict further development of the diseases and notify the public about them</s>,
 - [x] give advice about how you should behave in oder to stay healthy, 
 - [ ] if you got sick, we want to suggest tracking your health for advice & suggestions,
 - [x] data visualization,
 - [x] live notifications (updates), 
 - [x] general improvements, 
-- [ ] internationalization, 
-- [ ] fixes & improvement of some UI\UX issues, 
+- [x] internationalization, 
+- [x] fixes & improvement of some UI\UX issues, 
 - [ ] country breakdown,
 - [ ] and more, feel free to suggest new features via creating PR on this file and/or creating issues. 
 
 ####  (We are eager to <a href='https://github.com/danbilokha/covid19liveupdates/tree/master/CONTRIBUTING.md'>have your help</a>)
 
 ## Main dependencies 
-##### Telegram chat bot: https://github.com/yagop/node-telegram-bot-api
-##### Data maining: https://github.com/pomber/covid19 
+##### Telegram chat bot: https://github.com/yagop/node-telegram-bot-api,
+##### Viber chat bot: https://github.com/Viber/viber-bot-node,
+##### Data maining: https://github.com/pomber/covid19,
+##### Internationalization: https://github.com/mashpie/i18n-node/,
+##### Firebase: https://github.com/firebase/firebase-js-sdk,
+##### ts-node-dev: https://github.com/whitecolor/ts-node-dev.
+
 
 #### Other
 - <a href="https://github.com/meeDamian/country-emoji">Emoji</a>,
