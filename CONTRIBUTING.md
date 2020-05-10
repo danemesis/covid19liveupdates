@@ -58,11 +58,18 @@ on Windows 10, x64 machine
 - Open <a href='https://t.me/botfather'>BotFather</a>,
 - Create your development version of the bot (for your local testing purpose) via `/newbot` command
 - Receive from <a href='https://t.me/botfather'>BotFather</a> Key & Copy it,
-- Create `.env` in `/server/src/bots/telegram` file and add received **key** there (<a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/environments'>more about it, example of the file</a>),
+- Create `.env` in `/server/src/bots/telegram` file and add received **key** there (more about it in <a href='https://github.com/danbilokha/covid19liveupdates/tree/master/server/src/environments'>README</a>, <a href='https://github.com/danbilokha/covid19liveupdates/blob/master/server/src/environments/.env.example'>example file</a>),
 - Add to the project,
 - run `npm i`
 - run `npm run start:watch`, `npm run start:inspect` for debugging 
 (<a href='https://medium.com/the-node-js-collection/debugging-node-js-with-google-chrome-4965b5f910f4'>Useful link</a>)
+
+##### Viber
+Follow <a href='https://developers.viber.com/docs/api/rest-bot-api/'>the official doc</a>
+- After bot creation add `API key` to the `.env`. Take a look in <a href='https://github.com/danbilokha/covid19liveupdates/blob/master/server/src/environments/.env.example'>example file</a> for more information
+- run `npm i`
+- run `npm run start:watch`, `npm run start:inspect` for debugging (<a href='https://medium.com/the-node-js-collection/debugging-node-js-with-google-chrome-4965b5f910f4'>Useful link</a>)
+
 
 <b>Hints</b>
 - If you\'re running locally, you can run `ngrok http 3000` copy `https url` 
