@@ -1,5 +1,6 @@
 import * as express from 'express';
 import * as baseController from './routes/base/base';
+import * as logsController from './routes/logs';
 import { runTelegramBot } from './bots/telegram';
 import { runNgrok, stopNgrok } from './runNgrok';
 import environments from './environments/environment';
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Simple information of the API
 app.get('/', baseController.base);
+app.get('/logs', logsController.logs);
 
 i18n.configure({
     directory: path.resolve('./locales'),

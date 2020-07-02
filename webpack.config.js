@@ -25,6 +25,9 @@ module.exports = {
         new CopyPlugin([
             { from: './locales', to: 'locales' },
         ]),
+        new CopyPlugin([
+            { from: 'logs', to: 'logs' },
+        ]),
     ],
     output: {
         path: __dirname + '/dist',

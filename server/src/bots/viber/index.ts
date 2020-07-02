@@ -48,6 +48,7 @@ import { vTrendsByCountryResponse } from './botResponses/vTrendResponse';
 import { vAdviceResponse } from './botResponses/vAdviceResponse';
 import { vAssistantStrategyResponse } from './botResponses/vAssistantResponse';
 import { runSendScheduledNotificationToUsersJob } from '../../services/infrastructure/scheduler';
+import { createErrFile } from '../../services/infrastructure/createAndWriteToFile';
 
 export async function runViberBot(
     app: Express,
@@ -281,6 +282,7 @@ export async function runViberBot(
     );
     bot.on(Events.ERROR, (err) => {
         logger.log(LogLevel.Error, err, LogCategory.ViberError);
+        createErrFile(err);
     });
 
     bot.on(Events.UNSUBSCRIBED, (response) =>
