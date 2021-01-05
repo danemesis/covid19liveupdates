@@ -23,7 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^13.9.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "country-code-lookup": "0.0.17",
     "country-emoji": "^1.5.0",
